@@ -8,11 +8,26 @@ interface Props {
 }
 
 const severityColors: Record<string, string> = {
-  low: "#28E3A3",
+  low: "#A78BFA",
   medium: "#facc15",
   high: "#f97316",
   critical: "#ef4444",
 };
+
+function getDoctorVisitAdvice(severity: string): string {
+  switch (severity) {
+    case "low":
+      return "If symptoms persist beyond 7 days or worsen, visit a general physician.";
+    case "medium":
+      return "Visit a doctor within 2–3 days if there is no improvement or symptoms worsen.";
+    case "high":
+      return "Consult a doctor within 24–48 hours. Do not delay.";
+    case "critical":
+      return "Seek emergency medical care immediately.";
+    default:
+      return "Consult a licensed medical professional as soon as possible.";
+  }
+}
 
 function TypingText({ text }: { text: string }) {
   const [displayed, setDisplayed] = useState("");
@@ -23,9 +38,7 @@ function TypingText({ text }: { text: string }) {
       if (i < text.length) {
         setDisplayed(text.slice(0, i + 1));
         i++;
-      } else {
-        clearInterval(id);
-      }
+      } else clearInterval(id);
     }, 18);
     return () => clearInterval(id);
   }, [text]);
@@ -69,12 +82,11 @@ export default function ResultDashboard({
         </div>
       ) : (
         <div className="results-grid">
-          {/* Top result */}
           <div className="glass-card card-cyan result-top">
             <div className="result-badge">PRIMARY DIAGNOSIS</div>
             <h3 className="result-disease-name">{results[0].disease.name}</h3>
             <div className="result-confidence-big">
-              <span style={{ color: "#19D7FF" }}>{results[0].confidence}%</span>
+              <span style={{ color: "#A78BFA" }}>{results[0].confidence}%</span>
               <span className="result-confidence-label">MATCH</span>
             </div>
             <span
@@ -98,9 +110,41 @@ export default function ResultDashboard({
                 ))}
               </div>
             </div>
+
+            <div className="care-panels-grid">
+              <div className="care-panel care-panel--diet">
+                <div className="care-panel-header">
+                  <span className="care-panel-icon">🥗</span>
+                  <span className="care-panel-title">RECOMMENDED DIET</span>
+                </div>
+                <p className="care-panel-content">{results[0].disease.diet}</p>
+              </div>
+              <div className="care-panel care-panel--doctor">
+                <div className="care-panel-header">
+                  <span className="care-panel-icon">🏥</span>
+                  <span className="care-panel-title">WHEN TO SEE A DOCTOR</span>
+                </div>
+                <p className="care-panel-content">
+                  {getDoctorVisitAdvice(results[0].disease.severity)}
+                </p>
+              </div>
+              <div className="care-panel care-panel--medicine">
+                <div className="care-panel-header">
+                  <span className="care-panel-icon">💊</span>
+                  <span className="care-panel-title">COMMON MEDICINES</span>
+                </div>
+                <p className="care-panel-content">
+                  {results[0].disease.medicines}
+                </p>
+              </div>
+            </div>
+
+            <div className="care-disclaimer">
+              ⚠️ This is for informational purposes only. Always consult a
+              licensed medical professional before taking any medication.
+            </div>
           </div>
 
-          {/* Other results */}
           <div className="results-list-col">
             {results.map((r, i) => (
               <div key={r.disease.id} className="glass-card result-card">
@@ -112,7 +156,7 @@ export default function ResultDashboard({
                       className="confidence-bar-fill"
                       style={{
                         width: `${r.confidence}%`,
-                        background: i === 0 ? "#19D7FF" : "#A855F7",
+                        background: i === 0 ? "#8B5CF6" : "#6D28D9",
                       }}
                     />
                   </div>
@@ -123,9 +167,7 @@ export default function ResultDashboard({
                     color: severityColors[r.disease.severity],
                     borderColor: severityColors[r.disease.severity],
                   }}
-                >
-                  {`${r.confidence}%`}
-                </span>
+                >{`${r.confidence}%`}</span>
               </div>
             ))}
 
@@ -137,7 +179,6 @@ export default function ResultDashboard({
                 </p>
               </div>
             )}
-
             {!aiResponse && (
               <div className="glass-card ai-response-card">
                 <div className="ai-badge">🤖 LOCAL ANALYSIS</div>

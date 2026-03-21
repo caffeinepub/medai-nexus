@@ -1,115 +1,95 @@
 import { useState } from "react";
+import AboutSection from "./components/AboutSection";
 import ActivationScreen from "./components/ActivationScreen";
-import DiseaseDatabase from "./components/DiseaseDatabase";
+import HUDOverlay from "./components/HUDOverlay";
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
 import ParticleCanvas from "./components/ParticleCanvas";
 import ResultDashboard from "./components/ResultDashboard";
 import SymptomPanel from "./components/SymptomPanel";
 import { diseases } from "./data/diseases";
-import { symptoms } from "./data/symptoms";
+import { symptoms as SYMPTOMS } from "./data/symptoms";
 import { analyzeWithAI } from "./utils/apiCall";
-import { type MatchResult, matchDiseases } from "./utils/matchDisease";
-
-type Theme = "dark" | "light";
+import { matchDiseases } from "./utils/matchDisease";
+import type { MatchResult } from "./utils/matchDisease";
 
 export default function App() {
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [isActivated, setIsActivated] = useState(false);
-  const [showActivation, setShowActivation] = useState(false);
+  const [activated, setActivated] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [apiKeyActive, setApiKeyActive] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [showActivation, setShowActivation] = useState(false);
 
   const handleActivate = (key: string) => {
     setApiKey(key);
-    setIsActivated(true);
+    const looksLikeOpenAI = key.startsWith("sk-") && key.length > 20;
+    setApiKeyActive(looksLikeOpenAI);
+    setActivated(true);
     setShowActivation(false);
-  };
-
-  const handleSelectSymptom = (name: string) => {
-    if (!selectedSymptoms.includes(name)) {
-      setSelectedSymptoms((prev) => [...prev, name]);
-    }
-  };
-
-  const handleRemoveSymptom = (name: string) => {
-    setSelectedSymptoms((prev) => prev.filter((s) => s !== name));
   };
 
   const handleAnalyze = async () => {
     if (selectedSymptoms.length === 0) return;
     setIsAnalyzing(true);
-    setResults([]);
     setAiResponse(null);
-
-    // Scroll to results
+    const matched = matchDiseases(selectedSymptoms, diseases);
+    setResults(matched);
+    if (apiKeyActive && matched.length > 0) {
+      try {
+        const resp = await analyzeWithAI(selectedSymptoms, apiKey);
+        setAiResponse(resp);
+      } catch {
+        setAiResponse(null);
+      }
+    }
+    setIsAnalyzing(false);
     setTimeout(() => {
       document
         .getElementById("results")
         ?.scrollIntoView({ behavior: "smooth" });
     }, 100);
-
-    // Run local matching
-    const matched = matchDiseases(selectedSymptoms, diseases);
-
-    // Try AI if key is set
-    let ai: string | null = null;
-    if (apiKey) {
-      ai = await analyzeWithAI(selectedSymptoms, apiKey);
-    }
-
-    setResults(matched);
-    setAiResponse(ai);
-    setIsAnalyzing(false);
   };
 
-  if (!isActivated) {
-    return (
-      <div className={`app-root theme-${theme}`}>
-        <ParticleCanvas />
-        <ActivationScreen onActivate={handleActivate} />
-      </div>
-    );
+  if (!activated) {
+    return <ActivationScreen onActivate={handleActivate} />;
   }
 
   return (
-    <div className={`app-root theme-${theme}`}>
+    <div className={`app-root${theme === "light" ? " theme-light" : ""}`}>
       <ParticleCanvas />
-      {showActivation && <ActivationScreen onActivate={handleActivate} />}
+      <HUDOverlay />
       <Navbar
         theme={theme}
         onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-        isActivated={isActivated}
+        isActivated={activated}
       />
       <main className="main-content">
         <Hero />
         <SymptomPanel
-          symptoms={symptoms}
+          symptoms={SYMPTOMS}
           selectedSymptoms={selectedSymptoms}
-          onSelect={handleSelectSymptom}
-          onRemove={handleRemoveSymptom}
+          onSelect={(s) => setSelectedSymptoms((p) => [...p, s])}
+          onRemove={(s) => setSelectedSymptoms((p) => p.filter((x) => x !== s))}
           onAnalyze={handleAnalyze}
           isAnalyzing={isAnalyzing}
-          apiKeyActive={!!apiKey}
-          onChangeKey={() => setShowActivation(true)}
+          apiKeyActive={apiKeyActive}
+          onChangeKey={() => {
+            setShowActivation(true);
+            setActivated(false);
+          }}
         />
         <ResultDashboard
           results={results}
           aiResponse={aiResponse}
           isLoading={isAnalyzing}
         />
-        <DiseaseDatabase diseases={diseases} />
+        <AboutSection />
       </main>
-      <footer className="app-footer">
-        <span className="footer-brand">MEDAI NEXUS © 2026</span>
-        <span className="footer-status">● SYSTEM ONLINE</span>
-        <span className="footer-disclaimer">
-          For informational purposes only. Consult a medical professional.
-        </span>
-      </footer>
+      {showActivation && <ActivationScreen onActivate={handleActivate} />}
     </div>
   );
 }

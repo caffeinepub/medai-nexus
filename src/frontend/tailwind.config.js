@@ -15,6 +15,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        poppins: ["'Poppins'", "sans-serif"],
+        sans: ["'Poppins'", "sans-serif"],
+      },
       colors: {
         border: "oklch(var(--border))",
         input: "oklch(var(--input))",
@@ -66,14 +70,30 @@ export default {
           border: "oklch(var(--sidebar-border))",
           ring: "oklch(var(--sidebar-ring))",
         },
+        /* Education palette helpers */
+        edu: {
+          blue: "#2F80ED",
+          "blue-hover": "#1E6FD9",
+          cyan: "#43D6F2",
+          purple: "#8B5CF6",
+          lavender: "#E9E2FF",
+          navy: "#0B1D33",
+          "navy-muted": "#C7D2E3",
+          star: "#F4C542",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
+        card: "0 4px 24px rgba(47,128,237,0.08)",
+        "card-hover": "0 20px 40px rgba(47,128,237,0.15)",
+        hero: "0 32px 80px rgba(47,128,237,0.25)",
       },
       keyframes: {
         "accordion-down": {
