@@ -10,7 +10,28 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface _SERVICE { 'ping' : ActorMethod<[], string> }
+export interface ContactSubmission {
+  'name' : string,
+  'email' : string,
+  'message' : string,
+  'timestamp' : Time,
+}
+export interface ImageUpload {
+  'status' : string,
+  'filename' : string,
+  'timestamp' : Time,
+}
+export interface PlatformStats { 'totalAnalyses' : bigint, 'accuracy' : number }
+export type Time = bigint;
+export interface _SERVICE {
+  'addContactSubmission' : ActorMethod<[string, string, string], boolean>,
+  'addImageUpload' : ActorMethod<[string, string], boolean>,
+  'getContactSubmissions' : ActorMethod<[], Array<ContactSubmission>>,
+  'getImageUploadByFilename' : ActorMethod<[string], [] | [ImageUpload]>,
+  'getImageUploads' : ActorMethod<[], Array<ImageUpload>>,
+  'getStats' : ActorMethod<[], [] | [PlatformStats]>,
+  'updateStats' : ActorMethod<[bigint, number], boolean>,
+}
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;

@@ -1,158 +1,130 @@
 import { useEffect, useState } from "react";
 
-interface Props {
-  theme: "dark" | "light";
-  onToggleTheme: () => void;
-  isActivated: boolean;
-}
-
-export default function Navbar({ theme, onToggleTheme, isActivated }: Props) {
-  const [scanPos, setScanPos] = useState(-100);
-  const [blink, setBlink] = useState(true);
-
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    let pos = -100;
-    const id = setInterval(() => {
-      pos += 4;
-      if (pos > 110) pos = -100;
-      setScanPos(pos);
-    }, 16);
-    return () => clearInterval(id);
+    const handler = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handler);
+    return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  useEffect(() => {
-    const id = setInterval(() => setBlink((b) => !b), 600);
-    return () => clearInterval(id);
-  }, []);
-
-  const scrollTo = (id: string) => {
+  const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
+
+  const navLinks: [string, string][] = [
+    ["Home", ""],
+    ["Symptoms", "symptoms"],
+    ["Results", "results"],
+    ["About", "about"],
+  ];
 
   return (
-    <nav className="navbar" style={{ overflow: "hidden" }}>
-      {/* Sweep scan-line */}
+    <nav
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        background: scrolled
+          ? "rgba(255,255,255,0.1)"
+          : "rgba(255,255,255,0.05)",
+        backdropFilter: "blur(20px)",
+        borderBottom: "1px solid rgba(255,255,255,0.12)",
+        transition: "all 0.3s ease",
+      }}
+    >
       <div
         style={{
-          position: "absolute",
-          top: 0,
-          left: `${scanPos}%`,
-          width: "60px",
-          height: "100%",
-          background:
-            "linear-gradient(90deg, transparent, rgba(139,92,246,0.1), transparent)",
-          pointerEvents: "none",
-          transform: "skewX(-15deg)",
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "16px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
-      />
-
-      <div className="navbar-logo">
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 28 28"
-          fill="none"
-          role="img"
-          aria-label="MedAI Nexus icon"
-        >
-          <circle
-            cx="14"
-            cy="14"
-            r="12"
-            stroke="#8B5CF6"
-            strokeWidth="1.2"
-            opacity="0.7"
-          />
-          <circle cx="14" cy="14" r="5" fill="#A78BFA" opacity="0.8" />
-          <line
-            x1="14"
-            y1="2"
-            x2="14"
-            y2="7"
-            stroke="#8B5CF6"
-            strokeWidth="1.2"
-          />
-          <line
-            x1="14"
-            y1="21"
-            x2="14"
-            y2="26"
-            stroke="#8B5CF6"
-            strokeWidth="1.2"
-          />
-          <line
-            x1="2"
-            y1="14"
-            x2="7"
-            y2="14"
-            stroke="#8B5CF6"
-            strokeWidth="1.2"
-          />
-          <line
-            x1="21"
-            y1="14"
-            x2="26"
-            y2="14"
-            stroke="#8B5CF6"
-            strokeWidth="1.2"
-          />
-        </svg>
-        <span className="navbar-brand">MEDAI NEXUS</span>
-      </div>
-
-      <div className="navbar-links">
-        {["scan", "results", "about"].map((id, i) => (
-          <button
-            type="button"
-            key={id}
-            className="nav-link"
-            onClick={() => scrollTo(id)}
-            data-ocid={`nav.${id}.link`}
-          >
-            <span
-              style={{
-                display: "inline-block",
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "#8B5CF6",
-                marginRight: 6,
-                opacity: blink && i % 2 === 0 ? 1 : 0.3,
-                boxShadow: "0 0 6px rgba(139,92,246,0.7)",
-                verticalAlign: "middle",
-                transition: "opacity 0.3s",
-              }}
-            />
-            {id.toUpperCase()}
-          </button>
-        ))}
-      </div>
-
-      <div className="navbar-right">
-        <span
-          style={{
-            fontFamily: "'Share Tech Mono', monospace",
-            fontSize: "0.65rem",
-            color: "#A78BFA",
-            textShadow:
-              "0 0 10px rgba(167,139,250,0.7), 0 0 20px rgba(167,139,250,0.3)",
-            letterSpacing: "0.08em",
-          }}
-        >
-          SYS://ONLINE
-        </span>
-        {isActivated && (
-          <span className="status-pill active">● SYSTEM ACTIVE</span>
-        )}
+      >
         <button
           type="button"
-          className="theme-toggle"
-          onClick={onToggleTheme}
-          title="Toggle theme"
-          data-ocid="navbar.toggle"
+          data-ocid="nav.link"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+          }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
-          {theme === "dark" ? "\u2600" : "\u25d1"}
+          <span style={{ fontSize: "1.6rem" }}>🧠</span>
+          <span
+            className="gradient-text"
+            style={{ fontSize: "1.4rem", fontWeight: 700 }}
+          >
+            MedAI Nexus
+          </span>
         </button>
+
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          {navLinks.map(([label, id]) => (
+            <button
+              key={label}
+              type="button"
+              data-ocid={`nav.${label.toLowerCase()}.link`}
+              onClick={() =>
+                id
+                  ? scrollTo(id)
+                  : window.scrollTo({ top: 0, behavior: "smooth" })
+              }
+              style={{
+                background: "none",
+                border: "none",
+                color: "rgba(255,255,255,0.8)",
+                cursor: "pointer",
+                padding: "8px 14px",
+                borderRadius: "8px",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: 500,
+                fontSize: "0.9rem",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.background =
+                  "rgba(255,255,255,0.1)";
+                (e.target as HTMLElement).style.color = "#fff";
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.background = "none";
+                (e.target as HTMLElement).style.color = "rgba(255,255,255,0.8)";
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span
+            style={{
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              background: "#4ade80",
+              boxShadow: "0 0 8px #4ade80",
+              animation: "blink 1.5s ease-in-out infinite",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              fontSize: "0.8rem",
+              color: "rgba(255,255,255,0.7)",
+              fontWeight: 500,
+              letterSpacing: "1px",
+            }}
+          >
+            SYS ONLINE
+          </span>
+        </div>
       </div>
     </nav>
   );

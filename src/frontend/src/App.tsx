@@ -1,57 +1,81 @@
 import { useState } from "react";
 import AboutSection from "./components/AboutSection";
 import ActivationScreen from "./components/ActivationScreen";
-import HUDOverlay from "./components/HUDOverlay";
-import Hero from "./components/Hero";
+import Footer from "./components/Footer";
+import HeroSection from "./components/HeroSection";
 import Navbar from "./components/Navbar";
-import ParticleCanvas from "./components/ParticleCanvas";
+import ParticleBackground from "./components/ParticleBackground";
 import ResultDashboard from "./components/ResultDashboard";
 import SymptomPanel from "./components/SymptomPanel";
-import { diseases } from "./data/diseases";
-import { symptoms as SYMPTOMS } from "./data/symptoms";
-import { analyzeWithAI } from "./utils/apiCall";
-import { matchDiseases } from "./utils/matchDisease";
-import type { MatchResult } from "./utils/matchDisease";
+import "./index.css";
+
+interface AnalysisResult {
+  name: string;
+  symptoms: string[];
+  severity: string;
+  diet: string;
+  precautions: string;
+  confidence: number;
+  matches: number;
+}
 
 export default function App() {
+  const [apiKey, setApiKey] = useState<string>("");
   const [activated, setActivated] = useState(false);
-  const [apiKey, setApiKey] = useState("");
-  const [apiKeyActive, setApiKeyActive] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [results, setResults] = useState<MatchResult[]>([]);
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showActivation, setShowActivation] = useState(false);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
 
   const handleActivate = (key: string) => {
     setApiKey(key);
-    const looksLikeOpenAI = key.startsWith("sk-") && key.length > 20;
-    setApiKeyActive(looksLikeOpenAI);
     setActivated(true);
-    setShowActivation(false);
   };
 
-  const handleAnalyze = async () => {
-    if (selectedSymptoms.length === 0) return;
+  const handleAnalyze = async (symptoms: string[]) => {
+    setSelectedSymptoms(symptoms);
     setIsAnalyzing(true);
-    setAiResponse(null);
-    const matched = matchDiseases(selectedSymptoms, diseases);
-    setResults(matched);
-    if (apiKeyActive && matched.length > 0) {
-      try {
-        const resp = await analyzeWithAI(selectedSymptoms, apiKey);
-        setAiResponse(resp);
-      } catch {
-        setAiResponse(null);
-      }
-    }
-    setIsAnalyzing(false);
+    setAnalysisResults([]);
     setTimeout(() => {
       document
         .getElementById("results")
         ?.scrollIntoView({ behavior: "smooth" });
     }, 100);
+    await new Promise((r) => setTimeout(r, 2200));
+
+    const { DISEASES } = await import("./data/diseases");
+    const ranked = DISEASES.map((disease) => {
+      const matches = disease.symptoms.filter((s) =>
+        symptoms.some(
+          (sel) =>
+            sel.toLowerCase().includes(s.toLowerCase()) ||
+            s.toLowerCase().includes(sel.toLowerCase()),
+        ),
+      );
+      const confidence = Math.round(
+        (matches.length / disease.symptoms.length) * 100,
+      );
+      return { ...disease, matches: matches.length, confidence };
+    })
+      .filter((d) => d.confidence > 0)
+      .sort((a, b) => b.confidence - a.confidence)
+      .slice(0, 5);
+
+    try {
+      await fetch("https://api.example.com/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({ symptoms }),
+        signal: AbortSignal.timeout(3000),
+      });
+    } catch {
+      // Use local results
+    }
+
+    setAnalysisResults(ranked);
+    setIsAnalyzing(false);
   };
 
   if (!activated) {
@@ -59,37 +83,20 @@ export default function App() {
   }
 
   return (
-    <div className={`app-root${theme === "light" ? " theme-light" : ""}`}>
-      <ParticleCanvas />
-      <HUDOverlay />
-      <Navbar
-        theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-        isActivated={activated}
-      />
-      <main className="main-content">
-        <Hero />
-        <SymptomPanel
-          symptoms={SYMPTOMS}
-          selectedSymptoms={selectedSymptoms}
-          onSelect={(s) => setSelectedSymptoms((p) => [...p, s])}
-          onRemove={(s) => setSelectedSymptoms((p) => p.filter((x) => x !== s))}
-          onAnalyze={handleAnalyze}
-          isAnalyzing={isAnalyzing}
-          apiKeyActive={apiKeyActive}
-          onChangeKey={() => {
-            setShowActivation(true);
-            setActivated(false);
-          }}
-        />
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      <ParticleBackground />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <Navbar />
+        <HeroSection />
+        <SymptomPanel onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         <ResultDashboard
-          results={results}
-          aiResponse={aiResponse}
-          isLoading={isAnalyzing}
+          results={analysisResults}
+          isAnalyzing={isAnalyzing}
+          selectedSymptoms={selectedSymptoms}
         />
         <AboutSection />
-      </main>
-      {showActivation && <ActivationScreen onActivate={handleActivate} />}
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -1,12 +1,4 @@
-export interface Disease {
-  name: string;
-  symptoms: string[];
-  severity: string;
-  diet: string;
-  precautions: string;
-}
-
-export const DISEASES: Disease[] = [
+const DISEASES = [
   {
     name: "Common Cold",
     symptoms: [
@@ -16,12 +8,11 @@ export const DISEASES: Disease[] = [
       "Cough",
       "Nasal congestion",
       "Fatigue",
-      "Headache",
+      "Headache"
     ],
     severity: "Mild",
     diet: "Warm fluids, honey, ginger tea, vitamin C foods",
-    precautions:
-      "Rest, stay hydrated, avoid contact with others, wash hands frequently",
+    precautions: "Rest, stay hydrated, avoid contact with others, wash hands frequently"
   },
   {
     name: "Influenza (Flu)",
@@ -35,11 +26,11 @@ export const DISEASES: Disease[] = [
       "Sore throat",
       "Runny nose",
       "Vomiting",
-      "Diarrhea",
+      "Diarrhea"
     ],
     severity: "Moderate",
     diet: "Plenty of fluids, broth, fruits rich in vitamin C",
-    precautions: "Annual flu vaccine, rest, antiviral medication if prescribed",
+    precautions: "Annual flu vaccine, rest, antiviral medication if prescribed"
   },
   {
     name: "COVID-19",
@@ -55,11 +46,11 @@ export const DISEASES: Disease[] = [
       "Sore throat",
       "Nasal congestion",
       "Diarrhea",
-      "Nausea",
+      "Nausea"
     ],
     severity: "Moderate",
     diet: "High protein, vitamins C and D, zinc-rich foods, plenty of fluids",
-    precautions: "Isolation, vaccination, mask usage, regular testing",
+    precautions: "Isolation, vaccination, mask usage, regular testing"
   },
   {
     name: "Pneumonia",
@@ -72,11 +63,11 @@ export const DISEASES: Disease[] = [
       "Chills",
       "Fatigue",
       "Nausea",
-      "Vomiting",
+      "Vomiting"
     ],
     severity: "Severe",
     diet: "High calorie foods, protein-rich diet, plenty of fluids",
-    precautions: "Vaccination, avoid smoking, complete antibiotic course",
+    precautions: "Vaccination, avoid smoking, complete antibiotic course"
   },
   {
     name: "Tuberculosis",
@@ -88,12 +79,11 @@ export const DISEASES: Disease[] = [
       "Fatigue",
       "Fever",
       "Chest pain",
-      "Loss of appetite",
+      "Loss of appetite"
     ],
     severity: "Severe",
     diet: "High protein, vitamin-rich diet, avoid alcohol",
-    precautions:
-      "BCG vaccination, complete TB treatment, isolation during active disease",
+    precautions: "BCG vaccination, complete TB treatment, isolation during active disease"
   },
   {
     name: "Malaria",
@@ -105,11 +95,11 @@ export const DISEASES: Disease[] = [
       "Nausea",
       "Vomiting",
       "Muscle pain",
-      "Fatigue",
+      "Fatigue"
     ],
     severity: "Severe",
     diet: "Easy to digest foods, plenty of fluids, iron-rich foods",
-    precautions: "Mosquito nets, repellents, antimalarial medication",
+    precautions: "Mosquito nets, repellents, antimalarial medication"
   },
   {
     name: "Dengue Fever",
@@ -123,11 +113,11 @@ export const DISEASES: Disease[] = [
       "Nausea",
       "Vomiting",
       "Bruising easily",
-      "Gum bleeding",
+      "Gum bleeding"
     ],
     severity: "Severe",
     diet: "Papaya leaf juice, plenty of fluids, soft diet",
-    precautions: "Mosquito control, protective clothing, repellents",
+    precautions: "Mosquito control, protective clothing, repellents"
   },
   {
     name: "Typhoid",
@@ -140,11 +130,11 @@ export const DISEASES: Disease[] = [
       "Diarrhea",
       "Rash",
       "Nausea",
-      "Loss of appetite",
+      "Loss of appetite"
     ],
     severity: "Moderate",
     diet: "High calorie liquid diet, avoid raw foods",
-    precautions: "Typhoid vaccine, safe water, food hygiene",
+    precautions: "Typhoid vaccine, safe water, food hygiene"
   },
   {
     name: "Cholera",
@@ -155,11 +145,11 @@ export const DISEASES: Disease[] = [
       "Muscle cramps",
       "Rapid heartbeat",
       "Dry mouth",
-      "Sunken eyes",
+      "Sunken eyes"
     ],
     severity: "Severe",
     diet: "Oral rehydration solution, clear broths, bananas",
-    precautions: "Safe water, proper sanitation, cholera vaccine",
+    precautions: "Safe water, proper sanitation, cholera vaccine"
   },
   {
     name: "Hepatitis A",
@@ -171,11 +161,11 @@ export const DISEASES: Disease[] = [
       "Abdominal pain",
       "Dark urine",
       "Loss of appetite",
-      "Fever",
+      "Fever"
     ],
     severity: "Moderate",
     diet: "Low fat, high carbohydrate diet, avoid alcohol",
-    precautions: "Hepatitis A vaccine, hygiene, safe food and water",
+    precautions: "Hepatitis A vaccine, hygiene, safe food and water"
   },
   {
     name: "Hepatitis B",
@@ -187,11 +177,11 @@ export const DISEASES: Disease[] = [
       "Joint pain",
       "Nausea",
       "Vomiting",
-      "Loss of appetite",
+      "Loss of appetite"
     ],
     severity: "Severe",
     diet: "Low sodium, high protein diet, no alcohol",
-    precautions: "Hepatitis B vaccine, avoid sharing needles, safe sex",
+    precautions: "Hepatitis B vaccine, avoid sharing needles, safe sex"
   },
   {
     name: "Hepatitis C",
@@ -203,11 +193,11 @@ export const DISEASES: Disease[] = [
       "Nausea",
       "Loss of appetite",
       "Joint pain",
-      "Gum bleeding",
+      "Gum bleeding"
     ],
     severity: "Severe",
     diet: "Low fat, no alcohol, high antioxidant foods",
-    precautions: "Avoid sharing needles, safe sex, regular liver monitoring",
+    precautions: "Avoid sharing needles, safe sex, regular liver monitoring"
   },
   {
     name: "Diabetes Type 1",
@@ -219,11 +209,11 @@ export const DISEASES: Disease[] = [
       "Blurred vision",
       "Frequent hunger",
       "Slow wound healing",
-      "Frequent infections",
+      "Frequent infections"
     ],
     severity: "Chronic",
     diet: "Low glycemic index foods, controlled carbohydrates, regular meal timing",
-    precautions: "Insulin therapy, blood sugar monitoring, regular exercise",
+    precautions: "Insulin therapy, blood sugar monitoring, regular exercise"
   },
   {
     name: "Diabetes Type 2",
@@ -234,12 +224,11 @@ export const DISEASES: Disease[] = [
       "Blurred vision",
       "Slow wound healing",
       "Frequent infections",
-      "Numbness",
+      "Numbness"
     ],
     severity: "Chronic",
     diet: "Low sugar diet, whole grains, vegetables, portion control",
-    precautions:
-      "Weight management, exercise, medication adherence, regular checkups",
+    precautions: "Weight management, exercise, medication adherence, regular checkups"
   },
   {
     name: "Hypertension",
@@ -249,11 +238,11 @@ export const DISEASES: Disease[] = [
       "Blurred vision",
       "Chest pain",
       "Shortness of breath",
-      "Palpitations",
+      "Palpitations"
     ],
     severity: "Moderate",
     diet: "DASH diet, low sodium, potassium-rich foods, no alcohol",
-    precautions: "Regular BP monitoring, medication, reduce stress, limit salt",
+    precautions: "Regular BP monitoring, medication, reduce stress, limit salt"
   },
   {
     name: "Coronary Artery Disease",
@@ -264,11 +253,11 @@ export const DISEASES: Disease[] = [
       "Pain spreading to jaw",
       "Fatigue",
       "Palpitations",
-      "Sweating",
+      "Sweating"
     ],
     severity: "Severe",
     diet: "Heart-healthy diet, low cholesterol, omega-3 fatty acids",
-    precautions: "No smoking, exercise, medication, regular cardiac checkups",
+    precautions: "No smoking, exercise, medication, regular cardiac checkups"
   },
   {
     name: "Heart Failure",
@@ -279,12 +268,11 @@ export const DISEASES: Disease[] = [
       "Rapid heartbeat",
       "Persistent cough",
       "Wheezing",
-      "Irregular heartbeat",
+      "Irregular heartbeat"
     ],
     severity: "Severe",
     diet: "Low sodium diet, fluid restriction, small frequent meals",
-    precautions:
-      "Medication adherence, daily weight monitoring, limit fluid intake",
+    precautions: "Medication adherence, daily weight monitoring, limit fluid intake"
   },
   {
     name: "Asthma",
@@ -293,11 +281,11 @@ export const DISEASES: Disease[] = [
       "Shortness of breath",
       "Chest tightness",
       "Dry cough",
-      "Difficulty breathing",
+      "Difficulty breathing"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory foods, vitamin D, avoid allergens",
-    precautions: "Avoid triggers, use inhaler correctly, avoid smoking",
+    precautions: "Avoid triggers, use inhaler correctly, avoid smoking"
   },
   {
     name: "COPD",
@@ -308,11 +296,11 @@ export const DISEASES: Disease[] = [
       "Wheezing",
       "Chest tightness",
       "Fatigue",
-      "Bluish lips",
+      "Bluish lips"
     ],
     severity: "Severe",
     diet: "High calorie, high protein, omega-3 rich foods",
-    precautions: "Quit smoking, pulmonary rehabilitation, flu vaccine",
+    precautions: "Quit smoking, pulmonary rehabilitation, flu vaccine"
   },
   {
     name: "Kidney Disease (CKD)",
@@ -324,11 +312,11 @@ export const DISEASES: Disease[] = [
       "Nausea",
       "Confusion",
       "Itching",
-      "Back pain",
+      "Back pain"
     ],
     severity: "Severe",
     diet: "Low protein, low potassium, low phosphorus, fluid restriction",
-    precautions: "Control blood pressure and diabetes, avoid NSAIDs",
+    precautions: "Control blood pressure and diabetes, avoid NSAIDs"
   },
   {
     name: "Kidney Stones",
@@ -340,11 +328,11 @@ export const DISEASES: Disease[] = [
       "Passing stones",
       "Nausea",
       "Vomiting",
-      "Frequent urination",
+      "Frequent urination"
     ],
     severity: "Moderate",
     diet: "High fluid intake, low sodium, low oxalate foods",
-    precautions: "Stay well hydrated, limit calcium supplements",
+    precautions: "Stay well hydrated, limit calcium supplements"
   },
   {
     name: "Urinary Tract Infection",
@@ -356,11 +344,11 @@ export const DISEASES: Disease[] = [
       "Pelvic pain",
       "Fever",
       "Back pain",
-      "Nausea",
+      "Nausea"
     ],
     severity: "Mild",
     diet: "Plenty of water, cranberry juice, avoid caffeine",
-    precautions: "Good hygiene, urinate after sex, stay hydrated",
+    precautions: "Good hygiene, urinate after sex, stay hydrated"
   },
   {
     name: "Anemia",
@@ -373,12 +361,11 @@ export const DISEASES: Disease[] = [
       "Headache",
       "Cold hands and feet",
       "Chest pain",
-      "Weakness",
+      "Weakness"
     ],
     severity: "Moderate",
     diet: "Iron-rich foods (red meat, spinach, beans), vitamin C, folate",
-    precautions:
-      "Iron supplements, treat underlying cause, regular blood tests",
+    precautions: "Iron supplements, treat underlying cause, regular blood tests"
   },
   {
     name: "Hypothyroidism",
@@ -392,11 +379,11 @@ export const DISEASES: Disease[] = [
       "Slow heartbeat",
       "Depression",
       "Memory loss",
-      "Goiter (neck swelling)",
+      "Goiter (neck swelling)"
     ],
     severity: "Moderate",
     diet: "Iodine-rich foods, selenium, zinc",
-    precautions: "Thyroid hormone replacement, regular TSH monitoring",
+    precautions: "Thyroid hormone replacement, regular TSH monitoring"
   },
   {
     name: "Hyperthyroidism",
@@ -410,11 +397,11 @@ export const DISEASES: Disease[] = [
       "Tremors at rest",
       "Insomnia",
       "Goiter (neck swelling)",
-      "Protruding eyes",
+      "Protruding eyes"
     ],
     severity: "Moderate",
     diet: "High calorie diet, calcium-rich foods, avoid iodine-rich foods",
-    precautions: "Antithyroid medications, regular thyroid function tests",
+    precautions: "Antithyroid medications, regular thyroid function tests"
   },
   {
     name: "GERD / Acid Reflux",
@@ -425,11 +412,11 @@ export const DISEASES: Disease[] = [
       "Chest pain",
       "Sore throat",
       "Cough",
-      "Nausea",
+      "Nausea"
     ],
     severity: "Mild",
     diet: "Avoid spicy, acidic foods, small meals, no eating before bed",
-    precautions: "Elevate head of bed, avoid triggers, weight management",
+    precautions: "Elevate head of bed, avoid triggers, weight management"
   },
   {
     name: "Peptic Ulcer",
@@ -441,11 +428,11 @@ export const DISEASES: Disease[] = [
       "Vomiting",
       "Bloating",
       "Loss of appetite",
-      "Vomiting blood",
+      "Vomiting blood"
     ],
     severity: "Moderate",
     diet: "Bland diet, avoid spicy foods, small frequent meals, no alcohol",
-    precautions: "H. pylori treatment, avoid NSAIDs, no smoking",
+    precautions: "H. pylori treatment, avoid NSAIDs, no smoking"
   },
   {
     name: "Irritable Bowel Syndrome",
@@ -456,11 +443,11 @@ export const DISEASES: Disease[] = [
       "Bloating",
       "Gas",
       "Nausea",
-      "Stomach cramps",
+      "Stomach cramps"
     ],
     severity: "Mild",
     diet: "Low FODMAP diet, high fiber, adequate hydration",
-    precautions: "Stress management, identify food triggers, regular exercise",
+    precautions: "Stress management, identify food triggers, regular exercise"
   },
   {
     name: "Crohn's Disease",
@@ -473,11 +460,11 @@ export const DISEASES: Disease[] = [
       "Fever",
       "Nausea",
       "Loss of appetite",
-      "Joint pain",
+      "Joint pain"
     ],
     severity: "Severe",
     diet: "Low residue diet during flares, adequate nutrition, avoid trigger foods",
-    precautions: "Medication adherence, regular colonoscopy, stress management",
+    precautions: "Medication adherence, regular colonoscopy, stress management"
   },
   {
     name: "Appendicitis",
@@ -488,11 +475,11 @@ export const DISEASES: Disease[] = [
       "Fever",
       "Loss of appetite",
       "Abdominal pain",
-      "Chills",
+      "Chills"
     ],
     severity: "Severe",
     diet: "Post-surgery: clear liquids then gradual diet progression",
-    precautions: "Immediate surgical consultation, do not delay treatment",
+    precautions: "Immediate surgical consultation, do not delay treatment"
   },
   {
     name: "Gallstones",
@@ -502,11 +489,11 @@ export const DISEASES: Disease[] = [
       "Vomiting",
       "Severe abdominal pain",
       "Back pain",
-      "Shoulder pain",
+      "Shoulder pain"
     ],
     severity: "Moderate",
     diet: "Low fat diet, high fiber, avoid fried foods",
-    precautions: "Weight management, avoid rapid weight loss",
+    precautions: "Weight management, avoid rapid weight loss"
   },
   {
     name: "Pancreatitis",
@@ -517,11 +504,11 @@ export const DISEASES: Disease[] = [
       "Fever",
       "Rapid heartbeat",
       "Yellow skin (jaundice)",
-      "Bloating",
+      "Bloating"
     ],
     severity: "Severe",
     diet: "Clear liquids progressing to low fat, no alcohol",
-    precautions: "No alcohol, treat gallstones, low fat diet",
+    precautions: "No alcohol, treat gallstones, low fat diet"
   },
   {
     name: "Liver Cirrhosis",
@@ -533,11 +520,11 @@ export const DISEASES: Disease[] = [
       "Bruising easily",
       "Confusion",
       "Vomiting blood",
-      "Blood in stool",
+      "Blood in stool"
     ],
     severity: "Severe",
     diet: "High protein (unless encephalopathy), low sodium, no alcohol",
-    precautions: "No alcohol, treat underlying cause, regular liver monitoring",
+    precautions: "No alcohol, treat underlying cause, regular liver monitoring"
   },
   {
     name: "Rheumatoid Arthritis",
@@ -548,12 +535,11 @@ export const DISEASES: Disease[] = [
       "Fatigue",
       "Fever",
       "Weakness",
-      "Weight loss",
+      "Weight loss"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory diet, omega-3, turmeric, avoid processed foods",
-    precautions:
-      "DMARDs therapy, physical therapy, joint protection strategies",
+    precautions: "DMARDs therapy, physical therapy, joint protection strategies"
   },
   {
     name: "Osteoarthritis",
@@ -564,26 +550,25 @@ export const DISEASES: Disease[] = [
       "Reduced range of motion",
       "Joint swelling",
       "Knee pain",
-      "Hip pain",
+      "Hip pain"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory foods, calcium, vitamin D, maintain healthy weight",
-    precautions: "Weight management, low-impact exercise, physical therapy",
+    precautions: "Weight management, low-impact exercise, physical therapy"
   },
   {
     name: "Osteoporosis",
     symptoms: ["Back pain", "Pathological fractures", "Bone pain at night"],
     severity: "Moderate",
     diet: "Calcium-rich diet, vitamin D, magnesium, protein",
-    precautions:
-      "Weight-bearing exercise, fall prevention, bisphosphonates if prescribed",
+    precautions: "Weight-bearing exercise, fall prevention, bisphosphonates if prescribed"
   },
   {
     name: "Gout",
     symptoms: ["Joint pain", "Joint swelling", "Fever", "Burning sensation"],
     severity: "Moderate",
     diet: "Low purine diet, no alcohol, avoid organ meats, hydrate well",
-    precautions: "Uric acid lowering medication, avoid triggers, stay hydrated",
+    precautions: "Uric acid lowering medication, avoid triggers, stay hydrated"
   },
   {
     name: "Migraine",
@@ -595,12 +580,11 @@ export const DISEASES: Disease[] = [
       "Aura before headache",
       "Blurred vision",
       "Dizziness",
-      "Neck pain",
+      "Neck pain"
     ],
     severity: "Moderate",
     diet: "Avoid triggers (caffeine, alcohol, aged cheese), stay hydrated",
-    precautions:
-      "Identify and avoid triggers, stress management, migraine medications",
+    precautions: "Identify and avoid triggers, stress management, migraine medications"
   },
   {
     name: "Epilepsy",
@@ -609,12 +593,11 @@ export const DISEASES: Disease[] = [
       "Confusion",
       "Loss of consciousness",
       "Involuntary movements",
-      "Anxiety",
+      "Anxiety"
     ],
     severity: "Severe",
     diet: "Ketogenic diet may help, regular meals, adequate hydration",
-    precautions:
-      "Antiepileptic drugs, avoid seizure triggers, no driving if uncontrolled",
+    precautions: "Antiepileptic drugs, avoid seizure triggers, no driving if uncontrolled"
   },
   {
     name: "Parkinson's Disease",
@@ -625,11 +608,11 @@ export const DISEASES: Disease[] = [
       "Slurred speech",
       "Drooling",
       "Constipation",
-      "Depression",
+      "Depression"
     ],
     severity: "Severe",
     diet: "Mediterranean diet, high fiber, protein timing with medication",
-    precautions: "Levodopa therapy, physical therapy, fall prevention",
+    precautions: "Levodopa therapy, physical therapy, fall prevention"
   },
   {
     name: "Alzheimer's Disease",
@@ -639,11 +622,11 @@ export const DISEASES: Disease[] = [
       "Disorientation",
       "Mood swings",
       "Depression",
-      "Difficulty concentrating",
+      "Difficulty concentrating"
     ],
     severity: "Severe",
     diet: "MIND diet, omega-3, antioxidants, Mediterranean diet",
-    precautions: "Mental stimulation, social engagement, medication management",
+    precautions: "Mental stimulation, social engagement, medication management"
   },
   {
     name: "Multiple Sclerosis",
@@ -654,12 +637,11 @@ export const DISEASES: Disease[] = [
       "Blurred vision",
       "Double vision",
       "Fatigue",
-      "Muscle weakness",
+      "Muscle weakness"
     ],
     severity: "Severe",
     diet: "Anti-inflammatory diet, vitamin D, omega-3, low saturated fat",
-    precautions:
-      "Disease-modifying therapy, physical therapy, temperature management",
+    precautions: "Disease-modifying therapy, physical therapy, temperature management"
   },
   {
     name: "Stroke",
@@ -671,11 +653,11 @@ export const DISEASES: Disease[] = [
       "Sudden vision loss",
       "Sudden severe headache",
       "Loss of consciousness",
-      "Confusion",
+      "Confusion"
     ],
     severity: "Critical",
     diet: "Low sodium, heart-healthy diet, high antioxidants",
-    precautions: "Immediate emergency care, antihypertensives, rehabilitation",
+    precautions: "Immediate emergency care, antihypertensives, rehabilitation"
   },
   {
     name: "Meningitis",
@@ -687,12 +669,11 @@ export const DISEASES: Disease[] = [
       "Petechiae (purple spots)",
       "Nausea",
       "Vomiting",
-      "Confusion",
+      "Confusion"
     ],
     severity: "Critical",
     diet: "IV fluids initially, then gradual return to normal diet",
-    precautions:
-      "Meningococcal vaccine, immediate hospitalization, antibiotics",
+    precautions: "Meningococcal vaccine, immediate hospitalization, antibiotics"
   },
   {
     name: "Chickenpox",
@@ -703,11 +684,11 @@ export const DISEASES: Disease[] = [
       "Fatigue",
       "Headache",
       "Loss of appetite",
-      "Sore throat",
+      "Sore throat"
     ],
     severity: "Mild",
     diet: "Soft foods, cold foods for mouth sores, plenty of fluids",
-    precautions: "Varicella vaccine, isolation, calamine lotion",
+    precautions: "Varicella vaccine, isolation, calamine lotion"
   },
   {
     name: "Measles",
@@ -717,11 +698,11 @@ export const DISEASES: Disease[] = [
       "Cough",
       "Runny nose",
       "Eye redness",
-      "Sensitivity to light",
+      "Sensitivity to light"
     ],
     severity: "Moderate",
     diet: "Vitamin A supplementation, fluids, nutritious diet",
-    precautions: "MMR vaccination, isolation, vitamin A supplements",
+    precautions: "MMR vaccination, isolation, vitamin A supplements"
   },
   {
     name: "HIV/AIDS",
@@ -733,11 +714,11 @@ export const DISEASES: Disease[] = [
       "Swollen lymph nodes",
       "Recurring fever",
       "Diarrhea",
-      "Frequent infections",
+      "Frequent infections"
     ],
     severity: "Severe",
     diet: "High protein, micronutrient-rich diet, food safety practices",
-    precautions: "Antiretroviral therapy, safe sex, regular CD4 monitoring",
+    precautions: "Antiretroviral therapy, safe sex, regular CD4 monitoring"
   },
   {
     name: "Psoriasis",
@@ -747,18 +728,18 @@ export const DISEASES: Disease[] = [
       "Dry skin",
       "Skin discoloration",
       "Joint pain",
-      "Nail changes",
+      "Nail changes"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory diet, omega-3, avoid alcohol",
-    precautions: "Moisturize regularly, avoid triggers, phototherapy",
+    precautions: "Moisturize regularly, avoid triggers, phototherapy"
   },
   {
     name: "Eczema",
     symptoms: ["Itching", "Rash", "Dry skin", "Skin discoloration"],
     severity: "Mild",
     diet: "Identify and avoid food triggers, anti-inflammatory foods, probiotics",
-    precautions: "Moisturize frequently, avoid irritants and allergens",
+    precautions: "Moisturize frequently, avoid irritants and allergens"
   },
   {
     name: "Lupus (SLE)",
@@ -769,11 +750,11 @@ export const DISEASES: Disease[] = [
       "Fever",
       "Hair loss",
       "Skin discoloration",
-      "Chest pain",
+      "Chest pain"
     ],
     severity: "Severe",
     diet: "Anti-inflammatory diet, vitamin D, calcium, low sodium",
-    precautions: "Sun protection, antimalarials, immunosuppressants",
+    precautions: "Sun protection, antimalarials, immunosuppressants"
   },
   {
     name: "Celiac Disease",
@@ -784,12 +765,11 @@ export const DISEASES: Disease[] = [
       "Weight loss",
       "Fatigue",
       "Constipation",
-      "Bone pain at night",
+      "Bone pain at night"
     ],
     severity: "Moderate",
     diet: "Strict gluten-free diet for life, calcium, iron, vitamin D supplementation",
-    precautions:
-      "Avoid all gluten, read food labels, gluten-free cooking practices",
+    precautions: "Avoid all gluten, read food labels, gluten-free cooking practices"
   },
   {
     name: "Polycystic Ovary Syndrome",
@@ -799,12 +779,11 @@ export const DISEASES: Disease[] = [
       "Acne",
       "Weight gain",
       "Pelvic pain",
-      "Hair loss",
+      "Hair loss"
     ],
     severity: "Moderate",
     diet: "Low glycemic index diet, anti-inflammatory foods, high fiber",
-    precautions:
-      "Weight management, hormonal therapy, fertility treatment if needed",
+    precautions: "Weight management, hormonal therapy, fertility treatment if needed"
   },
   {
     name: "Endometriosis",
@@ -815,18 +794,18 @@ export const DISEASES: Disease[] = [
       "Painful urination",
       "Back pain",
       "Nausea",
-      "Fatigue",
+      "Fatigue"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory diet, omega-3, avoid red meat and alcohol",
-    precautions: "Hormonal therapy, laparoscopic surgery, pain management",
+    precautions: "Hormonal therapy, laparoscopic surgery, pain management"
   },
   {
     name: "Cataracts",
     symptoms: ["Blurred vision", "Double vision", "Sensitivity to light"],
     severity: "Moderate",
     diet: "Antioxidant-rich diet, vitamin C, E, lutein",
-    precautions: "UV eye protection, no smoking, regular eye exams",
+    precautions: "UV eye protection, no smoking, regular eye exams"
   },
   {
     name: "Glaucoma",
@@ -836,11 +815,11 @@ export const DISEASES: Disease[] = [
       "Tunnel vision",
       "Nausea",
       "Eye redness",
-      "Headache",
+      "Headache"
     ],
     severity: "Severe",
     diet: "Low sodium, leafy greens, avoid excessive caffeine",
-    precautions: "Eye drops, regular intraocular pressure monitoring",
+    precautions: "Eye drops, regular intraocular pressure monitoring"
   },
   {
     name: "Tonsillitis",
@@ -851,11 +830,11 @@ export const DISEASES: Disease[] = [
       "Bad breath",
       "Ear pain",
       "Headache",
-      "Neck pain",
+      "Neck pain"
     ],
     severity: "Mild",
     diet: "Cold liquids, ice cream, soft foods, plenty of fluids",
-    precautions: "Antibiotics if bacterial, rest, gargle with salt water",
+    precautions: "Antibiotics if bacterial, rest, gargle with salt water"
   },
   {
     name: "Sinusitis",
@@ -865,11 +844,11 @@ export const DISEASES: Disease[] = [
       "Post-nasal drip",
       "Loss of smell",
       "Cough",
-      "Fatigue",
+      "Fatigue"
     ],
     severity: "Mild",
     diet: "Hot liquids, stay hydrated",
-    precautions: "Nasal irrigation, decongestants, antibiotics if bacterial",
+    precautions: "Nasal irrigation, decongestants, antibiotics if bacterial"
   },
   {
     name: "Rheumatic Fever",
@@ -880,12 +859,11 @@ export const DISEASES: Disease[] = [
       "Chest pain",
       "Rash",
       "Fatigue",
-      "Sore throat",
+      "Sore throat"
     ],
     severity: "Severe",
     diet: "Nutritious balanced diet, anti-inflammatory foods",
-    precautions:
-      "Complete antibiotic course, benzathine penicillin prophylaxis",
+    precautions: "Complete antibiotic course, benzathine penicillin prophylaxis"
   },
   {
     name: "Fibromyalgia",
@@ -898,11 +876,11 @@ export const DISEASES: Disease[] = [
       "Depression",
       "Anxiety",
       "Tingling",
-      "Numbness",
+      "Numbness"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory diet, avoid MSG and artificial sweeteners, magnesium",
-    precautions: "Low-impact exercise, stress management, sleep hygiene",
+    precautions: "Low-impact exercise, stress management, sleep hygiene"
   },
   {
     name: "Chronic Fatigue Syndrome",
@@ -913,11 +891,11 @@ export const DISEASES: Disease[] = [
       "Insomnia",
       "Muscle pain",
       "Joint pain",
-      "Headache",
+      "Headache"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory diet, balanced nutrition, avoid alcohol",
-    precautions: "Pacing activity, sleep hygiene, cognitive behavioral therapy",
+    precautions: "Pacing activity, sleep hygiene, cognitive behavioral therapy"
   },
   {
     name: "Depression",
@@ -927,12 +905,11 @@ export const DISEASES: Disease[] = [
       "Insomnia",
       "Weight loss",
       "Difficulty concentrating",
-      "Suicidal thoughts",
+      "Suicidal thoughts"
     ],
     severity: "Moderate",
     diet: "Omega-3, folate, vitamin D, tryptophan-rich foods, limit alcohol",
-    precautions:
-      "Antidepressants, psychotherapy, regular exercise, social support",
+    precautions: "Antidepressants, psychotherapy, regular exercise, social support"
   },
   {
     name: "Anxiety Disorder",
@@ -945,19 +922,18 @@ export const DISEASES: Disease[] = [
       "Insomnia",
       "Irritability",
       "Difficulty concentrating",
-      "Nausea",
+      "Nausea"
     ],
     severity: "Moderate",
     diet: "Limit caffeine, magnesium-rich foods, omega-3, chamomile tea",
-    precautions:
-      "CBT therapy, mindfulness, medication if needed, regular exercise",
+    precautions: "CBT therapy, mindfulness, medication if needed, regular exercise"
   },
   {
     name: "Schizophrenia",
     symptoms: ["Hallucinations", "Confusion", "Insomnia", "Anxiety"],
     severity: "Severe",
     diet: "Balanced nutrition, omega-3, antioxidants",
-    precautions: "Antipsychotic medication, psychotherapy, family support",
+    precautions: "Antipsychotic medication, psychotherapy, family support"
   },
   {
     name: "Lung Cancer",
@@ -967,18 +943,18 @@ export const DISEASES: Disease[] = [
       "Shortness of breath",
       "Chest pain",
       "Weight loss",
-      "Fatigue",
+      "Fatigue"
     ],
     severity: "Severe",
     diet: "High protein, antioxidant-rich foods",
-    precautions: "No smoking, regular screening if high risk",
+    precautions: "No smoking, regular screening if high risk"
   },
   {
     name: "Breast Cancer",
     symptoms: ["Breast pain", "Nipple discharge", "Lumps under skin"],
     severity: "Severe",
     diet: "Mediterranean diet, limit alcohol, high fiber",
-    precautions: "Regular mammograms, self-examination",
+    precautions: "Regular mammograms, self-examination"
   },
   {
     name: "Colon Cancer",
@@ -987,18 +963,18 @@ export const DISEASES: Disease[] = [
       "Rectal bleeding",
       "Abdominal pain",
       "Weight loss",
-      "Fatigue",
+      "Fatigue"
     ],
     severity: "Severe",
     diet: "High fiber, low red meat, plenty of vegetables",
-    precautions: "Regular colonoscopy after 45, high fiber diet",
+    precautions: "Regular colonoscopy after 45, high fiber diet"
   },
   {
     name: "Skin Cancer (Melanoma)",
     symptoms: ["Skin discoloration", "Lumps under skin"],
     severity: "Severe",
     diet: "Antioxidant-rich diet, vitamin D in moderation",
-    precautions: "Sun protection, regular skin checks, avoid tanning beds",
+    precautions: "Sun protection, regular skin checks, avoid tanning beds"
   },
   {
     name: "Leukemia",
@@ -1011,18 +987,18 @@ export const DISEASES: Disease[] = [
       "Swollen lymph nodes",
       "Bone pain at night",
       "Weight loss",
-      "Night sweats",
+      "Night sweats"
     ],
     severity: "Severe",
     diet: "High protein, neutropenic diet during treatment",
-    precautions: "Chemotherapy, bone marrow transplant, infection prevention",
+    precautions: "Chemotherapy, bone marrow transplant, infection prevention"
   },
   {
     name: "Prostate Issues (BPH)",
     symptoms: ["Frequent urination", "Back pain"],
     severity: "Moderate",
     diet: "Low fat diet, lycopene-rich foods, green tea",
-    precautions: "Regular PSA tests, limit caffeine and alcohol",
+    precautions: "Regular PSA tests, limit caffeine and alcohol"
   },
   {
     name: "Varicose Veins",
@@ -1030,18 +1006,18 @@ export const DISEASES: Disease[] = [
       "Varicose veins",
       "Leg cramps",
       "Swelling",
-      "Skin discoloration",
+      "Skin discoloration"
     ],
     severity: "Mild",
     diet: "Anti-inflammatory diet, low salt, high fiber",
-    precautions: "Compression stockings, elevate legs, regular walking",
+    precautions: "Compression stockings, elevate legs, regular walking"
   },
   {
     name: "Hemorrhoids",
     symptoms: ["Rectal bleeding", "Itching", "Abdominal pain", "Constipation"],
     severity: "Mild",
     diet: "High fiber diet, plenty of water, avoid spicy foods",
-    precautions: "Sitz baths, topical creams, avoid straining",
+    precautions: "Sitz baths, topical creams, avoid straining"
   },
   {
     name: "Ankylosing Spondylitis",
@@ -1052,10 +1028,13 @@ export const DISEASES: Disease[] = [
       "Hip pain",
       "Fatigue",
       "Eye pain",
-      "Reduced range of motion",
+      "Reduced range of motion"
     ],
     severity: "Moderate",
     diet: "Anti-inflammatory diet, calcium, vitamin D, omega-3",
-    precautions: "Regular exercise, physical therapy, NSAIDs",
-  },
+    precautions: "Regular exercise, physical therapy, NSAIDs"
+  }
 ];
+export {
+  DISEASES
+};

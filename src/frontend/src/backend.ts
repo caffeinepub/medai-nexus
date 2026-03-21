@@ -89,25 +89,138 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface backendInterface {
-    ping(): Promise<string>;
+export type Time = bigint;
+export interface PlatformStats {
+    totalAnalyses: bigint;
+    accuracy: number;
 }
+export interface ImageUpload {
+    status: string;
+    filename: string;
+    timestamp: Time;
+}
+export interface ContactSubmission {
+    name: string;
+    email: string;
+    message: string;
+    timestamp: Time;
+}
+export interface backendInterface {
+    addContactSubmission(name: string, email: string, message: string): Promise<boolean>;
+    addImageUpload(filename: string, status: string): Promise<boolean>;
+    getContactSubmissions(): Promise<Array<ContactSubmission>>;
+    getImageUploadByFilename(filename: string): Promise<ImageUpload | null>;
+    getImageUploads(): Promise<Array<ImageUpload>>;
+    getStats(): Promise<PlatformStats | null>;
+    updateStats(totalAnalyses: bigint, accuracy: number): Promise<boolean>;
+}
+import type { ImageUpload as _ImageUpload, PlatformStats as _PlatformStats } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
-    async ping(): Promise<string> {
+    async addContactSubmission(arg0: string, arg1: string, arg2: string): Promise<boolean> {
         if (this.processError) {
             try {
-                const result = await this.actor.ping();
+                const result = await this.actor.addContactSubmission(arg0, arg1, arg2);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.ping();
+            const result = await this.actor.addContactSubmission(arg0, arg1, arg2);
             return result;
         }
     }
+    async addImageUpload(arg0: string, arg1: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addImageUpload(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addImageUpload(arg0, arg1);
+            return result;
+        }
+    }
+    async getContactSubmissions(): Promise<Array<ContactSubmission>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getContactSubmissions();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getContactSubmissions();
+            return result;
+        }
+    }
+    async getImageUploadByFilename(arg0: string): Promise<ImageUpload | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getImageUploadByFilename(arg0);
+                return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getImageUploadByFilename(arg0);
+            return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getImageUploads(): Promise<Array<ImageUpload>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getImageUploads();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getImageUploads();
+            return result;
+        }
+    }
+    async getStats(): Promise<PlatformStats | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStats();
+                return from_candid_opt_n2(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStats();
+            return from_candid_opt_n2(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async updateStats(arg0: bigint, arg1: number): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateStats(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateStats(arg0, arg1);
+            return result;
+        }
+    }
+}
+function from_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ImageUpload]): ImageUpload | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PlatformStats]): PlatformStats | null {
+    return value.length === 0 ? null : value[0];
 }
 export interface CreateActorOptions {
     agent?: Agent;

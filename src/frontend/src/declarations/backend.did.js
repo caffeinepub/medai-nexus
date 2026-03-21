@@ -8,14 +8,86 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const Time = IDL.Int;
+export const ContactSubmission = IDL.Record({
+  'name' : IDL.Text,
+  'email' : IDL.Text,
+  'message' : IDL.Text,
+  'timestamp' : Time,
+});
+export const ImageUpload = IDL.Record({
+  'status' : IDL.Text,
+  'filename' : IDL.Text,
+  'timestamp' : Time,
+});
+export const PlatformStats = IDL.Record({
+  'totalAnalyses' : IDL.Nat,
+  'accuracy' : IDL.Float64,
+});
+
 export const idlService = IDL.Service({
-  'ping' : IDL.Func([], [IDL.Text], ['query']),
+  'addContactSubmission' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text],
+      [IDL.Bool],
+      [],
+    ),
+  'addImageUpload' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
+  'getContactSubmissions' : IDL.Func(
+      [],
+      [IDL.Vec(ContactSubmission)],
+      ['query'],
+    ),
+  'getImageUploadByFilename' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(ImageUpload)],
+      ['query'],
+    ),
+  'getImageUploads' : IDL.Func([], [IDL.Vec(ImageUpload)], ['query']),
+  'getStats' : IDL.Func([], [IDL.Opt(PlatformStats)], ['query']),
+  'updateStats' : IDL.Func([IDL.Nat, IDL.Float64], [IDL.Bool], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
-  return IDL.Service({ 'ping' : IDL.Func([], [IDL.Text], ['query']) });
+  const Time = IDL.Int;
+  const ContactSubmission = IDL.Record({
+    'name' : IDL.Text,
+    'email' : IDL.Text,
+    'message' : IDL.Text,
+    'timestamp' : Time,
+  });
+  const ImageUpload = IDL.Record({
+    'status' : IDL.Text,
+    'filename' : IDL.Text,
+    'timestamp' : Time,
+  });
+  const PlatformStats = IDL.Record({
+    'totalAnalyses' : IDL.Nat,
+    'accuracy' : IDL.Float64,
+  });
+  
+  return IDL.Service({
+    'addContactSubmission' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Bool],
+        [],
+      ),
+    'addImageUpload' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
+    'getContactSubmissions' : IDL.Func(
+        [],
+        [IDL.Vec(ContactSubmission)],
+        ['query'],
+      ),
+    'getImageUploadByFilename' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(ImageUpload)],
+        ['query'],
+      ),
+    'getImageUploads' : IDL.Func([], [IDL.Vec(ImageUpload)], ['query']),
+    'getStats' : IDL.Func([], [IDL.Opt(PlatformStats)], ['query']),
+    'updateStats' : IDL.Func([IDL.Nat, IDL.Float64], [IDL.Bool], []),
+  });
 };
 
 export const init = ({ IDL }) => { return []; };

@@ -1,209 +1,421 @@
 import { useMemo, useState } from "react";
-import type { Symptom } from "../data/symptoms";
+import { SYMPTOMS, SYMPTOM_CATEGORIES } from "../data/symptoms";
 
 interface Props {
-  symptoms: Symptom[];
-  selectedSymptoms: string[];
-  onSelect: (name: string) => void;
-  onRemove: (name: string) => void;
-  onAnalyze: () => void;
+  onAnalyze: (symptoms: string[]) => void;
   isAnalyzing: boolean;
-  apiKeyActive: boolean;
-  onChangeKey: () => void;
 }
 
-type Category = "all" | "general" | "critical" | "rare";
+const CATEGORY_COLORS = {
+  general: {
+    bg: "rgba(102,126,234,0.2)",
+    border: "rgba(102,126,234,0.5)",
+    text: "#a5b4fc",
+  },
+  critical: {
+    bg: "rgba(239,68,68,0.15)",
+    border: "rgba(239,68,68,0.4)",
+    text: "#fca5a5",
+  },
+  rare: {
+    bg: "rgba(118,75,162,0.2)",
+    border: "rgba(167,139,250,0.5)",
+    text: "#c4b5fd",
+  },
+};
 
-export default function SymptomPanel({
-  symptoms,
-  selectedSymptoms,
-  onSelect,
-  onRemove,
-  onAnalyze,
-  isAnalyzing,
-  apiKeyActive,
-  onChangeKey,
-}: Props) {
+export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<Category>("all");
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<
+    "all" | "general" | "critical" | "rare"
+  >("all");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+
+  const allSymptoms = useMemo(() => {
+    if (activeCategory === "all")
+      return [...SYMPTOMS.general, ...SYMPTOMS.critical, ...SYMPTOMS.rare];
+    return SYMPTOMS[activeCategory];
+  }, [activeCategory]);
 
   const filtered = useMemo(() => {
-    return symptoms.filter((s) => {
-      const matchCat = category === "all" || s.category === category;
-      const matchSearch = s.name.toLowerCase().includes(search.toLowerCase());
-      return matchCat && matchSearch && !selectedSymptoms.includes(s.name);
-    });
-  }, [symptoms, category, search, selectedSymptoms]);
+    if (!search) return allSymptoms;
+    return allSymptoms.filter((s) =>
+      s.toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [search, allSymptoms]);
 
-  const autocomplete = useMemo(() => {
-    if (!search.trim()) return [];
-    return symptoms
-      .filter(
-        (s) =>
-          s.name.toLowerCase().includes(search.toLowerCase()) &&
-          !selectedSymptoms.includes(s.name),
-      )
+  const autocompleteItems = useMemo(() => {
+    if (!search || search.length < 2) return [];
+    const all = [...SYMPTOMS.general, ...SYMPTOMS.critical, ...SYMPTOMS.rare];
+    return all
+      .filter((s) => s.toLowerCase().includes(search.toLowerCase()))
       .slice(0, 8);
-  }, [symptoms, search, selectedSymptoms]);
+  }, [search]);
 
-  const categoryColors: Record<Category, string> = {
-    all: "#19D7FF",
-    general: "#22C8FF",
-    critical: "#f97316",
-    rare: "#A855F7",
+  const toggleSymptom = (s: string) => {
+    setSelected((prev) =>
+      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
+    );
+  };
+
+  const totalAll =
+    SYMPTOMS.general.length + SYMPTOMS.critical.length + SYMPTOMS.rare.length;
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    all: "All",
+    general: "General",
+    critical: "Critical",
+    rare: "Rare",
   };
 
   return (
-    <section className="symptom-section" id="scan">
-      <div className="section-header">
-        <h2 className="section-title">DIAGNOSTIC CONSOLE</h2>
-        <div className="section-line" />
-      </div>
-      <div className="symptom-grid">
-        {/* API Status Card */}
-        <div className="glass-card card-cyan">
-          <div className="card-number">01</div>
-          <h3 className="card-title">API STATUS</h3>
-          <div className="api-status-display">
-            <div
-              className={`api-status-dot ${apiKeyActive ? "active" : "inactive"}`}
-            />
-            <span className={apiKeyActive ? "text-green" : "text-muted"}>
-              {apiKeyActive ? "KEY ACTIVE — READY" : "NO KEY"}
-            </span>
-          </div>
-          <p className="api-status-desc">
-            {apiKeyActive
-              ? "AI analysis enabled via OpenAI API. Local pattern matching also active."
-              : "Local pattern matching active. Add API key for AI-enhanced analysis."}
+    <section id="symptoms" style={{ padding: "60px 24px" }}>
+      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
+          <h2
+            style={{
+              fontSize: "clamp(1.6rem, 3.5vw, 2.5rem)",
+              fontWeight: 700,
+              marginBottom: "12px",
+            }}
+          >
+            <span className="gradient-text">Symptom Selection</span>
+          </h2>
+          <p style={{ color: "rgba(255,255,255,0.7)" }}>
+            Select all symptoms you are experiencing for AI analysis
           </p>
-          <button type="button" className="btn-secondary" onClick={onChangeKey}>
-            {apiKeyActive ? "CHANGE API KEY" : "ACTIVATE API KEY"}
-          </button>
-          <div className="api-scan-visual">
-            <div className="scan-bar" />
-            <div className="scan-bar" style={{ animationDelay: "0.4s" }} />
-            <div className="scan-bar" style={{ animationDelay: "0.8s" }} />
-          </div>
         </div>
 
-        {/* Symptom Input Card */}
-        <div className="glass-card card-purple">
-          <div className="card-number">02</div>
-          <h3 className="card-title">SYMPTOM ANALYSIS</h3>
-
-          {/* Search */}
-          <div className="search-container">
-            <span className="search-icon">🔍</span>
-            <input
-              className="search-input"
-              placeholder="Search symptoms..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setShowDropdown(true);
-              }}
-              onFocus={() => setShowDropdown(true)}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-            />
-            {showDropdown && autocomplete.length > 0 && (
-              <div className="autocomplete-dropdown">
-                {autocomplete.map((s) => (
-                  <button
-                    type="button"
-                    key={s.id}
-                    className="autocomplete-item"
-                    onMouseDown={() => {
-                      onSelect(s.name);
-                      setSearch("");
-                    }}
-                  >
-                    <span className={`cat-badge cat-${s.category}`}>
-                      {s.category}
-                    </span>
-                    {s.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Category Filter */}
-          <div className="category-pills">
-            {(["all", "general", "critical", "rare"] as Category[]).map(
-              (cat) => (
-                <button
-                  type="button"
-                  key={cat}
-                  className={`cat-pill${category === cat ? " active" : ""}`}
-                  style={
-                    category === cat
-                      ? {
-                          borderColor: categoryColors[cat],
-                          color: categoryColors[cat],
-                        }
-                      : {}
-                  }
-                  onClick={() => setCategory(cat)}
-                >
-                  {cat.toUpperCase()}
-                </button>
-              ),
-            )}
-          </div>
-
-          {/* Symptom chips */}
-          <div className="symptom-chips-container">
-            {filtered.slice(0, 24).map((s) => (
+        <div className="glass-card" style={{ padding: "32px" }}>
+          {/* Category Tabs */}
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              marginBottom: "24px",
+              flexWrap: "wrap",
+            }}
+          >
+            {(["all", "general", "critical", "rare"] as const).map((cat) => (
               <button
+                key={cat}
                 type="button"
-                key={s.id}
-                className={`symptom-chip chip-${s.category}`}
-                onClick={() => onSelect(s.name)}
+                data-ocid={`symptoms.${cat}.tab`}
+                onClick={() => setActiveCategory(cat)}
+                style={{
+                  padding: "8px 20px",
+                  borderRadius: "20px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Poppins, sans-serif",
+                  fontWeight: 500,
+                  fontSize: "0.85rem",
+                  background:
+                    activeCategory === cat
+                      ? "linear-gradient(135deg, #667eea, #764ba2)"
+                      : "rgba(255,255,255,0.1)",
+                  color: "white",
+                  transition: "all 0.2s",
+                  boxShadow:
+                    activeCategory === cat
+                      ? "0 0 15px rgba(102,126,234,0.5)"
+                      : "none",
+                }}
               >
-                + {s.name}
+                {CATEGORY_LABELS[cat]}
+                <span
+                  style={{
+                    marginLeft: "6px",
+                    opacity: 0.7,
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  ({cat === "all" ? totalAll : SYMPTOMS[cat].length})
+                </span>
               </button>
             ))}
-            {filtered.length > 24 && (
-              <span className="chips-more">{`+${filtered.length - 24} more — use search`}</span>
+          </div>
+
+          {/* Search */}
+          <div style={{ position: "relative", marginBottom: "24px" }}>
+            <div style={{ position: "relative" }}>
+              <span
+                style={{
+                  position: "absolute",
+                  left: "14px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.5)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-label="Search"
+                >
+                  <title>Search</title>
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+              </span>
+              <input
+                data-ocid="symptoms.search_input"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setShowAutocomplete(true);
+                }}
+                onBlur={() => setTimeout(() => setShowAutocomplete(false), 200)}
+                placeholder="Search symptoms..."
+                style={{
+                  width: "100%",
+                  padding: "12px 14px 12px 42px",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  color: "white",
+                  fontSize: "0.95rem",
+                  fontFamily: "Poppins, sans-serif",
+                  outline: "none",
+                  transition: "all 0.3s",
+                  boxSizing: "border-box",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "rgba(167,139,250,0.7)";
+                  e.target.style.boxShadow = "0 0 15px rgba(102,126,234,0.3)";
+                }}
+              />
+            </div>
+            {showAutocomplete && autocompleteItems.length > 0 && (
+              <div
+                className="glass-card"
+                style={{
+                  position: "absolute",
+                  top: "110%",
+                  left: 0,
+                  right: 0,
+                  zIndex: 50,
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  animation: "slideDown 0.2s ease",
+                }}
+              >
+                {autocompleteItems.map((item) => (
+                  <div
+                    key={item}
+                    onMouseDown={() => {
+                      toggleSymptom(item);
+                      setSearch("");
+                      setShowAutocomplete(false);
+                    }}
+                    style={{
+                      padding: "10px 16px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      transition: "background 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.background =
+                        "rgba(255,255,255,0.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.background =
+                        "transparent";
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        padding: "2px 8px",
+                        borderRadius: "10px",
+                        background:
+                          CATEGORY_COLORS[SYMPTOM_CATEGORIES[item]]?.bg ||
+                          "rgba(255,255,255,0.1)",
+                        color:
+                          CATEGORY_COLORS[SYMPTOM_CATEGORIES[item]]?.text ||
+                          "white",
+                        border: `1px solid ${
+                          CATEGORY_COLORS[SYMPTOM_CATEGORIES[item]]?.border ||
+                          "rgba(255,255,255,0.2)"
+                        }`,
+                      }}
+                    >
+                      {SYMPTOM_CATEGORIES[item]}
+                    </span>
+                    {item}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Selected symptoms */}
-          {selectedSymptoms.length > 0 && (
-            <div className="selected-symptoms">
-              <p className="selected-label">{`SELECTED SYMPTOMS (${selectedSymptoms.length})`}</p>
-              <div className="selected-tags">
-                {selectedSymptoms.map((s) => (
-                  <span key={s} className="selected-tag">
-                    {s}
-                    <button
-                      type="button"
-                      className="tag-remove"
-                      onClick={() => onRemove(s)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Symptom Grid */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+              maxHeight: "340px",
+              overflowY: "auto",
+              padding: "4px 0",
+            }}
+          >
+            {filtered.map((symptom) => {
+              const cat = SYMPTOM_CATEGORIES[symptom] || "general";
+              const colors = CATEGORY_COLORS[cat];
+              const isSelected = selected.includes(symptom);
+              return (
+                <button
+                  key={symptom}
+                  type="button"
+                  onClick={() => toggleSymptom(symptom)}
+                  style={{
+                    padding: "7px 14px",
+                    borderRadius: "20px",
+                    cursor: "pointer",
+                    fontSize: "0.82rem",
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: 500,
+                    background: isSelected
+                      ? "linear-gradient(135deg, #667eea, #764ba2)"
+                      : colors.bg,
+                    border: `1px solid ${
+                      isSelected ? "rgba(167,139,250,0.8)" : colors.border
+                    }`,
+                    color: isSelected ? "white" : colors.text,
+                    transition: "all 0.2s",
+                    boxShadow: isSelected
+                      ? "0 0 12px rgba(102,126,234,0.5)"
+                      : "none",
+                    transform: isSelected ? "scale(1.03)" : "scale(1)",
+                  }}
+                >
+                  {symptom}
+                </button>
+              );
+            })}
+          </div>
 
+          {filtered.length === 0 && (
+            <p
+              style={{
+                textAlign: "center",
+                color: "rgba(255,255,255,0.5)",
+                padding: "24px",
+              }}
+            >
+              No symptoms found for &quot;{search}&quot;
+            </p>
+          )}
+        </div>
+
+        {/* Selected Symptoms Bar */}
+        {selected.length > 0 && (
+          <div
+            className="glass-card"
+            style={{ marginTop: "20px", padding: "20px 24px" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "14px",
+                flexWrap: "wrap",
+                gap: "8px",
+              }}
+            >
+              <span style={{ fontWeight: 600 }}>
+                Selected:{" "}
+                <span style={{ color: "var(--accent-light)" }}>
+                  {selected.length} symptoms
+                </span>
+              </span>
+              <button
+                type="button"
+                data-ocid="symptoms.delete_button"
+                onClick={() => setSelected([])}
+                style={{
+                  background: "rgba(239,68,68,0.2)",
+                  border: "1px solid rgba(239,68,68,0.4)",
+                  color: "#fca5a5",
+                  padding: "6px 14px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: "0.82rem",
+                }}
+              >
+                Clear All
+              </button>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+              {selected.map((s) => (
+                <span
+                  key={s}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "16px",
+                    background:
+                      "linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3))",
+                    border: "1px solid rgba(167,139,250,0.5)",
+                    fontSize: "0.8rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  {s}
+                  <button
+                    type="button"
+                    onClick={() => toggleSymptom(s)}
+                    style={{
+                      cursor: "pointer",
+                      opacity: 0.7,
+                      fontSize: "0.9rem",
+                      background: "none",
+                      border: "none",
+                      color: "white",
+                      padding: 0,
+                      lineHeight: 1,
+                    }}
+                  >
+                    x
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div style={{ textAlign: "center", marginTop: "32px" }}>
           <button
             type="button"
-            className="btn-analyze"
-            onClick={onAnalyze}
-            disabled={selectedSymptoms.length === 0 || isAnalyzing}
+            data-ocid="symptoms.submit_button"
+            onClick={() => onAnalyze(selected)}
+            disabled={selected.length === 0 || isAnalyzing}
+            className="btn-gradient"
+            style={{
+              padding: "16px 48px",
+              fontSize: "1.05rem",
+              borderRadius: "14px",
+              minWidth: "200px",
+            }}
           >
-            {isAnalyzing ? (
-              <>
-                <span className="spinner" /> ANALYZING...
-              </>
-            ) : (
-              "BEGIN AI ANALYSIS"
-            )}
+            {isAnalyzing
+              ? "Analyzing..."
+              : `Analyze ${selected.length > 0 ? `(${selected.length})` : ""} Symptoms`}
           </button>
         </div>
       </div>

@@ -40,6 +40,7 @@ body {
 }
 
 /* ANIMATIONS */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -50,6 +51,7 @@ body {
     transform: translateY(0);
   }
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -58,6 +60,7 @@ body {
     opacity: 1;
   }
 }
+
 @keyframes float {
   0%,
   100% {
@@ -67,6 +70,7 @@ body {
     transform: translateY(-12px);
   }
 }
+
 @keyframes spinSlow {
   from {
     transform: rotate(0deg);
@@ -75,6 +79,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @keyframes spinReverse {
   from {
     transform: rotate(0deg);
@@ -83,6 +88,7 @@ body {
     transform: rotate(-360deg);
   }
 }
+
 @keyframes glowPulse {
   0%,
   100% {
@@ -92,6 +98,7 @@ body {
     box-shadow: var(--glow-purple);
   }
 }
+
 @keyframes scanLine {
   0% {
     top: -4px;
@@ -105,6 +112,7 @@ body {
     opacity: 0;
   }
 }
+
 @keyframes radarPulse {
   0% {
     transform: translate(-50%, -50%) scale(1);
@@ -115,6 +123,7 @@ body {
     opacity: 0;
   }
 }
+
 @keyframes blink {
   0%,
   100% {
@@ -124,6 +133,7 @@ body {
     opacity: 0;
   }
 }
+
 @keyframes shimmer {
   0% {
     background-position: -200% center;
@@ -132,6 +142,7 @@ body {
     background-position: 200% center;
   }
 }
+
 @keyframes barFill {
   from {
     width: 0%;
@@ -140,6 +151,7 @@ body {
     width: var(--bar-width);
   }
 }
+
 @keyframes typing-cursor {
   0%,
   100% {
@@ -149,6 +161,7 @@ body {
     border-right-color: transparent;
   }
 }
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -161,6 +174,7 @@ body {
 }
 
 /* GLASS CARD */
+
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
@@ -169,12 +183,14 @@ body {
   border-radius: 16px;
   transition: all 0.3s ease;
 }
+
 .glass-card:hover {
   background: var(--glass-bg-hover);
   box-shadow: var(--glow-blue);
 }
 
 /* GRADIENT BUTTON */
+
 .btn-gradient {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
@@ -189,10 +205,12 @@ body {
   position: relative;
   overflow: hidden;
 }
+
 .btn-gradient:hover {
   box-shadow: var(--glow-blue);
   transform: translateY(-2px);
 }
+
 .btn-gradient:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -200,6 +218,7 @@ body {
 }
 
 /* GRADIENT TEXT */
+
 .gradient-text {
   background: linear-gradient(135deg, #a78bfa, #67e8f9, #ffffff);
   background-size: 200% auto;
@@ -210,12 +229,15 @@ body {
 }
 
 /* SCROLLBAR */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(167, 139, 250, 0.5);
   border-radius: 3px;
