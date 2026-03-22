@@ -218,15 +218,15 @@ export default function Hero() {
           >
             <button
               type="button"
-              data-ocid="hero.upload_button"
+              data-ocid="hero.primary_button"
               className="btn-cta"
-              onClick={() => scrollTo("#upload")}
+              onClick={() => scrollTo("#symptoms")}
             >
-              Upload Image <ArrowRight size={16} />
+              Check Now <ArrowRight size={16} />
             </button>
             <button
               type="button"
-              data-ocid="hero.learn_more.button"
+              data-ocid="hero.secondary_button"
               className="btn-outline"
               onClick={() => scrollTo("#how-it-works")}
             >

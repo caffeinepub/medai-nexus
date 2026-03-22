@@ -93,7 +93,8 @@ export default function ActivationScreen({ onActivate }: Props) {
       style={{
         position: "fixed",
         inset: 0,
-        background: "linear-gradient(135deg, #2a3280 0%, #3d1a6e 100%)",
+        background:
+          "linear-gradient(135deg, #0d1b6e 0%, #4c1d95 50%, #7c3aed 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -127,7 +128,7 @@ export default function ActivationScreen({ onActivate }: Props) {
           textAlign: "center",
           animation: "fadeInUp 0.8s ease",
           boxShadow:
-            "0 0 40px rgba(102,126,234,0.4), 0 0 80px rgba(118,75,162,0.2)",
+            "0 0 40px rgba(79,142,247,0.4), 0 0 80px rgba(147,51,234,0.2)",
         }}
       >
         <div
@@ -163,12 +164,12 @@ export default function ActivationScreen({ onActivate }: Props) {
             height: "64px",
             margin: "0 auto 16px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #667eea, #764ba2)",
+            background: "linear-gradient(135deg, #4f8ef7, #9333ea)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             animation: "float 3s ease-in-out infinite",
-            boxShadow: "0 0 20px rgba(102,126,234,0.5)",
+            boxShadow: "0 0 20px rgba(79,142,247,0.5)",
           }}
         >
           <svg
@@ -209,7 +210,7 @@ export default function ActivationScreen({ onActivate }: Props) {
           style={{
             width: "60px",
             height: "2px",
-            background: "linear-gradient(90deg, #667eea, #a78bfa)",
+            background: "linear-gradient(90deg, #4f8ef7, #a78bfa)",
             margin: "20px auto 32px",
           }}
         />
@@ -250,7 +251,7 @@ export default function ActivationScreen({ onActivate }: Props) {
           }}
           onFocus={(e) => {
             e.target.style.borderColor = "rgba(167,139,250,0.8)";
-            e.target.style.boxShadow = "0 0 20px rgba(102,126,234,0.4)";
+            e.target.style.boxShadow = "0 0 20px rgba(79,142,247,0.4)";
           }}
           onBlur={(e) => {
             e.target.style.borderColor = "rgba(255,255,255,0.2)";

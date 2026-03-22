@@ -2,11 +2,11 @@ import { useState } from "react";
 import AboutSection from "./components/AboutSection";
 import ActivationScreen from "./components/ActivationScreen";
 import Footer from "./components/Footer";
-import HeroSection from "./components/HeroSection";
 import Navbar from "./components/Navbar";
 import ParticleBackground from "./components/ParticleBackground";
 import ResultDashboard from "./components/ResultDashboard";
 import SymptomPanel from "./components/SymptomPanel";
+import Hero from "./components/medai/Hero";
 import "./index.css";
 
 interface AnalysisResult {
@@ -15,6 +15,8 @@ interface AnalysisResult {
   severity: string;
   diet: string;
   precautions: string;
+  medicines: string;
+  whenToSeeDoctor: string;
   confidence: number;
   matches: number;
 }
@@ -87,7 +89,7 @@ export default function App() {
       <ParticleBackground />
       <div style={{ position: "relative", zIndex: 1 }}>
         <Navbar />
-        <HeroSection />
+        <Hero />
         <SymptomPanel onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         <ResultDashboard
           results={analysisResults}

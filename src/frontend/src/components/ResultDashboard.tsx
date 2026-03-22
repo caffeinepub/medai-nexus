@@ -4,6 +4,8 @@ import type { Disease } from "../data/diseases";
 interface Result extends Disease {
   confidence: number;
   matches: number;
+  medicines: string;
+  whenToSeeDoctor: string;
 }
 
 interface Props {
@@ -81,6 +83,253 @@ function ConfidenceBar({
           boxShadow: `0 0 10px ${color}`,
         }}
       />
+    </div>
+  );
+}
+
+interface ActionStep {
+  step: number;
+  title: string;
+  description: string;
+  color: string;
+  borderColor: string;
+  icon: React.ReactNode;
+}
+
+function StepByStepPlan({ result }: { result: Result }) {
+  const steps: ActionStep[] = [
+    {
+      step: 1,
+      title: "Don't Panic — Stay Calm",
+      description:
+        "This is an AI-assisted analysis, not a final diagnosis. Take a deep breath and proceed with the next steps rationally.",
+      color: "rgba(102,126,234,0.15)",
+      borderColor: "rgba(102,126,234,0.4)",
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#818cf8"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-label="Calm icon"
+        >
+          <title>Calm</title>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+          <line x1="9" y1="9" x2="9.01" y2="9" />
+          <line x1="15" y1="9" x2="15.01" y2="9" />
+        </svg>
+      ),
+    },
+    {
+      step: 2,
+      title: "Follow Recommended Diet",
+      description: result.diet,
+      color: "rgba(74,222,128,0.1)",
+      borderColor: "rgba(74,222,128,0.35)",
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#4ade80"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-label="Diet icon"
+        >
+          <title>Diet</title>
+          <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" />
+          <path d="M12 8v4l3 3" />
+        </svg>
+      ),
+    },
+    {
+      step: 3,
+      title: "Take These Precautions",
+      description: result.precautions,
+      color: "rgba(167,139,250,0.1)",
+      borderColor: "rgba(167,139,250,0.35)",
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#c4b5fd"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-label="Precautions icon"
+        >
+          <title>Precautions</title>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      ),
+    },
+    {
+      step: 4,
+      title: "Consider These Medicines",
+      description: `${result.medicines}. Always consult a pharmacist or doctor before taking any medication.`,
+      color: "rgba(251,146,60,0.1)",
+      borderColor: "rgba(251,146,60,0.35)",
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#fb923c"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-label="Medicine icon"
+        >
+          <title>Medicine</title>
+          <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+          <line x1="8.5" y1="8.5" x2="15.5" y2="15.5" />
+        </svg>
+      ),
+    },
+    {
+      step: 5,
+      title: "When to See a Doctor",
+      description: result.whenToSeeDoctor,
+      color: "rgba(239,68,68,0.1)",
+      borderColor: "rgba(239,68,68,0.35)",
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f87171"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-label="Doctor icon"
+        >
+          <title>Doctor</title>
+          <path d="M8 2v4" />
+          <path d="M16 2v4" />
+          <rect width="18" height="18" x="3" y="4" rx="2" />
+          <path d="M3 10h18" />
+          <path d="M10 16h4" />
+          <path d="M12 14v4" />
+        </svg>
+      ),
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        marginTop: "32px",
+        padding: "28px",
+        borderRadius: "16px",
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(167,139,250,0.2)",
+        animation: "fadeInUp 0.8s ease",
+      }}
+    >
+      <div style={{ marginBottom: "24px" }}>
+        <div
+          style={{
+            fontSize: "0.72rem",
+            color: "var(--accent-light)",
+            letterSpacing: "2px",
+            textTransform: "uppercase",
+            marginBottom: "6px",
+          }}
+        >
+          Action Protocol
+        </div>
+        <h3
+          style={{
+            fontSize: "1.3rem",
+            fontWeight: 700,
+            background: "linear-gradient(90deg, #a78bfa, #818cf8)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Step-by-Step Action Plan
+        </h3>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+        {steps.map((s, idx) => (
+          <div
+            key={s.step}
+            style={{
+              display: "flex",
+              gap: "16px",
+              alignItems: "flex-start",
+              padding: "16px 18px",
+              borderRadius: "12px",
+              background: s.color,
+              border: `1px solid ${s.borderColor}`,
+              animation: `fadeInUp ${0.4 + idx * 0.1}s ease`,
+            }}
+          >
+            {/* Step number circle */}
+            <div
+              style={{
+                minWidth: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: s.borderColor,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 800,
+                fontSize: "0.9rem",
+                color: "#fff",
+                flexShrink: 0,
+              }}
+            >
+              {s.step}
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "6px",
+                }}
+              >
+                {s.icon}
+                <span
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
+                    color: "rgba(255,255,255,0.95)",
+                  }}
+                >
+                  {s.title}
+                </span>
+              </div>
+              <p
+                style={{
+                  fontSize: "0.85rem",
+                  color: "rgba(255,255,255,0.75)",
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
+                {s.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -248,7 +497,7 @@ export default function ResultDashboard({
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
                   gap: "16px",
                   marginTop: "24px",
                 }}
@@ -282,6 +531,7 @@ export default function ResultDashboard({
                     {results[0].diet}
                   </p>
                 </div>
+
                 <div
                   style={{
                     background: "rgba(118,75,162,0.1)",
@@ -309,6 +559,66 @@ export default function ResultDashboard({
                     }}
                   >
                     {results[0].precautions}
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    background: "rgba(251,146,60,0.1)",
+                    borderRadius: "12px",
+                    padding: "16px",
+                    border: "1px solid rgba(251,146,60,0.3)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#fed7aa",
+                      letterSpacing: "1px",
+                      textTransform: "uppercase",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Medicines
+                  </div>
+                  <p
+                    style={{
+                      fontSize: "0.88rem",
+                      color: "rgba(255,255,255,0.85)",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {results[0].medicines}
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    background: "rgba(239,68,68,0.1)",
+                    borderRadius: "12px",
+                    padding: "16px",
+                    border: "1px solid rgba(239,68,68,0.3)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#fca5a5",
+                      letterSpacing: "1px",
+                      textTransform: "uppercase",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    When to See a Doctor
+                  </div>
+                  <p
+                    style={{
+                      fontSize: "0.88rem",
+                      color: "rgba(255,255,255,0.85)",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {results[0].whenToSeeDoctor}
                   </p>
                 </div>
               </div>
@@ -352,6 +662,9 @@ export default function ResultDashboard({
                   </span>
                 </div>
               )}
+
+              {/* Step-by-Step Action Plan */}
+              <StepByStepPlan result={results[0]} />
             </div>
 
             {results.slice(1).length > 0 && (
@@ -474,12 +787,36 @@ export default function ResultDashboard({
                             style={{
                               fontSize: "0.82rem",
                               color: "rgba(255,255,255,0.7)",
+                              marginBottom: "8px",
                             }}
                           >
                             <strong style={{ color: "#c4b5fd" }}>
                               Precautions:
                             </strong>{" "}
                             {r.precautions}
+                          </p>
+                          <p
+                            style={{
+                              fontSize: "0.82rem",
+                              color: "rgba(255,255,255,0.7)",
+                              marginBottom: "8px",
+                            }}
+                          >
+                            <strong style={{ color: "#fed7aa" }}>
+                              Medicines:
+                            </strong>{" "}
+                            {r.medicines}
+                          </p>
+                          <p
+                            style={{
+                              fontSize: "0.82rem",
+                              color: "rgba(255,255,255,0.7)",
+                            }}
+                          >
+                            <strong style={{ color: "#fca5a5" }}>
+                              When to See Doctor:
+                            </strong>{" "}
+                            {r.whenToSeeDoctor}
                           </p>
                         </div>
                       )}
