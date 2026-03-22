@@ -1,37 +1,37 @@
-# MedAI Nexus
+# MedAI Nexus – Dark Neon Theme
 
 ## Current State
-New project. No existing application files.
+The app uses a deep navy-to-purple gradient background with glassmorphism cards, soft blue/purple accent colors, and white text. CSS variables define all color tokens in index.css.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Full-screen API key activation panel (shown first, blocks main app until key entered)
-- Futuristic cyberpunk navbar with logo, nav links, status indicator
-- Hero section with particle background and holographic elements
-- Symptom input panel: search with autocomplete, multi-select, clickable tags, 220+ symptoms categorized (General, Critical, Rare)
-- AI analysis engine: local matching algorithm (count matches, calculate %, rank results) + fetch() call to user-provided API endpoint using stored API key
-- AI Result Dashboard: typing animation for AI response, confidence %, possible diseases ranked
-- Disease Info Section: 60-80 diseases each with name, symptoms, severity, diet, precautions
-- Dark/light theme toggle
-- Glowing cursor effect
-- Scan/loading animation
-- Footer with system status
+- Neon glow variables: cyan (#00f5ff), magenta (#ff00ff), neon green (#00ff88), electric blue (#0080ff)
+- Neon text-shadow and box-shadow effects on buttons, cards, headings
+- Scanline/grid overlay for cyberpunk feel
+- Neon-colored confidence bars and severity badges
+- Neon animated borders on cards and inputs
 
 ### Modify
-N/A
+- Background: deep black (#030712) instead of navy-to-purple gradient
+- CSS variables: replace blue/purple accents with neon cyan, magenta, green, electric blue
+- ActivationScreen: black bg with neon cyan/magenta particle network and glowing title
+- Navbar: black translucent bar with neon cyan logo glow and neon CTA button
+- Hero: black bg, neon-ringed gyroscope, neon chip labels, neon glow headings
+- SymptomPanel: dark cards, neon selected states, neon category tabs
+- ResultDashboard: dark cards, neon confidence bars, neon step icons, neon download button
+- Footer: dark bg with neon accent text
+- index.css: full neon dark token overhaul
 
 ### Remove
-N/A
+- Blue-to-purple gradient backgrounds on body/sections
+- Soft pastel blue/purple tones throughout
 
 ## Implementation Plan
-1. Backend: minimal Motoko actor (store nothing sensitive, API key stays in browser only)
-2. Frontend: single-page React app with all sections
-   - APIActivationScreen component (fullscreen, blocks app)
-   - ParticleBackground component (canvas-based)
-   - Navbar, Hero, SymptomPanel, ResultDashboard, DiseaseInfo, Footer
-   - Large data files: symptoms.ts (220+), diseases.ts (60-80)
-   - matchingAlgorithm.ts utility
-   - API call utility using stored key
-   - Animations: typing effect, scan sweep, pulse glows via CSS/framer
-   - Responsive layout
+1. Update index.css with neon dark tokens and new keyframe glow animations
+2. Update ActivationScreen.tsx for black + neon cyan/magenta theme
+3. Update Navbar.tsx for neon accents
+4. Update Hero.tsx ring and chip colors to neon
+5. Update SymptomPanel.tsx neon selected states
+6. Update ResultDashboard.tsx neon confidence bars, step plan, download button
+7. Update Footer.tsx neon accents

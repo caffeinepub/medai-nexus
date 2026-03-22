@@ -17,12 +17,21 @@ export default function ActivationScreen({ onActivate }: Props) {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    const NEON_COLORS = [
+      "rgba(0,245,255,",
+      "rgba(255,0,255,",
+      "rgba(0,255,136,",
+      "rgba(0,128,255,",
+      "rgba(191,0,255,",
+    ];
+
     const particles: {
       x: number;
       y: number;
       vx: number;
       vy: number;
       size: number;
+      colorIdx: number;
     }[] = [];
     for (let i = 0; i < 80; i++) {
       particles.push({
@@ -31,6 +40,7 @@ export default function ActivationScreen({ onActivate }: Props) {
         vx: (Math.random() - 0.5) * 0.8,
         vy: (Math.random() - 0.5) * 0.8,
         size: Math.random() * 2 + 1,
+        colorIdx: Math.floor(Math.random() * NEON_COLORS.length),
       });
     }
 
@@ -44,8 +54,11 @@ export default function ActivationScreen({ onActivate }: Props) {
         if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.fillStyle = `${NEON_COLORS[p.colorIdx]}0.8)`;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = `${NEON_COLORS[p.colorIdx]}1)`;
         ctx.fill();
+        ctx.shadowBlur = 0;
       }
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -56,8 +69,8 @@ export default function ActivationScreen({ onActivate }: Props) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = `rgba(255,255,255,${0.15 * (1 - dist / 120)})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `${NEON_COLORS[p.colorIdx]}${0.2 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.6;
             ctx.stroke();
           }
         }
@@ -93,8 +106,7 @@ export default function ActivationScreen({ onActivate }: Props) {
       style={{
         position: "fixed",
         inset: 0,
-        background:
-          "linear-gradient(135deg, #0d1b6e 0%, #4c1d95 50%, #7c3aed 100%)",
+        background: "#030712",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -103,6 +115,7 @@ export default function ActivationScreen({ onActivate }: Props) {
       }}
     >
       <canvas ref={canvasRef} style={{ position: "absolute", inset: 0 }} />
+      {/* Neon scan line */}
       <div
         style={{
           position: "absolute",
@@ -110,9 +123,10 @@ export default function ActivationScreen({ onActivate }: Props) {
           right: 0,
           height: "2px",
           background:
-            "linear-gradient(90deg, transparent, rgba(103,232,249,0.8), transparent)",
+            "linear-gradient(90deg, transparent, rgba(0,245,255,0.9), transparent)",
           animation: "scanLine 3s linear infinite",
           zIndex: 1,
+          boxShadow: "0 0 10px rgba(0,245,255,0.7)",
         }}
       />
 
@@ -128,9 +142,11 @@ export default function ActivationScreen({ onActivate }: Props) {
           textAlign: "center",
           animation: "fadeInUp 0.8s ease",
           boxShadow:
-            "0 0 40px rgba(79,142,247,0.4), 0 0 80px rgba(147,51,234,0.2)",
+            "0 0 40px rgba(0,245,255,0.25), 0 0 80px rgba(191,0,255,0.15), inset 0 0 40px rgba(0,245,255,0.03)",
+          border: "1px solid rgba(0,245,255,0.2)",
         }}
       >
+        {/* Radar pulse rings */}
         <div
           style={{
             position: "absolute",
@@ -139,7 +155,7 @@ export default function ActivationScreen({ onActivate }: Props) {
             width: "200px",
             height: "200px",
             borderRadius: "50%",
-            border: "1px solid rgba(167,139,250,0.3)",
+            border: "1px solid rgba(0,245,255,0.25)",
             animation: "radarPulse 2s ease-out infinite",
             pointerEvents: "none",
           }}
@@ -152,24 +168,26 @@ export default function ActivationScreen({ onActivate }: Props) {
             width: "200px",
             height: "200px",
             borderRadius: "50%",
-            border: "1px solid rgba(167,139,250,0.2)",
+            border: "1px solid rgba(255,0,255,0.2)",
             animation: "radarPulse 2s ease-out 0.6s infinite",
             pointerEvents: "none",
           }}
         />
 
+        {/* Icon */}
         <div
           style={{
             width: "64px",
             height: "64px",
             margin: "0 auto 16px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #4f8ef7, #9333ea)",
+            background: "linear-gradient(135deg, #0080ff, #bf00ff)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             animation: "float 3s ease-in-out infinite",
-            boxShadow: "0 0 20px rgba(79,142,247,0.5)",
+            boxShadow:
+              "0 0 25px rgba(0,128,255,0.6), 0 0 50px rgba(191,0,255,0.3)",
           }}
         >
           <svg
@@ -197,7 +215,7 @@ export default function ActivationScreen({ onActivate }: Props) {
         </h1>
         <p
           style={{
-            color: "rgba(255,255,255,0.7)",
+            color: "rgba(0,245,255,0.6)",
             marginBottom: "8px",
             fontSize: "0.9rem",
             letterSpacing: "3px",
@@ -210,14 +228,15 @@ export default function ActivationScreen({ onActivate }: Props) {
           style={{
             width: "60px",
             height: "2px",
-            background: "linear-gradient(90deg, #4f8ef7, #a78bfa)",
+            background: "linear-gradient(90deg, #00f5ff, #bf00ff, #ff00ff)",
             margin: "20px auto 32px",
+            boxShadow: "0 0 10px rgba(0,245,255,0.5)",
           }}
         />
 
         <p
           style={{
-            color: "rgba(255,255,255,0.8)",
+            color: "rgba(224,247,255,0.75)",
             marginBottom: "24px",
             fontSize: "0.95rem",
           }}
@@ -240,9 +259,9 @@ export default function ActivationScreen({ onActivate }: Props) {
             padding: "14px 18px",
             borderRadius: "12px",
             marginBottom: "8px",
-            background: "rgba(255,255,255,0.1)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            color: "white",
+            background: "rgba(0,245,255,0.05)",
+            border: "1px solid rgba(0,245,255,0.25)",
+            color: "#e0f7ff",
             fontSize: "1rem",
             fontFamily: "Poppins, sans-serif",
             outline: "none",
@@ -250,11 +269,12 @@ export default function ActivationScreen({ onActivate }: Props) {
             boxSizing: "border-box",
           }}
           onFocus={(e) => {
-            e.target.style.borderColor = "rgba(167,139,250,0.8)";
-            e.target.style.boxShadow = "0 0 20px rgba(79,142,247,0.4)";
+            e.target.style.borderColor = "rgba(0,245,255,0.8)";
+            e.target.style.boxShadow =
+              "0 0 20px rgba(0,245,255,0.35), inset 0 0 10px rgba(0,245,255,0.05)";
           }}
           onBlur={(e) => {
-            e.target.style.borderColor = "rgba(255,255,255,0.2)";
+            e.target.style.borderColor = "rgba(0,245,255,0.25)";
             e.target.style.boxShadow = "none";
           }}
         />
@@ -263,10 +283,10 @@ export default function ActivationScreen({ onActivate }: Props) {
           <p
             data-ocid="activation.error_state"
             style={{
-              color: "#f87171",
+              color: "#ff4d6d",
               fontSize: "0.85rem",
               marginBottom: "16px",
-              textShadow: "0 0 10px rgba(248,113,113,0.5)",
+              textShadow: "0 0 10px rgba(255,77,109,0.6)",
               animation: "fadeIn 0.3s ease",
             }}
           >
@@ -293,7 +313,7 @@ export default function ActivationScreen({ onActivate }: Props) {
 
         <p
           style={{
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(0,245,255,0.3)",
             fontSize: "0.75rem",
             marginTop: "24px",
           }}

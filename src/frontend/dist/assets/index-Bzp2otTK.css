@@ -49,6 +49,7 @@ body {
 }
 
 /* ANIMATIONS */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -59,6 +60,7 @@ body {
     transform: translateY(0);
   }
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -67,6 +69,7 @@ body {
     opacity: 1;
   }
 }
+
 @keyframes float {
   0%,
   100% {
@@ -76,6 +79,7 @@ body {
     transform: translateY(-12px);
   }
 }
+
 @keyframes spinSlow {
   from {
     transform: rotate(0deg);
@@ -84,6 +88,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @keyframes spinReverse {
   from {
     transform: rotate(0deg);
@@ -92,6 +97,7 @@ body {
     transform: rotate(-360deg);
   }
 }
+
 @keyframes neonPulse {
   0%,
   100% {
@@ -101,6 +107,7 @@ body {
     box-shadow: var(--glow-magenta);
   }
 }
+
 @keyframes glowPulse {
   0%,
   100% {
@@ -110,6 +117,7 @@ body {
     box-shadow: var(--glow-purple);
   }
 }
+
 @keyframes scanLine {
   0% {
     top: -4px;
@@ -123,6 +131,7 @@ body {
     opacity: 0;
   }
 }
+
 @keyframes radarPulse {
   0% {
     transform: translate(-50%, -50%) scale(1);
@@ -133,6 +142,7 @@ body {
     opacity: 0;
   }
 }
+
 @keyframes blink {
   0%,
   100% {
@@ -142,6 +152,7 @@ body {
     opacity: 0;
   }
 }
+
 @keyframes shimmer {
   0% {
     background-position: -200% center;
@@ -150,6 +161,7 @@ body {
     background-position: 200% center;
   }
 }
+
 @keyframes barFill {
   from {
     width: 0%;
@@ -158,6 +170,7 @@ body {
     width: var(--bar-width);
   }
 }
+
 @keyframes typing-cursor {
   0%,
   100% {
@@ -167,6 +180,7 @@ body {
     border-right-color: transparent;
   }
 }
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -177,6 +191,7 @@ body {
     transform: translateY(0);
   }
 }
+
 @keyframes neonFlicker {
   0%,
   19%,
@@ -198,22 +213,26 @@ body {
 }
 
 /* NEON TEXT UTILITIES */
+
 .neon-text-cyan {
   color: #00f5ff;
   text-shadow: 0 0 8px rgba(0, 245, 255, 0.9), 0 0 20px rgba(0, 245, 255, 0.6),
     0 0 40px rgba(0, 245, 255, 0.3);
 }
+
 .neon-text-magenta {
   color: #ff00ff;
   text-shadow: 0 0 8px rgba(255, 0, 255, 0.9), 0 0 20px rgba(255, 0, 255, 0.6),
     0 0 40px rgba(255, 0, 255, 0.3);
 }
+
 .neon-text-green {
   color: #00ff88;
   text-shadow: 0 0 8px rgba(0, 255, 136, 0.9), 0 0 20px rgba(0, 255, 136, 0.6);
 }
 
 /* GLASS CARD */
+
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
@@ -222,12 +241,14 @@ body {
   border-radius: 16px;
   transition: all 0.3s ease;
 }
+
 .glass-card:hover {
   background: var(--glass-bg-hover);
   box-shadow: var(--glow-cyan);
 }
 
 /* GRADIENT BUTTON */
+
 .btn-gradient {
   background: linear-gradient(135deg, #0080ff, #bf00ff);
   color: white;
@@ -243,10 +264,12 @@ body {
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 128, 255, 0.4);
 }
+
 .btn-gradient:hover {
   box-shadow: 0 0 30px rgba(0, 245, 255, 0.6), 0 0 60px rgba(0, 128, 255, 0.4);
   transform: translateY(-2px);
 }
+
 .btn-gradient:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -254,6 +277,7 @@ body {
 }
 
 /* GRADIENT TEXT */
+
 .gradient-text {
   background: linear-gradient(135deg, #00f5ff, #bf00ff, #ff00ff);
   background-size: 200% auto;
@@ -264,16 +288,20 @@ body {
 }
 
 /* SCROLLBAR */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: rgba(0, 245, 255, 0.03);
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(0, 245, 255, 0.3);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 245, 255, 0.5);
 }

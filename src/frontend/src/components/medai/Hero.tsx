@@ -14,49 +14,49 @@ function setupReveal() {
   return obs;
 }
 
-/* Gyroscope rings config */
+/* Gyroscope rings config — neon colors */
 const RINGS = [
   {
     size: 340,
-    border: "rgba(102,126,234,0.55)",
+    border: "rgba(0,245,255,0.55)",
+    glow: "rgba(0,245,255,0.3)",
     anim: "rotateRing",
     dur: "8s",
-    tiltStyle: {},
   },
   {
     size: 290,
-    border: "rgba(118,75,162,0.45)",
+    border: "rgba(255,0,255,0.45)",
+    glow: "rgba(255,0,255,0.2)",
     anim: "rotateRingXR",
     dur: "11s",
-    tiltStyle: {},
   },
   {
     size: 240,
-    border: "rgba(102,126,234,0.38)",
+    border: "rgba(0,128,255,0.50)",
+    glow: "rgba(0,128,255,0.25)",
     anim: "rotateRingY",
     dur: "9s",
-    tiltStyle: {},
   },
   {
     size: 200,
-    border: "rgba(165,180,252,0.35)",
+    border: "rgba(0,255,136,0.40)",
+    glow: "rgba(0,255,136,0.2)",
     anim: "rotateRingD",
     dur: "14s",
-    tiltStyle: {},
   },
   {
     size: 160,
-    border: "rgba(79,209,255,0.30)",
+    border: "rgba(191,0,255,0.50)",
+    glow: "rgba(191,0,255,0.25)",
     anim: "rotateRingRev",
     dur: "7s",
-    tiltStyle: {},
   },
   {
     size: 120,
-    border: "rgba(118,75,162,0.50)",
+    border: "rgba(0,245,255,0.60)",
+    glow: "rgba(0,245,255,0.35)",
     anim: "rotateRingX",
     dur: "6s",
-    tiltStyle: {},
   },
 ];
 
@@ -145,6 +145,7 @@ export default function Hero() {
         paddingBottom: "4rem",
         position: "relative",
         zIndex: 1,
+        background: "#030712",
       }}
     >
       <div
@@ -160,35 +161,53 @@ export default function Hero() {
           width: "100%",
         }}
       >
-        {/* ── Left: text ── */}
+        {/* Left: text */}
         <div>
-          <div className="badge-pill reveal">
+          <div
+            className="reveal"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              background: "rgba(0,245,255,0.08)",
+              border: "1px solid rgba(0,245,255,0.25)",
+              borderRadius: "999px",
+              padding: "0.35rem 1rem",
+              fontSize: "0.78rem",
+              fontWeight: 600,
+              color: "#00f5ff",
+              textShadow: "0 0 8px rgba(0,245,255,0.6)",
+              letterSpacing: "0.04em",
+              marginBottom: "1.25rem",
+            }}
+          >
             ✦ AI-Powered Medical Intelligence
           </div>
 
           <h1
             className="reveal reveal-delay-1"
             style={{
-              fontFamily: "Bricolage Grotesque, sans-serif",
+              fontFamily: "Bricolage Grotesque, Poppins, sans-serif",
               fontSize: "clamp(3.5rem, 6vw, 5.2rem)",
               fontWeight: 800,
               lineHeight: 1.0,
               letterSpacing: "-0.03em",
-              color: "#fff",
+              color: "#e0f7ff",
               marginBottom: "1.5rem",
             }}
           >
-            <span className="grad-text">AI-Powered</span> Disease{"\n"}Detection
+            <span className="gradient-text">AI-Powered</span> Disease{"\n"}
+            Detection
             <br />
             <span
               style={{
                 fontSize: "0.6em",
                 fontWeight: 700,
-                color: "#C9D2E3",
+                color: "rgba(224,247,255,0.5)",
                 letterSpacing: "-0.01em",
               }}
             >
-              for a Healthier Future
+              for a healthier tomorrow
             </span>
           </h1>
 
@@ -196,17 +215,18 @@ export default function Hero() {
             className="reveal reveal-delay-2"
             style={{
               fontSize: "1.05rem",
-              color: "#C9D2E3",
-              lineHeight: 1.72,
-              marginBottom: "2.25rem",
-              maxWidth: 480,
+              color: "rgba(224,247,255,0.65)",
+              lineHeight: 1.7,
+              maxWidth: 440,
+              marginBottom: "2rem",
             }}
           >
-            Upload your medical scans and get instant, accurate AI-driven
-            diagnostic insights in seconds. Fast, reliable, and accessible
-            anywhere.
+            Analyze 220+ symptoms across 70+ diseases using advanced AI. Get
+            instant insights, diet recommendations, and step-by-step action
+            plans.
           </p>
 
+          {/* CTA Buttons */}
           <div
             className="reveal reveal-delay-3"
             style={{
@@ -219,40 +239,95 @@ export default function Hero() {
             <button
               type="button"
               data-ocid="hero.primary_button"
-              className="btn-cta"
               onClick={() => scrollTo("#symptoms")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                background: "linear-gradient(135deg, #0080ff, #bf00ff)",
+                border: "none",
+                borderRadius: "12px",
+                color: "white",
+                fontWeight: 700,
+                padding: "0.85rem 1.75rem",
+                cursor: "pointer",
+                fontSize: "1rem",
+                boxShadow:
+                  "0 0 25px rgba(0,128,255,0.5), 0 0 50px rgba(191,0,255,0.3)",
+                transition: "all 0.3s",
+                fontFamily: "Poppins, sans-serif",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 0 35px rgba(0,245,255,0.7), 0 0 70px rgba(0,128,255,0.5)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 0 25px rgba(0,128,255,0.5), 0 0 50px rgba(191,0,255,0.3)";
+                e.currentTarget.style.transform = "none";
+              }}
             >
-              Check Now <ArrowRight size={16} />
+              Start Analysis <ArrowRight size={16} />
             </button>
             <button
               type="button"
               data-ocid="hero.secondary_button"
-              className="btn-outline"
-              onClick={() => scrollTo("#how-it-works")}
+              onClick={() => scrollTo("#about")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                background: "transparent",
+                border: "1px solid rgba(0,245,255,0.3)",
+                borderRadius: "12px",
+                color: "#00f5ff",
+                fontWeight: 600,
+                padding: "0.85rem 1.75rem",
+                cursor: "pointer",
+                fontSize: "1rem",
+                transition: "all 0.3s",
+                fontFamily: "Poppins, sans-serif",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(0,245,255,0.08)";
+                e.currentTarget.style.boxShadow =
+                  "0 0 20px rgba(0,245,255,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
               Learn More
             </button>
           </div>
 
+          {/* Stats row */}
           <div
-            className="reveal reveal-delay-4"
+            className="reveal"
             style={{ display: "flex", gap: "2.5rem", flexWrap: "wrap" }}
           >
             {[
               {
+                value: "220+",
+                label: "Symptoms",
+                icon: <Zap size={14} color="#00f5ff" />,
+              },
+              {
                 value: totalAnalyses,
                 label: "Analyses Done",
-                icon: <Zap size={14} color="#a5b4fc" />,
+                icon: <Shield size={14} color="#00f5ff" />,
               },
               {
                 value: accuracy,
                 label: "AI Accuracy",
-                icon: <Shield size={14} color="#a5b4fc" />,
+                icon: <Shield size={14} color="#00f5ff" />,
               },
               {
                 value: "< 3s",
                 label: "Detection Time",
-                icon: <Zap size={14} color="#a5b4fc" />,
+                icon: <Zap size={14} color="#00f5ff" />,
               },
             ].map((s) => (
               <div key={s.label}>
@@ -261,11 +336,12 @@ export default function Hero() {
                     display: "flex",
                     alignItems: "center",
                     gap: "0.4rem",
-                    fontFamily: "Bricolage Grotesque, sans-serif",
+                    fontFamily: "Bricolage Grotesque, Poppins, sans-serif",
                     fontSize: "1.65rem",
                     fontWeight: 800,
-                    color: "#fff",
+                    color: "#00f5ff",
                     marginBottom: "0.2rem",
+                    textShadow: "0 0 15px rgba(0,245,255,0.6)",
                   }}
                 >
                   {s.icon}
@@ -274,7 +350,7 @@ export default function Hero() {
                 <div
                   style={{
                     fontSize: "0.76rem",
-                    color: "#9AA7C2",
+                    color: "rgba(224,247,255,0.5)",
                     fontWeight: 500,
                     letterSpacing: "0.04em",
                   }}
@@ -286,7 +362,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* ── Right: gyroscope scanner ── */}
+        {/* Right: gyroscope scanner */}
         <div
           className="reveal reveal-delay-2 hero-visual-wrap"
           style={{
@@ -297,7 +373,6 @@ export default function Hero() {
             minHeight: 420,
           }}
         >
-          {/* Scanner frame */}
           <div
             style={{
               position: "relative",
@@ -319,7 +394,7 @@ export default function Hero() {
                   borderRadius: "50%",
                   border: `1.5px solid ${r.border}`,
                   animation: `${r.anim} ${r.dur} linear infinite`,
-                  boxShadow: `0 0 8px ${r.border}`,
+                  boxShadow: `0 0 12px ${r.glow}, 0 0 24px ${r.glow}`,
                 }}
               />
             ))}
@@ -334,12 +409,12 @@ export default function Hero() {
                 left: "50%",
                 borderRadius: "50%",
                 background:
-                  "conic-gradient(from 0deg, transparent 0deg, rgba(102,126,234,0.30) 45deg, transparent 70deg)",
+                  "conic-gradient(from 0deg, transparent 0deg, rgba(0,245,255,0.25) 45deg, transparent 70deg)",
                 animation: "radar 3.5s linear infinite",
               }}
             />
 
-            {/* Radar sweep 2 — opposite */}
+            {/* Radar sweep 2 */}
             <div
               style={{
                 position: "absolute",
@@ -349,7 +424,7 @@ export default function Hero() {
                 left: "50%",
                 borderRadius: "50%",
                 background:
-                  "conic-gradient(from 180deg, transparent 0deg, rgba(118,75,162,0.22) 40deg, transparent 60deg)",
+                  "conic-gradient(from 180deg, transparent 0deg, rgba(255,0,255,0.20) 40deg, transparent 60deg)",
                 animation: "radar2 5s linear infinite",
               }}
             />
@@ -372,9 +447,8 @@ export default function Hero() {
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    background: "#a5b4fc",
-                    boxShadow:
-                      "0 0 10px #a5b4fc, 0 0 20px rgba(102,126,234,0.6)",
+                    background: "#00f5ff",
+                    boxShadow: "0 0 12px #00f5ff, 0 0 24px rgba(0,245,255,0.6)",
                     "--orbit-r": "130px",
                     animation: "orbit-dot 4s linear infinite",
                   } as React.CSSProperties
@@ -398,8 +472,8 @@ export default function Hero() {
                     width: 6,
                     height: 6,
                     borderRadius: "50%",
-                    background: "#c4b5fd",
-                    boxShadow: "0 0 8px #c4b5fd",
+                    background: "#ff00ff",
+                    boxShadow: "0 0 10px #ff00ff, 0 0 20px rgba(255,0,255,0.5)",
                     "--orbit-r": "100px",
                     animation: "orbit-dot 6.5s linear infinite reverse",
                   } as React.CSSProperties
@@ -418,11 +492,13 @@ export default function Hero() {
                 transform: "translate(-50%, -50%)",
                 zIndex: 4,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #667EEA, #764BA2)",
+                background: "linear-gradient(135deg, #0080ff, #bf00ff)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 animation: "core-pulse 2.5s ease-in-out infinite",
+                boxShadow:
+                  "0 0 25px rgba(0,128,255,0.7), 0 0 50px rgba(191,0,255,0.5)",
               }}
             >
               <svg
@@ -450,7 +526,7 @@ export default function Hero() {
                 top: "50%",
                 left: "50%",
                 borderRadius: "50%",
-                border: "1px solid rgba(102,126,234,0.18)",
+                border: "1px solid rgba(0,245,255,0.12)",
                 animation: "pulse-ring 3.5s ease-in-out infinite",
               }}
             />
@@ -465,23 +541,24 @@ export default function Hero() {
                   left: (chip as { left?: string }).left,
                   right: (chip as { right?: string }).right,
                   bottom: (chip as { bottom?: string }).bottom,
-                  background: "rgba(11,31,74,0.88)",
-                  border: "1px solid rgba(102,126,234,0.45)",
+                  background: "rgba(3,7,18,0.9)",
+                  border: "1px solid rgba(0,245,255,0.35)",
                   borderRadius: "8px",
                   padding: "0.28rem 0.6rem",
                   fontSize: "0.66rem",
                   fontWeight: 600,
-                  color: "#a5b4fc",
+                  color: "#00f5ff",
                   whiteSpace: "nowrap",
                   backdropFilter: "blur(10px)",
                   animation: `${chip.anim} 3.5s ease-in-out ${chip.delay} infinite`,
-                  boxShadow: "0 0 12px rgba(102,126,234,0.20)",
+                  boxShadow: "0 0 12px rgba(0,245,255,0.25)",
                   zIndex: 5,
+                  textShadow: "0 0 6px rgba(0,245,255,0.7)",
                 }}
               >
                 <span
                   style={{
-                    color: "rgba(79,209,255,0.7)",
+                    color: "rgba(255,0,255,0.9)",
                     marginRight: 4,
                     fontSize: "0.55rem",
                   }}
@@ -495,7 +572,6 @@ export default function Hero() {
 
           {/* Glass info card below rings */}
           <div
-            className="glass"
             style={{
               position: "absolute",
               bottom: 0,
@@ -507,15 +583,19 @@ export default function Hero() {
               borderRadius: 12,
               whiteSpace: "nowrap",
               minWidth: 200,
+              background: "rgba(0,245,255,0.04)",
+              border: "1px solid rgba(0,245,255,0.2)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 0 20px rgba(0,245,255,0.1)",
             }}
           >
             <div
               style={{
                 fontSize: "0.8rem",
                 fontWeight: 700,
-                color: "#fff",
+                color: "#00f5ff",
                 marginBottom: "0.15rem",
-                fontFamily: "Bricolage Grotesque, sans-serif",
+                textShadow: "0 0 8px rgba(0,245,255,0.5)",
               }}
             >
               AI Diagnostic Engine
@@ -523,7 +603,7 @@ export default function Hero() {
             <div
               style={{
                 fontSize: "0.7rem",
-                color: "#9AA7C2",
+                color: "rgba(224,247,255,0.5)",
                 letterSpacing: "0.04em",
               }}
             >
