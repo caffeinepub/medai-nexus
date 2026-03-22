@@ -96,7 +96,129 @@ interface ActionStep {
   icon: React.ReactNode;
 }
 
-function StepByStepPlan({ result }: { result: Result }) {
+function downloadPlan(result: Result, selectedSymptoms: string[]) {
+  const date = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MedAI Action Plan - ${result.name}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #1a1a2e; padding: 40px; max-width: 800px; margin: 0 auto; }
+    .header { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 32px; border-radius: 12px; margin-bottom: 28px; }
+    .header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
+    .header p { opacity: 0.85; font-size: 0.9rem; }
+    .meta { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+    .meta-item { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; }
+    .section-title { font-size: 1.1rem; font-weight: 700; color: #667eea; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #667eea22; padding-bottom: 6px; }
+    .symptoms-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .symptom-tag { background: #667eea15; border: 1px solid #667eea44; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #4a4a8a; }
+    .step { display: flex; gap: 16px; align-items: flex-start; padding: 16px 18px; border-radius: 10px; margin-bottom: 12px; }
+    .step-1 { background: #667eea10; border: 1px solid #667eea33; }
+    .step-2 { background: #4ade8010; border: 1px solid #4ade8033; }
+    .step-3 { background: #a78bfa10; border: 1px solid #a78bfa33; }
+    .step-4 { background: #fb923c10; border: 1px solid #fb923c33; }
+    .step-5 { background: #ef444410; border: 1px solid #ef444433; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; color: #fff; flex-shrink: 0; }
+    .step-1 .step-num { background: #667eea; }
+    .step-2 .step-num { background: #4ade80; }
+    .step-3 .step-num { background: #a78bfa; }
+    .step-4 .step-num { background: #fb923c; }
+    .step-5 .step-num { background: #ef4444; }
+    .step-content h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: #1a1a2e; }
+    .step-content p { font-size: 0.85rem; color: #444; line-height: 1.6; }
+    .disclaimer { margin-top: 28px; padding: 14px 18px; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #764ba2; font-size: 0.8rem; color: #666; line-height: 1.5; }
+    .footer { margin-top: 24px; text-align: center; font-size: 0.75rem; color: #999; }
+    @media print { body { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>MedAI Step-by-Step Action Plan</h1>
+    <p>AI-Powered Disease Detection Analysis</p>
+    <div class="meta">
+      <span class="meta-item">Diagnosis: ${result.name}</span>
+      <span class="meta-item">Confidence: ${result.confidence}%</span>
+      <span class="meta-item">Severity: ${result.severity}</span>
+      <span class="meta-item">Date: ${date}</span>
+    </div>
+  </div>
+
+  <div class="section-title">Symptoms Analyzed (${selectedSymptoms.length})</div>
+  <div class="symptoms-list">
+    ${selectedSymptoms.map((s) => `<span class="symptom-tag">${s}</span>`).join("")}
+  </div>
+
+  <div class="section-title">Action Protocol</div>
+
+  <div class="step step-1">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Don't Panic — Stay Calm</h3>
+      <p>This is an AI-assisted analysis, not a final diagnosis. Take a deep breath and proceed with the next steps rationally.</p>
+    </div>
+  </div>
+
+  <div class="step step-2">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Follow Recommended Diet</h3>
+      <p>${result.diet}</p>
+    </div>
+  </div>
+
+  <div class="step step-3">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Take These Precautions</h3>
+      <p>${result.precautions}</p>
+    </div>
+  </div>
+
+  <div class="step step-4">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h3>Consider These Medicines</h3>
+      <p>${result.medicines}. Always consult a pharmacist or doctor before taking any medication.</p>
+    </div>
+  </div>
+
+  <div class="step step-5">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h3>When to See a Doctor</h3>
+      <p>${result.whenToSeeDoctor}</p>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This tool is for educational purposes only and not a substitute for professional medical advice. Always consult a qualified healthcare provider for proper diagnosis and treatment.
+  </div>
+
+  <div class="footer">Generated by MedAI Nexus &mdash; ${date}</div>
+
+  <script>window.onload = function() { window.print(); }<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, "_blank");
+  if (w) {
+    w.onafterprint = () => URL.revokeObjectURL(url);
+  }
+}
+
+function StepByStepPlan({
+  result,
+  selectedSymptoms,
+}: { result: Result; selectedSymptoms: string[] }) {
   const steps: ActionStep[] = [
     {
       step: 1,
@@ -237,29 +359,91 @@ function StepByStepPlan({ result }: { result: Result }) {
         animation: "fadeInUp 0.8s ease",
       }}
     >
-      <div style={{ marginBottom: "24px" }}>
-        <div
-          style={{
-            fontSize: "0.72rem",
-            color: "var(--accent-light)",
-            letterSpacing: "2px",
-            textTransform: "uppercase",
-            marginBottom: "6px",
-          }}
-        >
-          Action Protocol
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          flexWrap: "wrap",
+          gap: "12px",
+          marginBottom: "24px",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: "0.72rem",
+              color: "var(--accent-light)",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              marginBottom: "6px",
+            }}
+          >
+            Action Protocol
+          </div>
+          <h3
+            style={{
+              fontSize: "1.3rem",
+              fontWeight: 700,
+              background: "linear-gradient(90deg, #a78bfa, #818cf8)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Step-by-Step Action Plan
+          </h3>
         </div>
-        <h3
+
+        {/* Download Plan Button */}
+        <button
+          type="button"
+          onClick={() => downloadPlan(result, selectedSymptoms)}
           style={{
-            fontSize: "1.3rem",
-            fontWeight: 700,
-            background: "linear-gradient(90deg, #a78bfa, #818cf8)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            background:
+              "linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.25))",
+            border: "1px solid rgba(167,139,250,0.5)",
+            color: "#c4b5fd",
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            letterSpacing: "0.5px",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background =
+              "linear-gradient(135deg, rgba(102,126,234,0.4), rgba(118,75,162,0.4))";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow =
+              "0 0 18px rgba(167,139,250,0.4)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background =
+              "linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.25))";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
           }}
         >
-          Step-by-Step Action Plan
-        </h3>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-label="Download icon"
+          >
+            <title>Download</title>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download Plan
+        </button>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -277,7 +461,6 @@ function StepByStepPlan({ result }: { result: Result }) {
               animation: `fadeInUp ${0.4 + idx * 0.1}s ease`,
             }}
           >
-            {/* Step number circle */}
             <div
               style={{
                 minWidth: "36px",
@@ -664,7 +847,10 @@ export default function ResultDashboard({
               )}
 
               {/* Step-by-Step Action Plan */}
-              <StepByStepPlan result={results[0]} />
+              <StepByStepPlan
+                result={results[0]}
+                selectedSymptoms={selectedSymptoms}
+              />
             </div>
 
             {results.slice(1).length > 0 && (
