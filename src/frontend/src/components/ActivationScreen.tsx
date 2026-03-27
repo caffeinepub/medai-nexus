@@ -5,6 +5,7 @@ interface Props {
 }
 
 const VALID_KEY = "AIzaSyAeYSZuSR6wbSApVmDEMX7AOvFlRJ774tU";
+const TAGLINE = "AI-Powered Precision Diagnostics";
 
 export default function ActivationScreen({ onActivate }: Props) {
   const [key, setKey] = useState("");
@@ -12,8 +13,24 @@ export default function ActivationScreen({ onActivate }: Props) {
   const [loading, setLoading] = useState(false);
   const [showKey, setShowKey] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [typedText, setTypedText] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Typewriter effect
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i <= TAGLINE.length) {
+        setTypedText(TAGLINE.slice(0, i));
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 55);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Subtle particle canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -22,7 +39,6 @@ export default function ActivationScreen({ onActivate }: Props) {
     canvas.height = window.innerHeight;
 
     const YELLOW = ["rgba(245,197,24,", "rgba(255,215,0,", "rgba(212,160,23,"];
-
     const particles: {
       x: number;
       y: number;
@@ -31,13 +47,13 @@ export default function ActivationScreen({ onActivate }: Props) {
       size: number;
       colorIdx: number;
     }[] = [];
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 50; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 2 + 0.5,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 1.5 + 0.3,
         colorIdx: Math.floor(Math.random() * YELLOW.length),
       });
     }
@@ -52,9 +68,9 @@ export default function ActivationScreen({ onActivate }: Props) {
         if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `${YELLOW[p.colorIdx]}0.8)`;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = `${YELLOW[p.colorIdx]}1)`;
+        ctx.fillStyle = `${YELLOW[p.colorIdx]}0.5)`;
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = `${YELLOW[p.colorIdx]}0.8)`;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
@@ -63,12 +79,12 @@ export default function ActivationScreen({ onActivate }: Props) {
           const p = particles[i];
           const q = particles[j];
           const dist = Math.hypot(p.x - q.x, p.y - q.y);
-          if (dist < 110) {
+          if (dist < 90) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = `${YELLOW[p.colorIdx]}${0.15 * (1 - dist / 110)})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `${YELLOW[p.colorIdx]}${0.08 * (1 - dist / 90)})`;
+            ctx.lineWidth = 0.4;
             ctx.stroke();
           }
         }
@@ -111,7 +127,6 @@ export default function ActivationScreen({ onActivate }: Props) {
       style={{
         position: "fixed",
         inset: 0,
-        background: "#0a0a0a",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -120,58 +135,99 @@ export default function ActivationScreen({ onActivate }: Props) {
         fontFamily: "Poppins, sans-serif",
       }}
     >
-      <canvas ref={canvasRef} style={{ position: "absolute", inset: 0 }} />
+      {/* Full-screen video background */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: 0,
+        }}
+      >
+        <source
+          src="/assets/uploads/probamo-019d2d13-2cca-778c-bff9-7af651d351ef-1.mp4"
+          type="video/mp4"
+        />
+      </video>
 
-      {/* Yellow grid overlay */}
+      {/* Dark overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(0,0,0,0.65)",
+          zIndex: 1,
+        }}
+      />
+
+      {/* Subtle yellow grid overlay */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(245,197,24,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,24,0.04) 1px, transparent 1px)",
-          backgroundSize: "50px 50px",
+            "linear-gradient(rgba(245,197,24,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,24,0.03) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          zIndex: 2,
           pointerEvents: "none",
         }}
       />
 
-      {/* Top scan line */}
+      {/* Particles canvas */}
+      <canvas
+        ref={canvasRef}
+        style={{ position: "absolute", inset: 0, zIndex: 3 }}
+      />
+
+      {/* Cinematic scanline sweep */}
       <div
         style={{
           position: "absolute",
           left: 0,
           right: 0,
-          height: "1px",
+          height: "2px",
           background:
-            "linear-gradient(90deg, transparent, rgba(245,197,24,0.9), transparent)",
-          animation: "scanLine 3s linear infinite",
-          zIndex: 1,
-          boxShadow: "0 0 12px rgba(245,197,24,0.7)",
+            "linear-gradient(90deg, transparent 0%, rgba(245,197,24,0.0) 20%, rgba(245,197,24,0.8) 50%, rgba(245,197,24,0.0) 80%, transparent 100%)",
+          animation: "scanLine 4s linear infinite",
+          zIndex: 4,
+          boxShadow:
+            "0 0 20px rgba(245,197,24,0.6), 0 0 40px rgba(245,197,24,0.3)",
         }}
       />
 
-      {/* Decorative corner brackets */}
-      {[
-        ["top", "left"],
-        ["top", "right"],
-        ["bottom", "left"],
-        ["bottom", "right"],
-      ].map(([v, h]) => (
+      {/* Corner brackets */}
+      {(
+        [
+          ["top", "left"],
+          ["top", "right"],
+          ["bottom", "left"],
+          ["bottom", "right"],
+        ] as const
+      ).map(([v, h]) => (
         <div
           key={`${v}-${h}`}
           style={{
             position: "absolute",
             [v]: 24,
             [h]: 24,
-            width: 32,
-            height: 32,
-            borderTop: v === "top" ? "2px solid rgba(245,197,24,0.5)" : "none",
+            width: 36,
+            height: 36,
+            borderTop: v === "top" ? "2px solid rgba(245,197,24,0.6)" : "none",
             borderBottom:
-              v === "bottom" ? "2px solid rgba(245,197,24,0.5)" : "none",
+              v === "bottom" ? "2px solid rgba(245,197,24,0.6)" : "none",
             borderLeft:
-              h === "left" ? "2px solid rgba(245,197,24,0.5)" : "none",
+              h === "left" ? "2px solid rgba(245,197,24,0.6)" : "none",
             borderRight:
-              h === "right" ? "2px solid rgba(245,197,24,0.5)" : "none",
+              h === "right" ? "2px solid rgba(245,197,24,0.6)" : "none",
+            zIndex: 5,
             pointerEvents: "none",
+            filter: "drop-shadow(0 0 6px rgba(245,197,24,0.5))",
           }}
         />
       ))}
@@ -180,15 +236,17 @@ export default function ActivationScreen({ onActivate }: Props) {
       <div
         style={{
           position: "absolute",
-          top: 28,
+          top: 30,
           left: "50%",
           transform: "translateX(-50%)",
-          fontSize: "0.65rem",
-          color: "rgba(245,197,24,0.5)",
-          letterSpacing: "0.3em",
+          fontSize: "0.6rem",
+          color: "rgba(245,197,24,0.55)",
+          letterSpacing: "0.35em",
           textTransform: "uppercase",
-          fontWeight: 600,
+          fontWeight: 700,
+          zIndex: 5,
           pointerEvents: "none",
+          textShadow: "0 0 10px rgba(245,197,24,0.4)",
         }}
       >
         ◈ SECURE ACCESS TERMINAL ◈
@@ -198,19 +256,20 @@ export default function ActivationScreen({ onActivate }: Props) {
       <div
         style={{
           position: "relative",
-          zIndex: 2,
+          zIndex: 6,
           width: "100%",
-          maxWidth: "460px",
+          maxWidth: "520px",
           margin: "20px",
-          padding: "44px 40px 36px",
+          padding: "50px 44px 40px",
           textAlign: "center",
-          animation: "fadeInUp 0.8s ease",
-          background: "rgba(10,10,10,0.9)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(245,197,24,0.25)",
-          borderRadius: "20px",
+          animation: "fadeInUp 0.9s ease",
+          background: "rgba(0,0,0,0.55)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          border: "1px solid rgba(245,197,24,0.45)",
+          borderRadius: "24px",
           boxShadow:
-            "0 0 60px rgba(245,197,24,0.1), 0 0 120px rgba(245,197,24,0.05), inset 0 0 40px rgba(245,197,24,0.02)",
+            "0 0 80px rgba(245,197,24,0.15), 0 0 160px rgba(245,197,24,0.06), inset 0 0 60px rgba(245,197,24,0.03)",
         }}
       >
         {/* Pulse rings */}
@@ -219,11 +278,11 @@ export default function ActivationScreen({ onActivate }: Props) {
             position: "absolute",
             top: "50%",
             left: "50%",
-            width: 220,
-            height: 220,
+            width: 260,
+            height: 260,
             borderRadius: "50%",
-            border: "1px solid rgba(245,197,24,0.12)",
-            animation: "radarPulse 2.2s ease-out infinite",
+            border: "1px solid rgba(245,197,24,0.1)",
+            animation: "radarPulse 2.5s ease-out infinite",
             pointerEvents: "none",
           }}
         />
@@ -232,11 +291,11 @@ export default function ActivationScreen({ onActivate }: Props) {
             position: "absolute",
             top: "50%",
             left: "50%",
-            width: 220,
-            height: 220,
+            width: 260,
+            height: 260,
             borderRadius: "50%",
-            border: "1px solid rgba(245,197,24,0.08)",
-            animation: "radarPulse 2.2s ease-out 0.7s infinite",
+            border: "1px solid rgba(245,197,24,0.06)",
+            animation: "radarPulse 2.5s ease-out 0.8s infinite",
             pointerEvents: "none",
           }}
         />
@@ -244,23 +303,23 @@ export default function ActivationScreen({ onActivate }: Props) {
         {/* Logo icon */}
         <div
           style={{
-            width: 72,
-            height: 72,
-            margin: "0 auto 20px",
+            width: 80,
+            height: 80,
+            margin: "0 auto 24px",
             borderRadius: "50%",
             background: "linear-gradient(135deg, #f5c518, #d4a017)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            animation: "float 3s ease-in-out infinite",
+            animation: "float 3.5s ease-in-out infinite",
             boxShadow:
-              "0 0 30px rgba(245,197,24,0.6), 0 0 60px rgba(245,197,24,0.3)",
+              "0 0 40px rgba(245,197,24,0.7), 0 0 80px rgba(245,197,24,0.35)",
             position: "relative",
           }}
         >
           <svg
-            width="32"
-            height="32"
+            width="36"
+            height="36"
             viewBox="0 0 24 24"
             fill="none"
             stroke="#0a0a0a"
@@ -275,84 +334,119 @@ export default function ActivationScreen({ onActivate }: Props) {
           </svg>
         </div>
 
+        {/* Title */}
         <h1
           style={{
-            fontSize: "2rem",
-            fontWeight: 800,
+            fontSize: "2.6rem",
+            fontWeight: 900,
             color: "#f5c518",
-            marginBottom: "6px",
-            letterSpacing: "-0.02em",
-            textShadow: "0 0 30px rgba(245,197,24,0.5)",
+            marginBottom: "10px",
+            letterSpacing: "-0.03em",
+            lineHeight: 1.1,
+            textShadow:
+              "0 0 40px rgba(245,197,24,0.8), 0 0 80px rgba(245,197,24,0.4)",
           }}
         >
           MedAI Nexus
         </h1>
 
+        {/* Typewriter tagline */}
         <p
           style={{
-            color: "rgba(245,197,24,0.6)",
-            marginBottom: "6px",
-            fontSize: "0.72rem",
-            letterSpacing: "0.25em",
-            textTransform: "uppercase",
-            fontWeight: 600,
+            color: "rgba(255,255,255,0.75)",
+            marginBottom: "4px",
+            fontSize: "0.95rem",
+            letterSpacing: "0.08em",
+            fontWeight: 500,
+            minHeight: "1.5em",
           }}
         >
-          Advanced AI Disease Detection
+          {typedText}
+          <span
+            style={{
+              display: "inline-block",
+              width: "2px",
+              height: "1em",
+              background: "#f5c518",
+              marginLeft: "2px",
+              verticalAlign: "text-bottom",
+              animation: "blink 0.8s step-end infinite",
+              boxShadow: "0 0 6px rgba(245,197,24,0.8)",
+            }}
+          />
         </p>
 
         {/* Divider */}
         <div
           style={{
-            width: 80,
+            width: 100,
             height: 1,
             background:
-              "linear-gradient(90deg, transparent, #f5c518, transparent)",
-            margin: "20px auto 28px",
-            boxShadow: "0 0 10px rgba(245,197,24,0.5)",
+              "linear-gradient(90deg, transparent, rgba(245,197,24,0.8), transparent)",
+            margin: "22px auto 26px",
+            boxShadow: "0 0 12px rgba(245,197,24,0.5)",
           }}
         />
 
-        {/* System status row */}
+        {/* System status — horizontal pill row */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            gap: "1.5rem",
+            gap: "10px",
             marginBottom: "28px",
+            flexWrap: "wrap",
           }}
         >
-          {["Neural Core", "Diagnostic DB", "AI Engine"].map((label) => (
-            <div key={label} style={{ textAlign: "center" }}>
+          {[
+            { label: "Neural Core", color: "#4ade80" },
+            { label: "Diagnostic DB", color: "#f5c518" },
+            { label: "AI Engine", color: "#4ade80" },
+          ].map(({ label, color }) => (
+            <div
+              key={label}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "6px 14px",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "999px",
+                backdropFilter: "blur(8px)",
+              }}
+            >
               <div
                 style={{
-                  width: 8,
-                  height: 8,
+                  width: 7,
+                  height: 7,
                   borderRadius: "50%",
-                  background: "#f5c518",
-                  boxShadow: "0 0 8px rgba(245,197,24,0.8)",
-                  margin: "0 auto 5px",
-                  animation: "glowPulse 2s ease-in-out infinite",
+                  background: color,
+                  boxShadow: `0 0 8px ${color}`,
+                  animation: "glowPulse 1.8s ease-in-out infinite",
+                  flexShrink: 0,
                 }}
               />
-              <div
+              <span
                 style={{
-                  fontSize: "0.6rem",
-                  color: "rgba(245,197,24,0.5)",
-                  letterSpacing: "0.05em",
+                  fontSize: "0.65rem",
+                  color: "rgba(255,255,255,0.65)",
+                  letterSpacing: "0.06em",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
                 }}
               >
                 {label}
-              </div>
+              </span>
             </div>
           ))}
         </div>
 
         <p
           style={{
-            color: "rgba(255,255,255,0.5)",
+            color: "rgba(255,255,255,0.45)",
             marginBottom: "18px",
-            fontSize: "0.88rem",
+            fontSize: "0.85rem",
           }}
         >
           Enter your API key to initialize the system
@@ -372,10 +466,10 @@ export default function ActivationScreen({ onActivate }: Props) {
             placeholder="Paste your API key here"
             style={{
               width: "100%",
-              padding: "14px 48px 14px 18px",
-              borderRadius: "12px",
+              padding: "14px 52px 14px 18px",
+              borderRadius: "14px",
               background: "rgba(245,197,24,0.05)",
-              border: "1px solid rgba(245,197,24,0.25)",
+              border: "1px solid rgba(245,197,24,0.3)",
               color: "#f5f5f5",
               fontSize: "0.95rem",
               fontFamily: "Poppins, sans-serif",
@@ -385,17 +479,16 @@ export default function ActivationScreen({ onActivate }: Props) {
               letterSpacing: showKey ? "0.02em" : "0.1em",
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = "rgba(245,197,24,0.7)";
-              e.target.style.boxShadow = "0 0 20px rgba(245,197,24,0.15)";
-              e.target.style.background = "rgba(245,197,24,0.08)";
+              e.target.style.borderColor = "rgba(245,197,24,0.8)";
+              e.target.style.boxShadow = "0 0 25px rgba(245,197,24,0.2)";
+              e.target.style.background = "rgba(245,197,24,0.09)";
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "rgba(245,197,24,0.25)";
+              e.target.style.borderColor = "rgba(245,197,24,0.3)";
               e.target.style.boxShadow = "none";
               e.target.style.background = "rgba(245,197,24,0.05)";
             }}
           />
-          {/* Show/hide key toggle */}
           <button
             type="button"
             onClick={() => setShowKey((v) => !v)}
@@ -407,7 +500,7 @@ export default function ActivationScreen({ onActivate }: Props) {
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "rgba(245,197,24,0.5)",
+              color: "rgba(245,197,24,0.55)",
               padding: 4,
               lineHeight: 1,
             }}
@@ -462,7 +555,7 @@ export default function ActivationScreen({ onActivate }: Props) {
               gap: "0.4rem",
             }}
           >
-            <span style={{ color: "#ff6b6b" }}>⚠</span> {error}
+            <span>⚠</span> {error}
           </p>
         )}
 
@@ -474,10 +567,10 @@ export default function ActivationScreen({ onActivate }: Props) {
           disabled={loading}
           style={{
             width: "100%",
-            padding: "15px",
-            fontSize: "0.95rem",
+            padding: "16px",
+            fontSize: "1rem",
             fontWeight: 700,
-            letterSpacing: "0.06em",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             marginTop: "8px",
             cursor: loading ? "not-allowed" : "pointer",
@@ -486,23 +579,23 @@ export default function ActivationScreen({ onActivate }: Props) {
               : "linear-gradient(135deg, #f5c518, #d4a017)",
             color: loading ? "rgba(245,197,24,0.7)" : "#0a0a0a",
             border: "none",
-            borderRadius: "12px",
+            borderRadius: "14px",
             fontFamily: "Poppins, sans-serif",
             transition: "all 0.3s",
-            boxShadow: loading ? "none" : "0 0 25px rgba(245,197,24,0.4)",
+            boxShadow: loading ? "none" : "0 0 30px rgba(245,197,24,0.5)",
             position: "relative",
             overflow: "hidden",
           }}
           onMouseEnter={(e) => {
             if (!loading) {
-              e.currentTarget.style.boxShadow = "0 0 40px rgba(245,197,24,0.6)";
-              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow = "0 0 50px rgba(245,197,24,0.7)";
+              e.currentTarget.style.transform = "translateY(-2px)";
             }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = loading
               ? "none"
-              : "0 0 25px rgba(245,197,24,0.4)";
+              : "0 0 30px rgba(245,197,24,0.5)";
             e.currentTarget.style.transform = "translateY(0)";
           }}
         >
@@ -573,7 +666,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                 height: "100%",
                 width: `${progress}%`,
                 background: "linear-gradient(90deg, #d4a017, #f5c518)",
-                boxShadow: "0 0 8px rgba(245,197,24,0.8)",
+                boxShadow: "0 0 10px rgba(245,197,24,0.9)",
                 transition: "width 0.05s linear",
                 borderRadius: "2px",
               }}
@@ -583,8 +676,8 @@ export default function ActivationScreen({ onActivate }: Props) {
 
         <p
           style={{
-            color: "rgba(255,255,255,0.25)",
-            fontSize: "0.7rem",
+            color: "rgba(255,255,255,0.2)",
+            fontSize: "0.68rem",
             marginTop: "20px",
           }}
         >
