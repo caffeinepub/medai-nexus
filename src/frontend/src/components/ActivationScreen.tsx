@@ -57,8 +57,8 @@ const SLIDES = [
     title: "Built By",
     subtitle: "The Minds Behind MedAI Nexus",
     description:
-      "Deekshith Kumar — Design & Prompt Engineering. Advith Sreejeth — Prototype & Main Project Development. Two innovators building the future of AI-driven diagnostics.",
-    stat: "Deekshith Kumar · Advith Sreejeth",
+      "Deekshith Kumar — Design & Prompt Engineering. Advaith Sreejith — Prototype & Main Project Development. Two innovators building the future of AI-driven diagnostics.",
+    stat: "Deekshith Kumar · Advaith Sreejith",
   },
   {
     num: "03",
@@ -862,7 +862,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                             marginBottom: 4,
                           }}
                         >
-                          Advith Sreejeth
+                          Advaith Sreejith
                         </div>
                         <div
                           style={{
