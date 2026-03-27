@@ -30,13 +30,18 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
         position: "sticky",
         top: 0,
         zIndex: 100,
-        background: scrolled ? "var(--glass-bg)" : "rgba(255,255,255,0.0)",
-        backdropFilter: scrolled ? "blur(20px)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
+        background: scrolled
+          ? "rgba(10, 15, 46, 0.92)"
+          : "rgba(10, 15, 46, 0.0)",
+        backdropFilter: scrolled ? "blur(24px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(24px)" : "none",
         borderBottom: scrolled
-          ? "1px solid var(--glass-border)"
+          ? "1px solid rgba(184,134,11,0.45)"
           : "1px solid transparent",
-        transition: "all 0.3s ease",
+        transition: "all 0.35s ease",
+        boxShadow: scrolled
+          ? "0 4px 30px rgba(10,15,46,0.6), 0 1px 0 rgba(245,197,24,0.1)"
+          : "none",
       }}
     >
       <div
@@ -62,7 +67,21 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
           }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
-          <span style={{ fontSize: "1.6rem" }}>🧠</span>
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#cc0000"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            style={{ filter: "drop-shadow(0 0 6px rgba(204,0,0,0.8))" }}
+          >
+            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
+            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
+          </svg>
           <span
             className="gradient-text"
             style={{ fontSize: "1.4rem", fontWeight: 700 }}
@@ -85,7 +104,7 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
               style={{
                 background: "none",
                 border: "none",
-                color: "var(--text-secondary)",
+                color: "rgba(255,255,255,0.7)",
                 cursor: "pointer",
                 padding: "8px 14px",
                 borderRadius: "8px",
@@ -96,12 +115,12 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
               }}
               onMouseEnter={(e) => {
                 (e.target as HTMLElement).style.background =
-                  "var(--accent-dim)";
-                (e.target as HTMLElement).style.color = "var(--accent)";
+                  "rgba(245,197,24,0.1)";
+                (e.target as HTMLElement).style.color = "#f5c518";
               }}
               onMouseLeave={(e) => {
                 (e.target as HTMLElement).style.background = "none";
-                (e.target as HTMLElement).style.color = "var(--text-secondary)";
+                (e.target as HTMLElement).style.color = "rgba(255,255,255,0.7)";
               }}
             >
               {label}
@@ -116,18 +135,19 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
                 width: "8px",
                 height: "8px",
                 borderRadius: "50%",
-                background: "#800020",
-                boxShadow: "0 0 8px rgba(128,0,32,0.8)",
+                background: "#cc0000",
+                boxShadow: "0 0 8px rgba(204,0,0,0.9)",
                 animation: "blink 1.5s ease-in-out infinite",
                 display: "inline-block",
               }}
             />
             <span
               style={{
-                fontSize: "0.8rem",
-                color: "var(--text-muted)",
-                fontWeight: 500,
+                fontSize: "0.75rem",
+                color: "rgba(245,197,24,0.7)",
+                fontWeight: 600,
                 letterSpacing: "1px",
+                textTransform: "uppercase",
               }}
             >
               SYS ONLINE
@@ -147,20 +167,20 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
               width: "38px",
               height: "38px",
               borderRadius: "10px",
-              background: "var(--accent-dim)",
-              border: "1px solid var(--border-color)",
-              color: "var(--accent)",
+              background: "rgba(245,197,24,0.1)",
+              border: "1px solid rgba(245,197,24,0.35)",
+              color: "#f5c518",
               cursor: "pointer",
               transition: "all 0.2s",
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--accent)";
-              e.currentTarget.style.color = "#ffffff";
+              e.currentTarget.style.background = "rgba(245,197,24,0.2)";
+              e.currentTarget.style.boxShadow = "0 0 12px rgba(245,197,24,0.4)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "var(--accent-dim)";
-              e.currentTarget.style.color = "var(--accent)";
+              e.currentTarget.style.background = "rgba(245,197,24,0.1)";
+              e.currentTarget.style.boxShadow = "none";
             }}
           >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}

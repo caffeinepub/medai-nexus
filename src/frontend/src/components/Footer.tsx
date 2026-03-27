@@ -4,11 +4,27 @@ export default function Footer() {
   return (
     <footer
       style={{
-        padding: "40px 24px",
-        borderTop: "1px solid var(--border-color)",
-        background: "var(--bg-card)",
+        padding: "48px 24px",
+        borderTop: "1px solid rgba(184,134,11,0.3)",
+        background: "#050a1a",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* Gold-red gradient glow at top edge */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "60%",
+          height: "1px",
+          background:
+            "linear-gradient(90deg, transparent, #cc0000 30%, #f5c518 50%, #b8860b 70%, transparent)",
+          boxShadow: "0 0 20px rgba(245,197,24,0.4), 0 0 8px rgba(204,0,0,0.4)",
+        }}
+      />
       <div
         style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center" }}
       >
@@ -26,13 +42,13 @@ export default function Footer() {
             height="22"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--accent)"
+            stroke="#cc0000"
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"
-            aria-label="Brain"
+            style={{ filter: "drop-shadow(0 0 6px rgba(204,0,0,0.7))" }}
+            aria-hidden="true"
           >
-            <title>Brain</title>
             <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
             <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
           </svg>
@@ -45,7 +61,7 @@ export default function Footer() {
         </div>
         <p
           style={{
-            color: "var(--text-muted)",
+            color: "rgba(255,255,255,0.45)",
             fontSize: "0.85rem",
             maxWidth: "500px",
             margin: "0 auto 20px",
@@ -57,21 +73,22 @@ export default function Footer() {
         </p>
         <p
           style={{
-            color: "var(--text-muted)",
+            color: "rgba(255,255,255,0.35)",
             fontSize: "0.8rem",
             marginBottom: "8px",
           }}
         >
-          © {year}. Built with{" "}
+          © {year}. Built with ♥ using{" "}
           <a
             href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${utm}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              color: "var(--accent)",
+              color: "#f5c518",
               textDecoration: "none",
               fontWeight: 600,
               transition: "opacity 0.2s",
+              textShadow: "0 0 8px rgba(245,197,24,0.5)",
             }}
             onMouseEnter={(e) => {
               (e.target as HTMLElement).style.opacity = "0.7";
@@ -85,9 +102,8 @@ export default function Footer() {
         </p>
         <p
           style={{
-            color: "var(--text-muted)",
+            color: "rgba(255,255,255,0.2)",
             fontSize: "0.75rem",
-            opacity: 0.6,
           }}
         >
           For educational use only. Not a medical device.

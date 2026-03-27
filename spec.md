@@ -1,37 +1,27 @@
-# MedAI Nexus – Dark Neon Theme
+# MedAI Vision
 
 ## Current State
-The app uses a deep navy-to-purple gradient background with glassmorphism cards, soft blue/purple accent colors, and white text. CSS variables define all color tokens in index.css.
+Full MedAI Nexus app with ActivationScreen (4-slide walkthrough, black/yellow), Navbar, Hero, SymptomPanel, ResultDashboard, Footer. Current theme is black + yellow (#f5c518). Slide transitions exist but are not 3D.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Neon glow variables: cyan (#00f5ff), magenta (#ff00ff), neon green (#00ff88), electric blue (#0080ff)
-- Neon text-shadow and box-shadow effects on buttons, cards, headings
-- Scanline/grid overlay for cyberpunk feel
-- Neon-colored confidence bars and severity badges
-- Neon animated borders on cards and inputs
+- 3D perspective rotateY + translateX slide transitions (outgoing rotates away, incoming spins in)
+- Blackish-gold color token
 
 ### Modify
-- Background: deep black (#030712) instead of navy-to-purple gradient
-- CSS variables: replace blue/purple accents with neon cyan, magenta, green, electric blue
-- ActivationScreen: black bg with neon cyan/magenta particle network and glowing title
-- Navbar: black translucent bar with neon cyan logo glow and neon CTA button
-- Hero: black bg, neon-ringed gyroscope, neon chip labels, neon glow headings
-- SymptomPanel: dark cards, neon selected states, neon category tabs
-- ResultDashboard: dark cards, neon confidence bars, neon step icons, neon download button
-- Footer: dark bg with neon accent text
-- index.css: full neon dark token overhaul
+- Whole app theme: dark blue (#0a0f2e) background, blackish-gold (#b8860b) gradient overlays, red (#cc0000) + yellow-gold (#f5c518) accents, white text, dark blue cards with gold borders
+- ActivationScreen: 3D flip+translate transitions with cubic-bezier easing, per-slide animations
+- Navbar, Hero, SymptomPanel, ResultDashboard, Footer: updated to new palette
+- Gyroscope rings + radar: red + gold
 
 ### Remove
-- Blue-to-purple gradient backgrounds on body/sections
-- Soft pastel blue/purple tones throughout
+- Black-only background (replaced with deep dark blue)
 
 ## Implementation Plan
-1. Update index.css with neon dark tokens and new keyframe glow animations
-2. Update ActivationScreen.tsx for black + neon cyan/magenta theme
-3. Update Navbar.tsx for neon accents
-4. Update Hero.tsx ring and chip colors to neon
-5. Update SymptomPanel.tsx neon selected states
-6. Update ResultDashboard.tsx neon confidence bars, step plan, download button
-7. Update Footer.tsx neon accents
+1. Update all components to 5-color palette
+2. Rewrite ActivationScreen transitions to 3D perspective flip + translate
+3. Add per-slide animations in ActivationScreen
+4. Update Hero gyroscope/radar colors
+5. Update all remaining sections to match
+6. Validate build

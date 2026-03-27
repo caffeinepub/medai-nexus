@@ -11,6 +11,7 @@ export default function Hero() {
     "dot-tl2",
   ];
 
+  // Alternating red / gold rings
   const rings = [
     {
       size: 320,
@@ -18,7 +19,7 @@ export default function Hero() {
       dur: "18s",
       rev: false,
       style: "dashed",
-      color: "rgba(109, 40, 217, 0.15)",
+      color: "rgba(204,0,0,0.18)",
     },
     {
       size: 280,
@@ -26,7 +27,7 @@ export default function Hero() {
       dur: "12s",
       rev: false,
       style: "dashed",
-      color: "rgba(139, 92, 246, 0.28)",
+      color: "rgba(245,197,24,0.3)",
     },
     {
       size: 230,
@@ -34,7 +35,7 @@ export default function Hero() {
       dur: "9s",
       rev: true,
       style: "solid",
-      color: "rgba(124, 58, 237, 0.35)",
+      color: "rgba(184,134,11,0.4)",
     },
     {
       size: 185,
@@ -42,7 +43,7 @@ export default function Hero() {
       dur: "14s",
       rev: false,
       style: "dashed",
-      color: "rgba(167, 139, 250, 0.25)",
+      color: "rgba(204,0,0,0.28)",
     },
     {
       size: 145,
@@ -50,7 +51,7 @@ export default function Hero() {
       dur: "7s",
       rev: true,
       style: "solid",
-      color: "rgba(109, 40, 217, 0.5)",
+      color: "rgba(245,197,24,0.55)",
     },
     {
       size: 105,
@@ -58,7 +59,7 @@ export default function Hero() {
       dur: "5s",
       rev: false,
       style: "solid",
-      color: "rgba(139, 92, 246, 0.6)",
+      color: "rgba(204,0,0,0.65)",
     },
     {
       size: 68,
@@ -66,7 +67,7 @@ export default function Hero() {
       dur: "3.5s",
       rev: true,
       style: "solid",
-      color: "rgba(167, 139, 250, 0.7)",
+      color: "rgba(245,197,24,0.75)",
     },
   ];
 
@@ -104,8 +105,8 @@ export default function Hero() {
           </p>
           <div className="hero-stats">
             {[
-              { value: "270+", label: "Symptoms" },
-              { value: "122", label: "Diseases" },
+              { value: "264+", label: "Symptoms" },
+              { value: "70", label: "Diseases" },
               { value: "AI", label: "Powered" },
               { value: "Live", label: "Analysis" },
             ].map((s) => (
@@ -128,13 +129,24 @@ export default function Hero() {
               height: ring.size,
               borderColor: ring.color,
               borderStyle: ring.style as React.CSSProperties["borderStyle"],
-              animation: `${ring.rev ? "rotate-ring-rev" : "rotate-ring"} ${ring.dur} linear infinite`,
-              boxShadow: ring.size < 150 ? `0 0 12px ${ring.color}` : undefined,
+              animation: `${
+                ring.rev ? "rotate-ring-rev" : "rotate-ring"
+              } ${ring.dur} linear infinite`,
+              boxShadow: ring.size < 150 ? `0 0 14px ${ring.color}` : undefined,
             }}
           />
         ))}
 
+        {/* Dual radar sweeps: red + gold */}
         <div className="radar-sweep" />
+        <div
+          className="radar-sweep"
+          style={{
+            background:
+              "conic-gradient(from 180deg, transparent 70%, rgba(245,197,24,0.25) 85%, rgba(184,134,11,0.4) 95%, rgba(245,197,24,0.1) 100%)",
+            animation: "radar2 4.5s linear infinite",
+          }}
+        />
 
         <svg
           style={{
@@ -159,7 +171,9 @@ export default function Hero() {
                 y1={170 + innerR * Math.sin(angle)}
                 x2={170 + outerR * Math.cos(angle)}
                 y2={170 + outerR * Math.sin(angle)}
-                stroke="rgba(139, 92, 246, 0.45)"
+                stroke={
+                  i % 2 === 0 ? "rgba(204,0,0,0.5)" : "rgba(245,197,24,0.4)"
+                }
                 strokeWidth={i % 6 === 0 ? 1.5 : 0.8}
               />
             );
@@ -173,7 +187,7 @@ export default function Hero() {
                 y1={170 + 34 * Math.sin(rad)}
                 x2={170 + 52 * Math.cos(rad)}
                 y2={170 + 52 * Math.sin(rad)}
-                stroke="#8B5CF6"
+                stroke="#f5c518"
                 strokeWidth="1"
                 opacity="0.6"
               />
@@ -194,7 +208,7 @@ export default function Hero() {
               cx="30"
               cy="30"
               r="20"
-              stroke="#8B5CF6"
+              stroke="rgba(245,197,24,0.55)"
               strokeWidth="1"
               opacity="0.5"
             />
@@ -202,11 +216,11 @@ export default function Hero() {
               cx="30"
               cy="30"
               r="12"
-              stroke="#7C3AED"
+              stroke="#cc0000"
               strokeWidth="1.5"
-              opacity="0.7"
+              opacity="0.75"
             />
-            <circle cx="30" cy="30" r="5" fill="#A78BFA" />
+            <circle cx="30" cy="30" r="5" fill="#f5c518" />
             {ringAngles.map((deg) => {
               const rad = (deg * Math.PI) / 180;
               return (
@@ -216,9 +230,9 @@ export default function Hero() {
                   y1={30 + 12 * Math.sin(rad)}
                   x2={30 + 20 * Math.cos(rad)}
                   y2={30 + 20 * Math.sin(rad)}
-                  stroke="#8B5CF6"
+                  stroke={deg % 120 === 0 ? "#cc0000" : "#f5c518"}
                   strokeWidth="1"
-                  opacity="0.6"
+                  opacity="0.7"
                 />
               );
             })}

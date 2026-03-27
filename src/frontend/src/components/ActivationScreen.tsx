@@ -7,15 +7,20 @@ interface Props {
 const VALID_KEY = "AIzaSyAeYSZuSR6wbSApVmDEMX7AOvFlRJ774tU";
 const AUTO_ADVANCE_MS = 3500;
 
+const SYMPTOM_DOTS = Array.from({ length: 18 }, (_, i) => ({
+  id: `sdot-${i}`,
+  delay: i * 0.1,
+}));
 const SLIDES = [
   {
+    num: "01",
     icon: (
       <svg
-        width="48"
-        height="48"
+        width="64"
+        height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#f5c518"
+        stroke="#cc0000"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -32,41 +37,38 @@ const SLIDES = [
     stat: "70+ Diseases Detected",
   },
   {
+    num: "02",
     icon: (
       <svg
-        width="48"
-        height="48"
+        width="64"
+        height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#f5c518"
+        stroke="#cc0000"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        <path d="M9 12h6" />
-        <path d="M11 10v4" />
-        <path d="M4 6h16" />
-        <path d="M4 10h4" />
-        <path d="M4 14h4" />
-        <path d="M4 18h16" />
-        <rect x="8" y="8" width="8" height="8" rx="1" />
+        <circle cx="12" cy="8" r="4" />
+        <path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
       </svg>
     ),
-    title: "264 Symptoms Analyzed",
-    subtitle: "Comprehensive Symptom Database",
+    title: "Built By",
+    subtitle: "The Minds Behind MedAI Nexus",
     description:
-      "Select from 264 symptoms across General, Critical, and Rare categories. Our AI engine matches your profile against 70 known conditions with precision scoring.",
-    stat: "264 Symptoms · 3 Categories",
+      "Deekshith Kumar — Design & Prompt Engineering. Advith Sreejeth — Prototype & Main Project Development. Two innovators building the future of AI-driven diagnostics.",
+    stat: "Deekshith Kumar · Advith Sreejeth",
   },
   {
+    num: "03",
     icon: (
       <svg
-        width="48"
-        height="48"
+        width="64"
+        height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#f5c518"
+        stroke="#cc0000"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -84,13 +86,14 @@ const SLIDES = [
     stat: "Step-by-Step Action Plan",
   },
   {
+    num: "04",
     icon: (
       <svg
-        width="48"
-        height="48"
+        width="64"
+        height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#f5c518"
+        stroke="#cc0000"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -108,21 +111,22 @@ const SLIDES = [
   },
 ];
 
+type SlideState = "idle" | "exiting" | "entering";
+
 export default function ActivationScreen({ onActivate }: Props) {
   const [slide, setSlide] = useState(0);
-  const [animating, setAnimating] = useState(false);
-  const animatingRef = useRef(false);
+  const [slideState, setSlideState] = useState<SlideState>("idle");
+  const transitioning = useRef(false);
   const [apiKey, setApiKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showKey, setShowKey] = useState(false);
-  const [slideDir, setSlideDir] = useState<"in" | "out">("in");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const isLastSlide = slide === SLIDES.length;
 
-  // Particle canvas
+  // Particle canvas — dark-blue bg with red + gold particles
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -134,14 +138,19 @@ export default function ActivationScreen({ onActivate }: Props) {
     resize();
     window.addEventListener("resize", resize);
 
-    const YELLOW = ["rgba(245,197,24,", "rgba(255,215,0,", "rgba(212,160,23,"];
-    const particles = Array.from({ length: 60 }, () => ({
+    const COLORS = [
+      "rgba(204,0,0,",
+      "rgba(245,197,24,",
+      "rgba(184,134,11,",
+      "rgba(204,0,0,",
+    ];
+    const particles = Array.from({ length: 70 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      size: Math.random() * 1.8 + 0.3,
-      colorIdx: Math.floor(Math.random() * YELLOW.length),
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      size: Math.random() * 1.8 + 0.4,
+      colorIdx: Math.floor(Math.random() * COLORS.length),
     }));
 
     let animId: number;
@@ -154,9 +163,9 @@ export default function ActivationScreen({ onActivate }: Props) {
         if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `${YELLOW[p.colorIdx]}0.55)`;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = `${YELLOW[p.colorIdx]}0.8)`;
+        ctx.fillStyle = `${COLORS[p.colorIdx]}0.65)`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `${COLORS[p.colorIdx]}0.9)`;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
@@ -165,11 +174,11 @@ export default function ActivationScreen({ onActivate }: Props) {
           const a = particles[i];
           const b = particles[j];
           const dist = Math.hypot(a.x - b.x, a.y - b.y);
-          if (dist < 100) {
+          if (dist < 90) {
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `${YELLOW[a.colorIdx]}${0.09 * (1 - dist / 100)})`;
+            ctx.strokeStyle = `${COLORS[a.colorIdx]}${0.08 * (1 - dist / 90)})`;
             ctx.lineWidth = 0.4;
             ctx.stroke();
           }
@@ -188,30 +197,21 @@ export default function ActivationScreen({ onActivate }: Props) {
   useEffect(() => {
     if (isLastSlide) return;
     const t = setTimeout(() => {
-      const nextSlide = slide + 1;
-      if (nextSlide <= SLIDES.length - 1 && !animatingRef.current) {
-        goToSlide(nextSlide);
-      }
+      if (transitioning.current) return;
+      const next = slide < SLIDES.length ? slide + 1 : slide;
+      transitioning.current = true;
+      setSlideState("exiting");
+      setTimeout(() => {
+        setSlide(next);
+        setSlideState("entering");
+        setTimeout(() => {
+          setSlideState("idle");
+          transitioning.current = false;
+        }, 700);
+      }, 620);
     }, AUTO_ADVANCE_MS);
     return () => clearTimeout(t);
-    // goToSlide is stable (defined in render, uses ref for guard)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slide, isLastSlide]);
-
-  const goToSlide = (next: number) => {
-    if (animatingRef.current) return;
-    animatingRef.current = true;
-    setAnimating(true);
-    setSlideDir("out");
-    setTimeout(() => {
-      setSlide(next);
-      setSlideDir("in");
-      setTimeout(() => {
-        animatingRef.current = false;
-        setAnimating(false);
-      }, 50);
-    }, 500);
-  };
 
   const handleActivate = async () => {
     if (!apiKey.trim()) {
@@ -233,20 +233,34 @@ export default function ActivationScreen({ onActivate }: Props) {
 
   const currentSlideData = SLIDES[slide];
 
-  const cardAnim: React.CSSProperties = {
-    opacity: animating ? 0 : 1,
-    transform: animating
-      ? slideDir === "out"
-        ? "translateX(-40px) scale(0.96)"
-        : "translateX(40px) scale(0.96)"
-      : "translateX(0) scale(1)",
-    transition:
-      "opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+  // 3D slide transition styles
+  const getSlideStyle = (): React.CSSProperties => {
+    if (slideState === "exiting") {
+      return {
+        animation: "slide3dOut 0.62s cubic-bezier(0.23, 1, 0.32, 1) forwards",
+      };
+    }
+    if (slideState === "entering") {
+      return {
+        animation: "slide3dIn 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards",
+      };
+    }
+    return { opacity: 1, transform: "translateX(0) rotateY(0deg)" };
   };
+
+  const isActive = slideState === "idle";
 
   return (
     <>
       <style>{`
+        @keyframes slide3dOut {
+          from { opacity: 1; transform: translateX(0) rotateY(0deg); }
+          to   { opacity: 0; transform: translateX(-90px) rotateY(-38deg) scale(0.94); }
+        }
+        @keyframes slide3dIn {
+          from { opacity: 0; transform: translateX(90px) rotateY(38deg) scale(0.94); }
+          to   { opacity: 1; transform: translateX(0) rotateY(0deg) scale(1); }
+        }
         @keyframes slideTimer {
           from { width: 0% }
           to { width: 100% }
@@ -255,24 +269,85 @@ export default function ActivationScreen({ onActivate }: Props) {
           0% { top: -2px; }
           100% { top: 100%; }
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
+        @keyframes floatIcon {
+          0%, 100% { transform: translateY(0px) rotate(-2deg); }
+          50% { transform: translateY(-10px) rotate(2deg); }
         }
-        @keyframes radarPulse {
-          0% { transform: scale(1); opacity: 0.6; }
-          100% { transform: scale(1.5); opacity: 0; }
+        @keyframes pulseRing {
+          0% { transform: scale(1); opacity: 0.7; }
+          100% { transform: scale(1.65); opacity: 0; }
         }
-        @keyframes glowPulse {
+        @keyframes glowBlink {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+          50% { opacity: 0.35; }
         }
         @keyframes spinSlow {
           to { transform: rotate(360deg); }
         }
+        @keyframes drawLine {
+          from { width: 0%; opacity: 0; }
+          to { width: 100%; opacity: 1; }
+        }
+        @keyframes bgNumFloat {
+          0%, 100% { transform: translateY(0px) skewX(-2deg); }
+          50% { transform: translateY(-14px) skewX(2deg); }
+        }
+        @keyframes statPulse {
+          0%, 100% { box-shadow: 0 0 14px rgba(245,197,24,0.4), 0 0 30px rgba(245,197,24,0.15); }
+          50% { box-shadow: 0 0 28px rgba(245,197,24,0.75), 0 0 55px rgba(204,0,0,0.3); }
+        }
+        @keyframes countUp {
+          from { opacity: 0; transform: scale(0.5); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes dotLight {
+          0%, 100% { background: rgba(184,134,11,0.2); box-shadow: none; }
+          50% { background: #f5c518; box-shadow: 0 0 8px rgba(245,197,24,0.9); }
+        }
+        @keyframes cardSlideLeft {
+          from { opacity: 0; transform: translateX(-40px) rotateY(15deg); }
+          to { opacity: 1; transform: translateX(0) rotateY(0); }
+        }
+        @keyframes cardSlideRight {
+          from { opacity: 0; transform: translateX(40px) rotateY(-15deg); }
+          to { opacity: 1; transform: translateX(0) rotateY(0); }
+        }
+        @keyframes typewriter {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+        @keyframes shieldPulse {
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(204,0,0,0.7)); }
+          50% { filter: drop-shadow(0 0 20px rgba(245,197,24,0.8)) drop-shadow(0 0 35px rgba(204,0,0,0.5)); }
+        }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-4px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideTextIn1 {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideTextIn2 {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideTextIn3 {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-title { animation: slideTextIn1 0.55s cubic-bezier(0.4,0,0.2,1) 0.08s both; }
+        .slide-sub { animation: slideTextIn2 0.55s cubic-bezier(0.4,0,0.2,1) 0.2s both; }
+        .slide-desc { animation: slideTextIn3 0.55s cubic-bezier(0.4,0,0.2,1) 0.34s both; }
+        .slide-stat { animation: slideTextIn3 0.55s cubic-bezier(0.4,0,0.2,1) 0.46s both; }
+        .draw-line {
+          animation: drawLine 0.7s cubic-bezier(0.4,0,0.2,1) 0.28s both;
+        }
+        .creator-left {
+          animation: cardSlideLeft 0.65s cubic-bezier(0.23,1,0.32,1) 0.15s both;
+        }
+        .creator-right {
+          animation: cardSlideRight 0.65s cubic-bezier(0.23,1,0.32,1) 0.3s both;
         }
       `}</style>
       <div
@@ -286,17 +361,34 @@ export default function ActivationScreen({ onActivate }: Props) {
           zIndex: 9999,
           overflow: "hidden",
           fontFamily: "Poppins, sans-serif",
-          background: "#050505",
+          background: "#0a0f2e",
         }}
       >
-        {/* Grid overlay */}
+        {/* Dark-blue grid overlay */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "linear-gradient(rgba(245,197,24,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,24,0.04) 1px, transparent 1px)",
+              "linear-gradient(rgba(184,134,11,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,11,0.05) 1px, transparent 1px)",
             backgroundSize: "55px 55px",
+            zIndex: 1,
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Radial glow center */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "60vmax",
+            height: "60vmax",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(204,0,0,0.07) 0%, rgba(184,134,11,0.04) 40%, transparent 70%)",
             zIndex: 1,
             pointerEvents: "none",
           }}
@@ -316,10 +408,10 @@ export default function ActivationScreen({ onActivate }: Props) {
             right: 0,
             height: "1px",
             background:
-              "linear-gradient(90deg, transparent 0%, rgba(245,197,24,0.0) 15%, rgba(245,197,24,0.9) 50%, rgba(245,197,24,0.0) 85%, transparent 100%)",
-            animation: "scanLine 5s linear infinite",
+              "linear-gradient(90deg, transparent 0%, rgba(245,197,24,0.0) 15%, rgba(245,197,24,0.85) 50%, rgba(245,197,24,0.0) 85%, transparent 100%)",
+            animation: "scanLine 5.5s linear infinite",
             zIndex: 3,
-            boxShadow: "0 0 20px rgba(245,197,24,0.5)",
+            boxShadow: "0 0 22px rgba(245,197,24,0.5)",
           }}
         />
 
@@ -332,16 +424,16 @@ export default function ActivationScreen({ onActivate }: Props) {
                 position: "absolute",
                 [v]: 20,
                 [h]: 20,
-                width: 32,
-                height: 32,
+                width: 38,
+                height: 38,
                 borderTop:
-                  v === "top" ? "2px solid rgba(245,197,24,0.5)" : "none",
+                  v === "top" ? "2px solid rgba(184,134,11,0.6)" : "none",
                 borderBottom:
-                  v === "bottom" ? "2px solid rgba(245,197,24,0.5)" : "none",
+                  v === "bottom" ? "2px solid rgba(184,134,11,0.6)" : "none",
                 borderLeft:
-                  h === "left" ? "2px solid rgba(245,197,24,0.5)" : "none",
+                  h === "left" ? "2px solid rgba(184,134,11,0.6)" : "none",
                 borderRight:
-                  h === "right" ? "2px solid rgba(245,197,24,0.5)" : "none",
+                  h === "right" ? "2px solid rgba(184,134,11,0.6)" : "none",
                 zIndex: 4,
                 pointerEvents: "none",
                 filter: "drop-shadow(0 0 6px rgba(245,197,24,0.4))",
@@ -358,20 +450,20 @@ export default function ActivationScreen({ onActivate }: Props) {
             left: "50%",
             transform: "translateX(-50%)",
             fontSize: "0.58rem",
-            color: "rgba(245,197,24,0.5)",
+            color: "rgba(245,197,24,0.65)",
             letterSpacing: "0.35em",
             textTransform: "uppercase",
             fontWeight: 700,
             zIndex: 5,
             pointerEvents: "none",
-            textShadow: "0 0 10px rgba(245,197,24,0.4)",
+            textShadow: "0 0 12px rgba(245,197,24,0.5)",
             whiteSpace: "nowrap",
           }}
         >
           ◈ MEDAI NEXUS — SECURE ACCESS ◈
         </div>
 
-        {/* Step dots top-right */}
+        {/* Step dots */}
         <div
           style={{
             position: "absolute",
@@ -387,24 +479,29 @@ export default function ActivationScreen({ onActivate }: Props) {
             <div
               key={s.title}
               style={{
-                width: i === slide ? 20 : 7,
+                width: i === slide && !isLastSlide ? 22 : 7,
                 height: 7,
                 borderRadius: 4,
-                background: i === slide ? "#f5c518" : "rgba(245,197,24,0.25)",
+                background:
+                  i === slide && !isLastSlide
+                    ? "#f5c518"
+                    : "rgba(245,197,24,0.2)",
                 transition: "all 0.3s ease",
                 boxShadow:
-                  i === slide ? "0 0 8px rgba(245,197,24,0.7)" : "none",
+                  i === slide && !isLastSlide
+                    ? "0 0 10px rgba(245,197,24,0.9)"
+                    : "none",
               }}
             />
           ))}
           <div
             style={{
-              width: isLastSlide ? 20 : 7,
+              width: isLastSlide ? 22 : 7,
               height: 7,
               borderRadius: 4,
-              background: isLastSlide ? "#f5c518" : "rgba(245,197,24,0.25)",
+              background: isLastSlide ? "#cc0000" : "rgba(204,0,0,0.25)",
               transition: "all 0.3s ease",
-              boxShadow: isLastSlide ? "0 0 8px rgba(245,197,24,0.7)" : "none",
+              boxShadow: isLastSlide ? "0 0 10px rgba(204,0,0,0.9)" : "none",
             }}
           />
         </div>
@@ -415,17 +512,19 @@ export default function ActivationScreen({ onActivate }: Props) {
             position: "relative",
             zIndex: 6,
             width: "100%",
-            maxWidth: 520,
+            maxWidth: 560,
             margin: "20px",
             textAlign: "center",
-            background: "rgba(0,0,0,0.6)",
-            backdropFilter: "blur(28px)",
-            WebkitBackdropFilter: "blur(28px)",
-            border: "1px solid rgba(245,197,24,0.4)",
+            background: "rgba(8,12,36,0.78)",
+            backdropFilter: "blur(36px)",
+            WebkitBackdropFilter: "blur(36px)",
+            border: "1px solid rgba(184,134,11,0.45)",
             borderRadius: 24,
             boxShadow:
-              "0 0 80px rgba(245,197,24,0.12), 0 0 160px rgba(245,197,24,0.05), inset 0 0 50px rgba(245,197,24,0.03)",
+              "0 0 80px rgba(204,0,0,0.1), 0 0 40px rgba(184,134,11,0.08), inset 0 0 50px rgba(10,15,46,0.5)",
             overflow: "hidden",
+            perspective: "1200px",
+            transformStyle: "preserve-3d",
           }}
         >
           {/* Per-slide progress bar */}
@@ -436,8 +535,8 @@ export default function ActivationScreen({ onActivate }: Props) {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: 2,
-                background: "rgba(245,197,24,0.12)",
+                height: 3,
+                background: "rgba(184,134,11,0.12)",
                 zIndex: 10,
               }}
             >
@@ -445,9 +544,10 @@ export default function ActivationScreen({ onActivate }: Props) {
                 key={slide}
                 style={{
                   height: "100%",
-                  background: "#f5c518",
+                  background:
+                    "linear-gradient(90deg, #cc0000, #f5c518, #b8860b)",
                   boxShadow:
-                    "0 0 8px rgba(245,197,24,0.9), 0 0 16px rgba(245,197,24,0.4)",
+                    "0 0 10px rgba(245,197,24,0.8), 0 0 20px rgba(204,0,0,0.4)",
                   borderRadius: 2,
                   animation: `slideTimer ${AUTO_ADVANCE_MS}ms linear forwards`,
                 }}
@@ -458,256 +558,497 @@ export default function ActivationScreen({ onActivate }: Props) {
           <div style={{ padding: "48px 44px 40px" }}>
             {!isLastSlide ? (
               /* ── Feature slide ── */
-              <div style={cardAnim}>
-                {/* Glowing icon ring */}
+              <div
+                style={{
+                  ...getSlideStyle(),
+                  transformStyle: "preserve-3d",
+                }}
+                key={`slide-wrapper-${slide}`}
+              >
+                {/* Big decorative bg number */}
                 <div
                   style={{
-                    width: 96,
-                    height: 96,
-                    margin: "0 auto 28px",
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    fontSize: "22rem",
+                    fontWeight: 900,
+                    color: "rgba(184,134,11,0.04)",
+                    letterSpacing: "-0.05em",
+                    lineHeight: 1,
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    animation: "bgNumFloat 8s ease-in-out infinite",
+                    fontFamily: "Poppins, sans-serif",
+                    zIndex: 0,
+                  }}
+                >
+                  {currentSlideData.num}
+                </div>
+
+                {/* Content */}
+                <div style={{ position: "relative", zIndex: 1 }}>
+                  {/* Icon ring */}
+                  <div
+                    style={{
+                      width: 110,
+                      height: 110,
+                      margin: "0 auto 32px",
+                      borderRadius: "50%",
+                      background:
+                        "radial-gradient(circle, rgba(204,0,0,0.1) 0%, rgba(184,134,11,0.08) 60%, transparent 100%)",
+                      border: "1.5px solid rgba(204,0,0,0.55)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      boxShadow:
+                        "0 0 35px rgba(204,0,0,0.3), 0 0 18px rgba(245,197,24,0.15), inset 0 0 20px rgba(204,0,0,0.06)",
+                      animation: isActive
+                        ? "floatIcon 3.8s ease-in-out infinite"
+                        : "none",
+                      position: "relative",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: -14,
+                        borderRadius: "50%",
+                        border: "1px solid rgba(245,197,24,0.3)",
+                        animation: isActive
+                          ? "pulseRing 2.6s ease-out infinite"
+                          : "none",
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: -28,
+                        borderRadius: "50%",
+                        border: "1px solid rgba(204,0,0,0.15)",
+                        animation: isActive
+                          ? "pulseRing 2.6s ease-out 0.9s infinite"
+                          : "none",
+                      }}
+                    />
+                    {currentSlideData.icon}
+                  </div>
+
+                  {/* Draw line */}
+                  <div
+                    className="draw-line"
+                    key={`line-${slide}`}
+                    style={{
+                      height: 2,
+                      background:
+                        "linear-gradient(90deg, transparent, #cc0000 40%, #f5c518 60%, transparent)",
+                      borderRadius: 2,
+                      marginBottom: 20,
+                      boxShadow:
+                        "0 0 12px rgba(204,0,0,0.6), 0 0 6px rgba(245,197,24,0.4)",
+                    }}
+                  />
+
+                  {/* Slide 01: Symptom dots grid animation */}
+                  {slide === 0 && isActive && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 5,
+                        marginBottom: 16,
+                        flexWrap: "wrap",
+                        maxWidth: 220,
+                        margin: "0 auto 18px",
+                      }}
+                    >
+                      {SYMPTOM_DOTS.map((dot) => (
+                        <div
+                          key={dot.id}
+                          style={{
+                            width: 7,
+                            height: 7,
+                            borderRadius: "50%",
+                            animation: `dotLight 1.8s ease-in-out ${dot.delay}s infinite`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Slide 01: Pulsing cross */}
+                  {slide === 0 && isActive && (
+                    <div
+                      style={{
+                        display: "inline-block",
+                        marginBottom: 14,
+                        animation: "shieldPulse 2.2s ease-in-out infinite",
+                      }}
+                    >
+                      <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#cc0000"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h5v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2z" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* Slide 01: symptom counter */}
+                  {slide === 0 && (
+                    <p
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "rgba(245,197,24,0.7)",
+                        letterSpacing: "0.2em",
+                        textTransform: "uppercase",
+                        fontWeight: 700,
+                        marginBottom: 8,
+                        animation:
+                          "countUp 0.7s cubic-bezier(0.23,1,0.32,1) 0.6s both",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "1.8rem",
+                          fontWeight: 900,
+                          color: "#f5c518",
+                          textShadow: "0 0 20px rgba(245,197,24,0.8)",
+                          marginRight: 6,
+                        }}
+                      >
+                        264
+                      </span>
+                      Symptoms Analyzed
+                    </p>
+                  )}
+
+                  {/* Slide 01: text reveal */}
+                  <h1
+                    className="slide-title"
+                    key={`title-${slide}`}
+                    style={{
+                      fontSize: "2rem",
+                      fontWeight: 900,
+                      color: "#cc0000",
+                      marginBottom: 8,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.15,
+                      textShadow:
+                        "0 0 40px rgba(204,0,0,0.7), 0 0 80px rgba(204,0,0,0.3)",
+                    }}
+                  >
+                    {currentSlideData.title}
+                  </h1>
+                  <p
+                    className="slide-sub"
+                    key={`sub-${slide}`}
+                    style={{
+                      fontSize: "0.78rem",
+                      color: "rgba(245,197,24,0.8)",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      marginBottom: 22,
+                    }}
+                  >
+                    {currentSlideData.subtitle}
+                  </p>
+
+                  {/* Slide 02: Creator cards */}
+                  {slide === 1 ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 14,
+                        marginBottom: 28,
+                        perspective: "600px",
+                      }}
+                    >
+                      <div
+                        className="creator-left"
+                        style={{
+                          flex: 1,
+                          padding: "18px 14px",
+                          background: "rgba(204,0,0,0.08)",
+                          border: "1px solid rgba(204,0,0,0.45)",
+                          borderRadius: 14,
+                          boxShadow: "0 0 20px rgba(204,0,0,0.2)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: "50%",
+                            background:
+                              "linear-gradient(135deg, #cc0000, #8b0000)",
+                            margin: "0 auto 10px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 0 15px rgba(204,0,0,0.5)",
+                            fontSize: "1rem",
+                            fontWeight: 800,
+                            color: "#fff",
+                          }}
+                        >
+                          D
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.82rem",
+                            fontWeight: 700,
+                            color: "#fff",
+                            marginBottom: 4,
+                          }}
+                        >
+                          Deekshith Kumar
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.65rem",
+                            color: "rgba(245,197,24,0.7)",
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Design & Prompt Engineering
+                        </div>
+                      </div>
+                      <div
+                        className="creator-right"
+                        style={{
+                          flex: 1,
+                          padding: "18px 14px",
+                          background: "rgba(245,197,24,0.06)",
+                          border: "1px solid rgba(245,197,24,0.4)",
+                          borderRadius: 14,
+                          boxShadow: "0 0 20px rgba(245,197,24,0.15)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: "50%",
+                            background:
+                              "linear-gradient(135deg, #f5c518, #b8860b)",
+                            margin: "0 auto 10px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 0 15px rgba(245,197,24,0.5)",
+                            fontSize: "1rem",
+                            fontWeight: 800,
+                            color: "#0a0f2e",
+                          }}
+                        >
+                          A
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.82rem",
+                            fontWeight: 700,
+                            color: "#fff",
+                            marginBottom: 4,
+                          }}
+                        >
+                          Advith Sreejeth
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.65rem",
+                            color: "rgba(245,197,24,0.7)",
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Prototype & Main Development
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p
+                      className="slide-desc"
+                      key={`desc-${slide}`}
+                      style={{
+                        color: "rgba(255,255,255,0.72)",
+                        fontSize: "0.96rem",
+                        lineHeight: 1.8,
+                        marginBottom: 28,
+                        fontWeight: 400,
+                      }}
+                    >
+                      {currentSlideData.description}
+                    </p>
+                  )}
+
+                  {/* Stat badge */}
+                  <div
+                    className="slide-stat"
+                    key={`stat-${slide}`}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "9px 20px",
+                      background: "rgba(245,197,24,0.07)",
+                      border: "1px solid rgba(245,197,24,0.35)",
+                      borderRadius: 999,
+                      marginBottom: 32,
+                      animation: isActive
+                        ? "statPulse 2.2s ease-in-out infinite"
+                        : "none",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
+                        background: "#f5c518",
+                        boxShadow: "0 0 10px #f5c518",
+                        animation: isActive
+                          ? "glowBlink 1.6s ease-in-out infinite"
+                          : "none",
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: "0.72rem",
+                        color: "rgba(245,197,24,0.9)",
+                        fontWeight: 700,
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {currentSlideData.stat}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* ── API Key slide ── */
+              <div
+                style={{
+                  ...getSlideStyle(),
+                  transformStyle: "preserve-3d",
+                }}
+                key="api-slide"
+              >
+                {/* Shield icon with pulse */}
+                <div
+                  style={{
+                    width: 76,
+                    height: 76,
+                    margin: "0 auto 22px",
                     borderRadius: "50%",
-                    background: "rgba(245,197,24,0.07)",
-                    border: "1.5px solid rgba(245,197,24,0.5)",
+                    background: "linear-gradient(135deg, #cc0000, #8b0000)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    animation:
+                      "floatIcon 3.5s ease-in-out infinite, shieldPulse 2.5s ease-in-out infinite",
                     boxShadow:
-                      "0 0 30px rgba(245,197,24,0.3), inset 0 0 20px rgba(245,197,24,0.05)",
-                    animation: "float 3.5s ease-in-out infinite",
+                      "0 0 40px rgba(204,0,0,0.6), 0 0 80px rgba(204,0,0,0.3)",
                     position: "relative",
                   }}
                 >
-                  {/* outer pulse ring */}
                   <div
                     style={{
                       position: "absolute",
                       inset: -12,
                       borderRadius: "50%",
-                      border: "1px solid rgba(245,197,24,0.2)",
-                      animation: "radarPulse 2.8s ease-out infinite",
+                      border: "1px solid rgba(245,197,24,0.35)",
+                      animation: "pulseRing 2.4s ease-out infinite",
                     }}
                   />
-                  {currentSlideData.icon}
-                </div>
-
-                <h1
-                  style={{
-                    fontSize: "1.9rem",
-                    fontWeight: 900,
-                    color: "#f5c518",
-                    marginBottom: 8,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.15,
-                    textShadow:
-                      "0 0 40px rgba(245,197,24,0.7), 0 0 80px rgba(245,197,24,0.3)",
-                  }}
-                >
-                  {currentSlideData.title}
-                </h1>
-                <p
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "rgba(245,197,24,0.7)",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    fontWeight: 600,
-                    marginBottom: 20,
-                  }}
-                >
-                  {currentSlideData.subtitle}
-                </p>
-
-                <div
-                  style={{
-                    width: 80,
-                    height: 1,
-                    background:
-                      "linear-gradient(90deg, transparent, rgba(245,197,24,0.7), transparent)",
-                    margin: "0 auto 22px",
-                  }}
-                />
-
-                <p
-                  style={{
-                    color: "rgba(255,255,255,0.72)",
-                    fontSize: "0.96rem",
-                    lineHeight: 1.75,
-                    marginBottom: 28,
-                    fontWeight: 400,
-                  }}
-                >
-                  {currentSlideData.description}
-                </p>
-
-                {/* Stat badge */}
-                <div
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "8px 18px",
-                    background: "rgba(245,197,24,0.08)",
-                    border: "1px solid rgba(245,197,24,0.3)",
-                    borderRadius: 999,
-                    marginBottom: 36,
-                  }}
-                >
                   <div
                     style={{
-                      width: 6,
-                      height: 6,
+                      position: "absolute",
+                      inset: -24,
                       borderRadius: "50%",
-                      background: "#f5c518",
-                      boxShadow: "0 0 8px #f5c518",
-                      animation: "glowPulse 1.8s ease-in-out infinite",
+                      border: "1px solid rgba(204,0,0,0.2)",
+                      animation: "pulseRing 2.4s ease-out 0.8s infinite",
                     }}
                   />
-                  <span
-                    style={{
-                      fontSize: "0.72rem",
-                      color: "rgba(245,197,24,0.85)",
-                      fontWeight: 700,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {currentSlideData.stat}
-                  </span>
-                </div>
-
-                {/* Navigation */}
-                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                  {slide > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => goToSlide(slide - 1)}
-                      style={{
-                        flex: 1,
-                        padding: "13px",
-                        fontSize: "0.88rem",
-                        fontWeight: 600,
-                        letterSpacing: "0.05em",
-                        cursor: "pointer",
-                        background: "transparent",
-                        color: "rgba(245,197,24,0.7)",
-                        border: "1px solid rgba(245,197,24,0.3)",
-                        borderRadius: 12,
-                        fontFamily: "Poppins, sans-serif",
-                        transition: "all 0.25s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor =
-                          "rgba(245,197,24,0.7)";
-                        e.currentTarget.style.color = "#f5c518";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor =
-                          "rgba(245,197,24,0.3)";
-                        e.currentTarget.style.color = "rgba(245,197,24,0.7)";
-                      }}
-                    >
-                      ← Back
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => goToSlide(slide + 1)}
-                    style={{
-                      flex: 2,
-                      padding: "13px",
-                      fontSize: "0.92rem",
-                      fontWeight: 700,
-                      letterSpacing: "0.07em",
-                      textTransform: "uppercase",
-                      cursor: "pointer",
-                      background: "linear-gradient(135deg, #f5c518, #d4a017)",
-                      color: "#0a0a0a",
-                      border: "none",
-                      borderRadius: 12,
-                      fontFamily: "Poppins, sans-serif",
-                      transition: "all 0.25s",
-                      boxShadow: "0 0 25px rgba(245,197,24,0.45)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 0 45px rgba(245,197,24,0.7)";
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 0 25px rgba(245,197,24,0.45)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
-                  >
-                    {slide === SLIDES.length - 1 ? "Get Started →" : "Next →"}
-                  </button>
-                </div>
-
-                {/* Skip to API */}
-                {slide < SLIDES.length - 1 && (
-                  <button
-                    type="button"
-                    onClick={() => goToSlide(SLIDES.length)}
-                    style={{
-                      marginTop: 16,
-                      background: "none",
-                      border: "none",
-                      color: "rgba(255,255,255,0.28)",
-                      fontSize: "0.72rem",
-                      cursor: "pointer",
-                      fontFamily: "Poppins, sans-serif",
-                      letterSpacing: "0.06em",
-                      textDecoration: "underline",
-                      textDecorationColor: "rgba(255,255,255,0.15)",
-                    }}
-                  >
-                    skip intro
-                  </button>
-                )}
-              </div>
-            ) : (
-              /* ── API Key slide ── */
-              <div style={cardAnim}>
-                {/* Logo */}
-                <div
-                  style={{
-                    width: 72,
-                    height: 72,
-                    margin: "0 auto 22px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #f5c518, #d4a017)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    animation: "float 3.5s ease-in-out infinite",
-                    boxShadow:
-                      "0 0 40px rgba(245,197,24,0.7), 0 0 80px rgba(245,197,24,0.3)",
-                  }}
-                >
                   <svg
                     width="32"
                     height="32"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#0a0a0a"
+                    stroke="#fff"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
                   >
-                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
-                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   </svg>
+                </div>
+
+                {/* Draw line */}
+                <div
+                  className="draw-line"
+                  key="api-line"
+                  style={{
+                    height: 2,
+                    background:
+                      "linear-gradient(90deg, transparent, #cc0000 40%, #f5c518 60%, transparent)",
+                    borderRadius: 2,
+                    marginBottom: 18,
+                    boxShadow:
+                      "0 0 12px rgba(204,0,0,0.6), 0 0 6px rgba(245,197,24,0.4)",
+                  }}
+                />
+
+                {/* Typewriter SYSTEM INITIALIZATION */}
+                <div
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    margin: "0 auto 10px",
+                    display: "inline-block",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.3em",
+                      color: "rgba(245,197,24,0.7)",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      display: "inline-block",
+                      overflow: "hidden",
+                      borderRight: "2px solid rgba(245,197,24,0.7)",
+                      whiteSpace: "nowrap",
+                      animation:
+                        "typewriter 1.8s steps(22) 0.2s both, glowBlink 0.8s step-end infinite",
+                      width: 0,
+                    }}
+                  >
+                    SYSTEM INITIALIZATION
+                  </span>
                 </div>
 
                 <h2
                   style={{
-                    fontSize: "1.75rem",
+                    fontSize: "1.8rem",
                     fontWeight: 900,
-                    color: "#f5c518",
+                    color: "#cc0000",
                     marginBottom: 6,
                     letterSpacing: "-0.02em",
-                    textShadow: "0 0 40px rgba(245,197,24,0.8)",
+                    textShadow: "0 0 40px rgba(204,0,0,0.8)",
                   }}
                 >
                   Activate System
@@ -745,8 +1086,8 @@ export default function ActivationScreen({ onActivate }: Props) {
                         alignItems: "center",
                         gap: 6,
                         padding: "5px 12px",
-                        background: "rgba(255,255,255,0.05)",
-                        border: "1px solid rgba(255,255,255,0.1)",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(184,134,11,0.2)",
                         borderRadius: 999,
                       }}
                     >
@@ -757,7 +1098,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                           borderRadius: "50%",
                           background: color,
                           boxShadow: `0 0 7px ${color}`,
-                          animation: "glowPulse 1.8s ease-in-out infinite",
+                          animation: "glowBlink 1.8s ease-in-out infinite",
                         }}
                       />
                       <span
@@ -791,8 +1132,8 @@ export default function ActivationScreen({ onActivate }: Props) {
                       width: "100%",
                       padding: "15px 52px 15px 18px",
                       borderRadius: 14,
-                      background: "rgba(245,197,24,0.05)",
-                      border: "1px solid rgba(245,197,24,0.35)",
+                      background: "rgba(184,134,11,0.06)",
+                      border: "1px solid rgba(184,134,11,0.4)",
                       color: "#f5f5f5",
                       fontSize: "0.95rem",
                       fontFamily: "Poppins, sans-serif",
@@ -802,15 +1143,15 @@ export default function ActivationScreen({ onActivate }: Props) {
                       letterSpacing: showKey ? "0.02em" : "0.1em",
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = "rgba(245,197,24,0.85)";
+                      e.target.style.borderColor = "rgba(245,197,24,0.8)";
                       e.target.style.boxShadow =
-                        "0 0 25px rgba(245,197,24,0.2)";
-                      e.target.style.background = "rgba(245,197,24,0.09)";
+                        "0 0 25px rgba(245,197,24,0.2), 0 0 8px rgba(204,0,0,0.15)";
+                      e.target.style.background = "rgba(184,134,11,0.1)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = "rgba(245,197,24,0.35)";
+                      e.target.style.borderColor = "rgba(184,134,11,0.4)";
                       e.target.style.boxShadow = "none";
-                      e.target.style.background = "rgba(245,197,24,0.05)";
+                      e.target.style.background = "rgba(184,134,11,0.06)";
                     }}
                   />
                   <button
@@ -824,7 +1165,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "rgba(245,197,24,0.55)",
+                      color: "rgba(245,197,24,0.6)",
                       padding: 4,
                       lineHeight: 1,
                     }}
@@ -899,30 +1240,30 @@ export default function ActivationScreen({ onActivate }: Props) {
                     marginTop: 8,
                     cursor: loading ? "not-allowed" : "pointer",
                     background: loading
-                      ? "rgba(245,197,24,0.3)"
-                      : "linear-gradient(135deg, #f5c518, #d4a017)",
-                    color: loading ? "rgba(245,197,24,0.7)" : "#0a0a0a",
+                      ? "rgba(204,0,0,0.3)"
+                      : "linear-gradient(135deg, #cc0000 0%, #e10600 50%, #8b0000 100%)",
+                    color: "#fff",
                     border: "none",
                     borderRadius: 14,
                     fontFamily: "Poppins, sans-serif",
                     transition: "all 0.3s",
                     boxShadow: loading
                       ? "none"
-                      : "0 0 30px rgba(245,197,24,0.5)",
+                      : "0 0 30px rgba(204,0,0,0.5), 0 4px 20px rgba(204,0,0,0.3)",
                     position: "relative",
                     overflow: "hidden",
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
                       e.currentTarget.style.boxShadow =
-                        "0 0 50px rgba(245,197,24,0.7)";
+                        "0 0 50px rgba(204,0,0,0.75), 0 0 20px rgba(245,197,24,0.2)";
                       e.currentTarget.style.transform = "translateY(-2px)";
                     }
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.boxShadow = loading
                       ? "none"
-                      : "0 0 30px rgba(245,197,24,0.5)";
+                      : "0 0 30px rgba(204,0,0,0.5)";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
@@ -982,7 +1323,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     style={{
                       marginTop: 14,
                       height: 3,
-                      background: "rgba(245,197,24,0.1)",
+                      background: "rgba(184,134,11,0.12)",
                       borderRadius: 2,
                       overflow: "hidden",
                     }}
@@ -991,8 +1332,10 @@ export default function ActivationScreen({ onActivate }: Props) {
                       style={{
                         height: "100%",
                         width: `${progress}%`,
-                        background: "linear-gradient(90deg, #d4a017, #f5c518)",
-                        boxShadow: "0 0 10px rgba(245,197,24,0.9)",
+                        background:
+                          "linear-gradient(90deg, #cc0000, #f5c518, #b8860b)",
+                        boxShadow:
+                          "0 0 10px rgba(245,197,24,0.8), 0 0 5px rgba(204,0,0,0.6)",
                         transition: "width 0.05s linear",
                         borderRadius: 2,
                       }}
@@ -1000,31 +1343,11 @@ export default function ActivationScreen({ onActivate }: Props) {
                   </div>
                 )}
 
-                {/* Back link */}
-                <button
-                  type="button"
-                  onClick={() => goToSlide(SLIDES.length - 1)}
-                  style={{
-                    marginTop: 16,
-                    background: "none",
-                    border: "none",
-                    color: "rgba(255,255,255,0.25)",
-                    fontSize: "0.72rem",
-                    cursor: "pointer",
-                    fontFamily: "Poppins, sans-serif",
-                    letterSpacing: "0.06em",
-                    textDecoration: "underline",
-                    textDecorationColor: "rgba(255,255,255,0.12)",
-                  }}
-                >
-                  ← back to overview
-                </button>
-
                 <p
                   style={{
                     color: "rgba(255,255,255,0.18)",
                     fontSize: "0.65rem",
-                    marginTop: 12,
+                    marginTop: 14,
                   }}
                 >
                   Stored in browser memory only — never transmitted
