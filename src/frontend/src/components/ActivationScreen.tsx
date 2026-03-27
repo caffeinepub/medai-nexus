@@ -5,7 +5,7 @@ interface Props {
 }
 
 const VALID_KEY = "AIzaSyAeYSZuSR6wbSApVmDEMX7AOvFlRJ774tU";
-const AUTO_ADVANCE_MS = 3500;
+const AUTO_ADVANCE_MS = 5000;
 
 const SYMPTOM_DOTS = Array.from({ length: 18 }, (_, i) => ({
   id: `sdot-${i}`,
