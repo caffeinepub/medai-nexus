@@ -1,26 +1,26 @@
 import { useMemo, useState } from "react";
-import { SYMPTOMS, SYMPTOM_CATEGORIES } from "../data/symptoms";
+import { SYMPTOMS, SYMPTOM_CATEGORIES, SYMPTOM_PACKS } from "../data/symptoms";
 
 interface Props {
   onAnalyze: (symptoms: string[]) => void;
   isAnalyzing: boolean;
 }
 
-const CATEGORY_COLORS = {
+const CATEGORY_STYLES = {
   general: {
-    bg: "rgba(0,128,255,0.12)",
-    border: "rgba(0,128,255,0.4)",
-    text: "#60b3ff",
+    bg: "var(--accent-dim)",
+    border: "var(--border-color)",
+    text: "var(--accent)",
   },
   critical: {
-    bg: "rgba(255,0,255,0.10)",
-    border: "rgba(255,0,255,0.4)",
-    text: "#ff80ff",
+    bg: "rgba(128,0,32,0.15)",
+    border: "rgba(160,0,40,0.45)",
+    text: "var(--accent-hover)",
   },
   rare: {
-    bg: "rgba(191,0,255,0.10)",
-    border: "rgba(191,0,255,0.4)",
-    text: "#d966ff",
+    bg: "rgba(100,0,25,0.12)",
+    border: "rgba(100,0,25,0.4)",
+    text: "#a00028",
   },
 };
 
@@ -31,6 +31,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
   >("all");
   const [selected, setSelected] = useState<string[]>([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [justSelected, setJustSelected] = useState<Set<string>>(new Set());
 
   const allSymptoms = useMemo(() => {
     if (activeCategory === "all")
@@ -54,10 +55,67 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
   }, [search]);
 
   const toggleSymptom = (s: string) => {
-    setSelected((prev) =>
-      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
-    );
+    setSelected((prev) => {
+      if (prev.includes(s)) return prev.filter((x) => x !== s);
+      setJustSelected((js) => {
+        const next = new Set(js);
+        next.add(s);
+        setTimeout(
+          () =>
+            setJustSelected((cur) => {
+              const n2 = new Set(cur);
+              n2.delete(s);
+              return n2;
+            }),
+          400,
+        );
+        return next;
+      });
+      return [...prev, s];
+    });
   };
+
+  const addPack = (packSymptoms: string[]) => {
+    setSelected((prev) => {
+      const added: string[] = [];
+      for (const s of packSymptoms) {
+        if (!prev.includes(s)) added.push(s);
+      }
+      if (added.length > 0) {
+        setJustSelected((js) => {
+          const next = new Set(js);
+          for (const s of added) {
+            next.add(s);
+            setTimeout(
+              () =>
+                setJustSelected((cur) => {
+                  const n2 = new Set(cur);
+                  n2.delete(s);
+                  return n2;
+                }),
+              400,
+            );
+          }
+          return next;
+        });
+      }
+      return [...prev, ...added];
+    });
+  };
+
+  // Severity distribution
+  const severityCounts = useMemo(() => {
+    let general = 0;
+    let critical = 0;
+    let rare = 0;
+    for (const s of selected) {
+      const cat = SYMPTOM_CATEGORIES[s] || "general";
+      if (cat === "general") general++;
+      else if (cat === "critical") critical++;
+      else rare++;
+    }
+    return { general, critical, rare };
+  }, [selected]);
 
   const totalAll =
     SYMPTOMS.general.length + SYMPTOMS.critical.length + SYMPTOMS.rare.length;
@@ -69,20 +127,10 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
     rare: "Rare",
   };
 
-  const CATEGORY_TAB_COLORS: Record<
-    string,
-    { active: string; inactive: string }
-  > = {
-    all: { active: "#00f5ff", inactive: "rgba(0,245,255,0.4)" },
-    general: { active: "#60b3ff", inactive: "rgba(96,179,255,0.4)" },
-    critical: { active: "#ff80ff", inactive: "rgba(255,128,255,0.4)" },
-    rare: { active: "#d966ff", inactive: "rgba(217,102,255,0.4)" },
-  };
-
   return (
     <section
       id="symptoms"
-      style={{ padding: "60px 24px", background: "#030712" }}
+      style={{ padding: "60px 24px", background: "var(--bg-primary)" }}
     >
       <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
@@ -95,7 +143,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
           >
             <span className="gradient-text">Symptom Selection</span>
           </h2>
-          <p style={{ color: "rgba(224,247,255,0.6)" }}>
+          <p style={{ color: "var(--text-muted)" }}>
             Select all symptoms you are experiencing for AI analysis
           </p>
         </div>
@@ -104,10 +152,59 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
           className="glass-card"
           style={{
             padding: "32px",
-            background: "rgba(0,245,255,0.03)",
-            border: "1px solid rgba(0,245,255,0.15)",
           }}
         >
+          {/* Quick Packs */}
+          <div style={{ marginBottom: "20px" }}>
+            <div
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "1.5px",
+                color: "var(--text-muted)",
+                marginBottom: "10px",
+              }}
+            >
+              Quick Packs
+            </div>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {Object.entries(SYMPTOM_PACKS).map(([packName, packSymptoms]) => (
+                <button
+                  key={packName}
+                  type="button"
+                  data-ocid={`symptoms.${packName.replace(/[^a-z0-9]/gi, "-").toLowerCase()}.button`}
+                  onClick={() => addPack(packSymptoms)}
+                  style={{
+                    padding: "7px 14px",
+                    borderRadius: "999px",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: 600,
+                    background: "transparent",
+                    border: "1.5px solid var(--accent)",
+                    color: "var(--accent)",
+                    transition: "all 0.22s",
+                    letterSpacing: "0.2px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(128,0,32,0.12)";
+                    e.currentTarget.style.boxShadow = "var(--glow-soft)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.boxShadow = "none";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  {packName}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Category Tabs */}
           <div
             style={{
@@ -119,7 +216,6 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
           >
             {(["all", "general", "critical", "rare"] as const).map((cat) => {
               const isActive = activeCategory === cat;
-              const colors = CATEGORY_TAB_COLORS[cat];
               return (
                 <button
                   key={cat}
@@ -135,16 +231,11 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                     fontSize: "0.85rem",
                     transition: "all 0.25s",
                     background: isActive
-                      ? `linear-gradient(135deg, ${colors.active}33, ${colors.active}22)`
+                      ? "linear-gradient(135deg, #80002033, #a0002822)"
                       : "transparent",
-                    border: `1px solid ${isActive ? colors.active : "rgba(0,245,255,0.15)"}`,
-                    color: isActive ? colors.active : "rgba(224,247,255,0.5)",
-                    boxShadow: isActive
-                      ? `0 0 12px ${colors.active}44`
-                      : "none",
-                    textShadow: isActive
-                      ? `0 0 8px ${colors.active}88`
-                      : "none",
+                    border: `1px solid ${isActive ? "var(--accent)" : "var(--border-color)"}`,
+                    color: isActive ? "var(--accent)" : "var(--text-muted)",
+                    boxShadow: isActive ? "var(--glow-soft)" : "none",
                   }}
                 >
                   {CATEGORY_LABELS[cat]}
@@ -180,7 +271,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="rgba(0,245,255,0.5)"
+                  stroke="rgba(128,0,32,0.5)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -203,9 +294,9 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   width: "100%",
                   padding: "12px 14px 12px 42px",
                   borderRadius: "10px",
-                  background: "rgba(0,245,255,0.05)",
-                  border: "1px solid rgba(0,245,255,0.2)",
-                  color: "#e0f7ff",
+                  background: "var(--bg-secondary)",
+                  border: "1px solid var(--border-color)",
+                  color: "var(--text-primary)",
                   fontSize: "0.95rem",
                   fontFamily: "Poppins, sans-serif",
                   outline: "none",
@@ -213,12 +304,12 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   boxSizing: "border-box",
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = "rgba(0,245,255,0.6)";
-                  e.target.style.boxShadow = "0 0 15px rgba(0,245,255,0.2)";
+                  e.target.style.borderColor = "rgba(128,0,32,0.7)";
+                  e.target.style.boxShadow = "0 0 15px rgba(128,0,32,0.15)";
                 }}
                 onBlur={(e) => {
                   setTimeout(() => setShowAutocomplete(false), 200);
-                  e.target.style.borderColor = "rgba(0,245,255,0.2)";
+                  e.target.style.borderColor = "var(--border-color)";
                   e.target.style.boxShadow = "none";
                 }}
               />
@@ -235,8 +326,8 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   maxHeight: "200px",
                   overflowY: "auto",
                   animation: "slideDown 0.2s ease",
-                  background: "rgba(3,7,18,0.97)",
-                  border: "1px solid rgba(0,245,255,0.2)",
+                  background: "var(--bg-secondary)",
+                  border: "1px solid var(--border-color)",
                 }}
               >
                 {autocompleteItems.map((item) => (
@@ -253,13 +344,13 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
-                      borderBottom: "1px solid rgba(0,245,255,0.06)",
+                      borderBottom: "1px solid var(--border-color)",
                       transition: "background 0.2s",
-                      color: "#e0f7ff",
+                      color: "var(--text-primary)",
                     }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.background =
-                        "rgba(0,245,255,0.08)";
+                        "var(--accent-dim)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLElement).style.background =
@@ -272,14 +363,14 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                         padding: "2px 8px",
                         borderRadius: "10px",
                         background:
-                          CATEGORY_COLORS[SYMPTOM_CATEGORIES[item]]?.bg ||
-                          "rgba(0,245,255,0.08)",
+                          CATEGORY_STYLES[SYMPTOM_CATEGORIES[item]]?.bg ||
+                          "var(--accent-dim)",
                         color:
-                          CATEGORY_COLORS[SYMPTOM_CATEGORIES[item]]?.text ||
-                          "#00f5ff",
+                          CATEGORY_STYLES[SYMPTOM_CATEGORIES[item]]?.text ||
+                          "var(--accent)",
                         border: `1px solid ${
-                          CATEGORY_COLORS[SYMPTOM_CATEGORIES[item]]?.border ||
-                          "rgba(0,245,255,0.2)"
+                          CATEGORY_STYLES[SYMPTOM_CATEGORIES[item]]?.border ||
+                          "var(--border-color)"
                         }`,
                       }}
                     >
@@ -305,13 +396,14 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
           >
             {filtered.map((symptom) => {
               const cat = SYMPTOM_CATEGORIES[symptom] || "general";
-              const colors = CATEGORY_COLORS[cat];
+              const styles = CATEGORY_STYLES[cat];
               const isSelected = selected.includes(symptom);
-              const isCritical = cat === "critical";
+              const isPopping = justSelected.has(symptom);
               return (
                 <button
                   key={symptom}
                   type="button"
+                  title={`Category: ${SYMPTOM_CATEGORIES[symptom] || "general"}`}
                   onClick={() => toggleSymptom(symptom)}
                   style={{
                     padding: "7px 14px",
@@ -321,34 +413,15 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                     fontFamily: "Poppins, sans-serif",
                     fontWeight: 500,
                     background: isSelected
-                      ? isCritical
-                        ? "linear-gradient(135deg, rgba(255,0,255,0.3), rgba(191,0,255,0.3))"
-                        : "linear-gradient(135deg, rgba(0,128,255,0.35), rgba(191,0,255,0.35))"
-                      : colors.bg,
-                    border: `1px solid ${
-                      isSelected
-                        ? isCritical
-                          ? "rgba(255,0,255,0.8)"
-                          : "rgba(0,245,255,0.7)"
-                        : colors.border
-                    }`,
-                    color: isSelected
-                      ? isCritical
-                        ? "#ff80ff"
-                        : "#00f5ff"
-                      : colors.text,
+                      ? "linear-gradient(135deg, rgba(128,0,32,0.3), rgba(160,0,40,0.3))"
+                      : styles.bg,
+                    border: `1px solid ${isSelected ? "rgba(128,0,32,0.8)" : styles.border}`,
+                    color: isSelected ? "var(--accent)" : styles.text,
                     transition: "all 0.2s",
-                    boxShadow: isSelected
-                      ? isCritical
-                        ? "0 0 12px rgba(255,0,255,0.5)"
-                        : "0 0 12px rgba(0,245,255,0.4)"
-                      : "none",
-                    textShadow: isSelected
-                      ? isCritical
-                        ? "0 0 6px rgba(255,0,255,0.6)"
-                        : "0 0 6px rgba(0,245,255,0.5)"
-                      : "none",
-                    transform: isSelected ? "scale(1.03)" : "scale(1)",
+                    boxShadow: isSelected ? "var(--glow-soft)" : "none",
+                    animation: isPopping
+                      ? "chipPop 0.3s ease forwards"
+                      : undefined,
                   }}
                 >
                   {symptom}
@@ -361,12 +434,104 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
             <p
               style={{
                 textAlign: "center",
-                color: "rgba(224,247,255,0.4)",
+                color: "var(--text-muted)",
                 padding: "24px",
               }}
             >
               No symptoms found for &quot;{search}&quot;
             </p>
+          )}
+
+          {/* Severity Distribution Bar */}
+          {selected.length > 0 && (
+            <div style={{ marginTop: "20px" }}>
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "1.5px",
+                  color: "var(--text-muted)",
+                  marginBottom: "8px",
+                }}
+              >
+                Symptom Distribution
+              </div>
+              <div
+                style={{
+                  height: "10px",
+                  borderRadius: "5px",
+                  overflow: "hidden",
+                  display: "flex",
+                  gap: "2px",
+                }}
+              >
+                {severityCounts.general > 0 && (
+                  <div
+                    style={{
+                      flex: severityCounts.general,
+                      background: "#2d8a55",
+                      borderRadius: "5px 0 0 5px",
+                      transition: "flex 0.4s ease",
+                      minWidth: "4px",
+                    }}
+                  />
+                )}
+                {severityCounts.critical > 0 && (
+                  <div
+                    style={{
+                      flex: severityCounts.critical,
+                      background: "#c97a20",
+                      transition: "flex 0.4s ease",
+                      minWidth: "4px",
+                    }}
+                  />
+                )}
+                {severityCounts.rare > 0 && (
+                  <div
+                    style={{
+                      flex: severityCounts.rare,
+                      background: "#c0304a",
+                      borderRadius: "0 5px 5px 0",
+                      transition: "flex 0.4s ease",
+                      minWidth: "4px",
+                    }}
+                  />
+                )}
+              </div>
+              <div style={{ display: "flex", gap: "16px", marginTop: "6px" }}>
+                {[
+                  {
+                    label: "General",
+                    count: severityCounts.general,
+                    color: "#2d8a55",
+                  },
+                  {
+                    label: "Critical",
+                    count: severityCounts.critical,
+                    color: "#c97a20",
+                  },
+                  {
+                    label: "Rare",
+                    count: severityCounts.rare,
+                    color: "#c0304a",
+                  },
+                ]
+                  .filter((d) => d.count > 0)
+                  .map((d) => (
+                    <span
+                      key={d.label}
+                      style={{
+                        fontSize: "0.72rem",
+                        color: d.color,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {d.label}: {d.count}
+                    </span>
+                  ))}
+              </div>
+            </div>
           )}
         </div>
 
@@ -377,8 +542,6 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
             style={{
               marginTop: "20px",
               padding: "20px 24px",
-              background: "rgba(0,245,255,0.03)",
-              border: "1px solid rgba(0,245,255,0.15)",
             }}
           >
             <div
@@ -391,14 +554,9 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                 gap: "8px",
               }}
             >
-              <span style={{ fontWeight: 600, color: "#e0f7ff" }}>
+              <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>
                 Selected:{" "}
-                <span
-                  style={{
-                    color: "#00f5ff",
-                    textShadow: "0 0 8px rgba(0,245,255,0.6)",
-                  }}
-                >
+                <span style={{ color: "var(--accent)", fontWeight: 700 }}>
                   {selected.length} symptoms
                 </span>
               </span>
@@ -407,9 +565,9 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                 data-ocid="symptoms.delete_button"
                 onClick={() => setSelected([])}
                 style={{
-                  background: "rgba(255,0,255,0.1)",
-                  border: "1px solid rgba(255,0,255,0.35)",
-                  color: "#ff80ff",
+                  background: "var(--accent-dim)",
+                  border: "1px solid var(--border-color)",
+                  color: "var(--accent)",
                   padding: "6px 14px",
                   borderRadius: "8px",
                   cursor: "pointer",
@@ -418,12 +576,11 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,0,255,0.2)";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 12px rgba(255,0,255,0.4)";
+                  e.currentTarget.style.background = "rgba(128,0,32,0.2)";
+                  e.currentTarget.style.boxShadow = "var(--glow-soft)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255,0,255,0.1)";
+                  e.currentTarget.style.background = "var(--accent-dim)";
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
@@ -438,29 +595,22 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                 marginBottom: "20px",
               }}
             >
-              {selected.map((s) => {
-                const cat = SYMPTOM_CATEGORIES[s] || "general";
-                const isCritical = cat === "critical";
-                return (
-                  <span
-                    key={s}
-                    style={{
-                      padding: "5px 12px",
-                      borderRadius: "20px",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                      background: isCritical
-                        ? "rgba(255,0,255,0.15)"
-                        : "rgba(0,245,255,0.1)",
-                      border: `1px solid ${isCritical ? "rgba(255,0,255,0.5)" : "rgba(0,245,255,0.4)"}`,
-                      color: isCritical ? "#ff80ff" : "#00f5ff",
-                      textShadow: `0 0 6px ${isCritical ? "rgba(255,0,255,0.5)" : "rgba(0,245,255,0.4)"}`,
-                    }}
-                  >
-                    {s}
-                  </span>
-                );
-              })}
+              {selected.map((s) => (
+                <span
+                  key={s}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "20px",
+                    fontSize: "0.8rem",
+                    fontWeight: 500,
+                    background: "rgba(128,0,32,0.12)",
+                    border: "1px solid rgba(128,0,32,0.4)",
+                    color: "var(--accent)",
+                  }}
+                >
+                  {s}
+                </span>
+              ))}
             </div>
             <button
               type="button"
@@ -483,12 +633,11 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                     style={{
                       width: "18px",
                       height: "18px",
-                      border: "2px solid rgba(0,245,255,0.3)",
-                      borderTopColor: "#00f5ff",
+                      border: "2px solid rgba(255,255,255,0.3)",
+                      borderTopColor: "#ffffff",
                       borderRadius: "50%",
                       animation: "spinSlow 0.8s linear infinite",
                       display: "inline-block",
-                      boxShadow: "0 0 8px rgba(0,245,255,0.5)",
                     }}
                   />
                   Analyzing...
@@ -500,6 +649,50 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
           </div>
         )}
       </div>
+
+      {/* Floating sticky pill */}
+      {selected.length > 0 && (
+        <button
+          type="button"
+          data-ocid="symptoms.primary_button"
+          onClick={() => onAnalyze(selected)}
+          disabled={isAnalyzing}
+          style={{
+            position: "fixed",
+            bottom: "28px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 100,
+            background: "linear-gradient(135deg, #800020, #a00028)",
+            color: "#fff",
+            border: "none",
+            borderRadius: "999px",
+            padding: "14px 32px",
+            fontFamily: "Poppins, sans-serif",
+            fontWeight: 700,
+            fontSize: "0.9rem",
+            cursor: "pointer",
+            boxShadow:
+              "0 4px 28px rgba(128,0,32,0.55), 0 0 0 1px rgba(128,0,32,0.3)",
+            animation: "slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards",
+            whiteSpace: "nowrap",
+            letterSpacing: "0.2px",
+            transition: "opacity 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow =
+              "0 6px 38px rgba(128,0,32,0.75), 0 0 0 1px rgba(128,0,32,0.4)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow =
+              "0 4px 28px rgba(128,0,32,0.55), 0 0 0 1px rgba(128,0,32,0.3)";
+          }}
+        >
+          {isAnalyzing
+            ? "Analyzing..."
+            : `${selected.length} symptoms selected — Analyze Now →`}
+        </button>
+      )}
     </section>
   );
 }

@@ -1,6 +1,12 @@
+import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function Navbar() {
+interface Props {
+  isDark: boolean;
+  onToggleTheme: () => void;
+}
+
+export default function Navbar({ isDark, onToggleTheme }: Props) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -24,11 +30,12 @@ export default function Navbar() {
         position: "sticky",
         top: 0,
         zIndex: 100,
-        background: scrolled
-          ? "rgba(255,255,255,0.1)"
-          : "rgba(255,255,255,0.05)",
-        backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255,255,255,0.12)",
+        background: scrolled ? "var(--glass-bg)" : "rgba(255,255,255,0.0)",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled
+          ? "1px solid var(--glass-border)"
+          : "1px solid transparent",
         transition: "all 0.3s ease",
       }}
     >
@@ -78,7 +85,7 @@ export default function Navbar() {
               style={{
                 background: "none",
                 border: "none",
-                color: "rgba(255,255,255,0.8)",
+                color: "var(--text-secondary)",
                 cursor: "pointer",
                 padding: "8px 14px",
                 borderRadius: "8px",
@@ -89,12 +96,12 @@ export default function Navbar() {
               }}
               onMouseEnter={(e) => {
                 (e.target as HTMLElement).style.background =
-                  "rgba(255,255,255,0.1)";
-                (e.target as HTMLElement).style.color = "#fff";
+                  "var(--accent-dim)";
+                (e.target as HTMLElement).style.color = "var(--accent)";
               }}
               onMouseLeave={(e) => {
                 (e.target as HTMLElement).style.background = "none";
-                (e.target as HTMLElement).style.color = "rgba(255,255,255,0.8)";
+                (e.target as HTMLElement).style.color = "var(--text-secondary)";
               }}
             >
               {label}
@@ -102,28 +109,62 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: "#800020",
+                boxShadow: "0 0 8px rgba(128,0,32,0.8)",
+                animation: "blink 1.5s ease-in-out infinite",
+                display: "inline-block",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "0.8rem",
+                color: "var(--text-muted)",
+                fontWeight: 500,
+                letterSpacing: "1px",
+              }}
+            >
+              SYS ONLINE
+            </span>
+          </div>
+
+          {/* Theme toggle */}
+          <button
+            type="button"
+            data-ocid="nav.toggle"
+            onClick={onToggleTheme}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
             style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              background: "#4ade80",
-              boxShadow: "0 0 8px #4ade80",
-              animation: "blink 1.5s ease-in-out infinite",
-              display: "inline-block",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "38px",
+              height: "38px",
+              borderRadius: "10px",
+              background: "var(--accent-dim)",
+              border: "1px solid var(--border-color)",
+              color: "var(--accent)",
+              cursor: "pointer",
+              transition: "all 0.2s",
+              flexShrink: 0,
             }}
-          />
-          <span
-            style={{
-              fontSize: "0.8rem",
-              color: "rgba(255,255,255,0.7)",
-              fontWeight: 500,
-              letterSpacing: "1px",
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--accent)";
+              e.currentTarget.style.color = "#ffffff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--accent-dim)";
+              e.currentTarget.style.color = "var(--accent)";
             }}
           >
-            SYS ONLINE
-          </span>
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
         </div>
       </div>
     </nav>

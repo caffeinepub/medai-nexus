@@ -27,6 +27,9 @@ export default function App() {
   const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [isDark, setIsDark] = useState(false);
+
+  const toggleTheme = () => setIsDark((v) => !v);
 
   const handleActivate = (key: string) => {
     setApiKey(key);
@@ -81,14 +84,21 @@ export default function App() {
   };
 
   if (!activated) {
-    return <ActivationScreen onActivate={handleActivate} />;
+    return (
+      <div data-theme={isDark ? "dark" : "light"}>
+        <ActivationScreen onActivate={handleActivate} />
+      </div>
+    );
   }
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh" }}>
-      <ParticleBackground />
+    <div
+      data-theme={isDark ? "dark" : "light"}
+      style={{ position: "relative", minHeight: "100vh" }}
+    >
+      <ParticleBackground isDark={isDark} />
       <div style={{ position: "relative", zIndex: 1 }}>
-        <Navbar />
+        <Navbar isDark={isDark} onToggleTheme={toggleTheme} />
         <Hero />
         <SymptomPanel onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         <ResultDashboard

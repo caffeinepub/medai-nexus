@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface DiagnosisResult {
   name: string;
@@ -18,38 +18,59 @@ interface Props {
   isAnalyzing: boolean;
 }
 
-const SEVERITY_NEON: Record<
-  string,
-  { color: string; glow: string; bg: string; border: string }
-> = {
-  mild: {
-    color: "#00ff88",
-    glow: "rgba(0,255,136,0.6)",
-    bg: "rgba(0,255,136,0.1)",
-    border: "rgba(0,255,136,0.4)",
-  },
-  moderate: {
-    color: "#facc15",
-    glow: "rgba(250,204,21,0.6)",
-    bg: "rgba(250,204,21,0.1)",
-    border: "rgba(250,204,21,0.4)",
-  },
-  severe: {
-    color: "#ff6b00",
-    glow: "rgba(255,107,0,0.6)",
-    bg: "rgba(255,107,0,0.1)",
-    border: "rgba(255,107,0,0.4)",
-  },
-  critical: {
-    color: "#ff00ff",
-    glow: "rgba(255,0,255,0.6)",
-    bg: "rgba(255,0,255,0.1)",
-    border: "rgba(255,0,255,0.5)",
-  },
-};
+function getSeverityStyle(severity: string) {
+  const s = severity.toLowerCase();
+  const vars: Record<string, { color: string; bg: string; border: string }> = {
+    mild: {
+      color: "var(--severity-mild-color)",
+      bg: "var(--severity-mild-bg)",
+      border: "var(--severity-mild-border)",
+    },
+    moderate: {
+      color: "var(--severity-moderate-color)",
+      bg: "var(--severity-moderate-bg)",
+      border: "var(--severity-moderate-border)",
+    },
+    severe: {
+      color: "var(--severity-severe-color)",
+      bg: "var(--severity-severe-bg)",
+      border: "var(--severity-severe-border)",
+    },
+    critical: {
+      color: "var(--severity-critical-color)",
+      bg: "var(--severity-critical-bg)",
+      border: "var(--severity-critical-border)",
+    },
+  };
+  return vars[s] || vars.moderate;
+}
 
-function getSeverityNeon(severity: string) {
-  return SEVERITY_NEON[severity.toLowerCase()] || SEVERITY_NEON.moderate;
+const STEP_COLORS = ["#800020", "#2d8a55", "#b07d20", "#2060a0", "#800020"];
+
+function useCountUp(target: number, active: boolean) {
+  const [value, setValue] = useState(0);
+  const rafRef = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (!active) return;
+    const start = performance.now();
+    const duration = 1000;
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - (1 - progress) * (1 - progress);
+      setValue(Math.round(eased * target));
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current !== undefined) cancelAnimationFrame(rafRef.current);
+    };
+  }, [target, active]);
+
+  return value;
 }
 
 export default function ResultDashboard({
@@ -59,6 +80,19 @@ export default function ResultDashboard({
 }: Props) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [showDb, setShowDb] = useState(false);
+  const hasResults = results.length > 0 && !isAnalyzing;
+  const confidenceDisplay = useCountUp(results[0]?.confidence ?? 0, hasResults);
+
+  // Auto-scroll to results
+  useEffect(() => {
+    if (!hasResults) return;
+    const timer = setTimeout(() => {
+      document
+        .getElementById("results")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [hasResults]);
 
   if (isAnalyzing) {
     return (
@@ -66,7 +100,7 @@ export default function ResultDashboard({
         id="results"
         style={{
           padding: "60px 24px",
-          background: "#030712",
+          background: "var(--section-bg)",
           textAlign: "center",
         }}
       >
@@ -83,21 +117,19 @@ export default function ResultDashboard({
             style={{
               width: "60px",
               height: "60px",
-              border: "3px solid rgba(0,245,255,0.15)",
-              borderTopColor: "#00f5ff",
-              borderRightColor: "#bf00ff",
+              border: "3px solid var(--spinner-border)",
+              borderTopColor: "var(--spinner-top)",
+              borderRightColor: "var(--accent-hover)",
               borderRadius: "50%",
               animation: "spinSlow 1s linear infinite",
-              boxShadow:
-                "0 0 20px rgba(0,245,255,0.4), 0 0 40px rgba(191,0,255,0.2)",
+              boxShadow: "var(--glow)",
             }}
           />
           <p
             style={{
-              color: "#00f5ff",
+              color: "var(--accent)",
               fontSize: "1.1rem",
               fontWeight: 600,
-              textShadow: "0 0 12px rgba(0,245,255,0.6)",
             }}
           >
             Initializing AI System...
@@ -110,7 +142,7 @@ export default function ResultDashboard({
   if (!results.length) return null;
 
   const top = results[0];
-  const sevNeon = getSeverityNeon(top.severity);
+  const topSev = getSeverityStyle(top.severity);
 
   const downloadPlan = () => {
     const content = `
@@ -154,7 +186,7 @@ Always consult a qualified healthcare professional.
   return (
     <section
       id="results"
-      style={{ padding: "60px 24px", background: "#030712" }}
+      style={{ padding: "60px 24px", background: "var(--section-bg)" }}
     >
       <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
@@ -167,21 +199,22 @@ Always consult a qualified healthcare professional.
           >
             <span className="gradient-text">AI Diagnosis Results</span>
           </h2>
-          <p style={{ color: "rgba(224,247,255,0.55)" }}>
+          <p style={{ color: "var(--text-muted)" }}>
             Based on {selectedSymptoms.length} symptoms analyzed
           </p>
         </div>
 
-        {/* Top Result Card */}
+        {/* Top Result Card — animated entrance */}
         <div
           data-ocid="results.card"
           style={{
-            background: "rgba(0,245,255,0.04)",
-            border: "1px solid rgba(0,245,255,0.2)",
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-color)",
             borderRadius: "20px",
             padding: "32px",
             marginBottom: "24px",
-            boxShadow: "0 0 30px rgba(0,245,255,0.08)",
+            boxShadow: "var(--glow-soft)",
+            animation: "fadeSlideUp 0.5s ease forwards",
           }}
         >
           <div
@@ -200,7 +233,7 @@ Always consult a qualified healthcare professional.
                   fontSize: "0.75rem",
                   letterSpacing: "2px",
                   textTransform: "uppercase",
-                  color: "rgba(0,245,255,0.6)",
+                  color: "var(--text-muted)",
                   marginBottom: "6px",
                   fontWeight: 600,
                 }}
@@ -211,9 +244,7 @@ Always consult a qualified healthcare professional.
                 style={{
                   fontSize: "clamp(1.4rem, 3vw, 2rem)",
                   fontWeight: 800,
-                  color: "#00f5ff",
-                  textShadow:
-                    "0 0 15px rgba(0,245,255,0.6), 0 0 30px rgba(0,245,255,0.3)",
+                  color: "var(--accent)",
                 }}
               >
                 {top.name}
@@ -223,21 +254,19 @@ Always consult a qualified healthcare professional.
               style={{
                 padding: "6px 16px",
                 borderRadius: "999px",
-                background: sevNeon.bg,
-                border: `1px solid ${sevNeon.border}`,
-                color: sevNeon.color,
+                background: topSev.bg,
+                border: `1px solid ${topSev.border}`,
+                color: topSev.color,
                 fontWeight: 700,
                 fontSize: "0.85rem",
                 textTransform: "capitalize",
-                boxShadow: `0 0 10px ${sevNeon.glow}`,
-                textShadow: `0 0 8px ${sevNeon.glow}`,
               }}
             >
               {top.severity}
             </div>
           </div>
 
-          {/* Confidence bar */}
+          {/* Confidence bar with animated count-up */}
           <div style={{ marginBottom: "24px" }}>
             <div
               style={{
@@ -245,24 +274,18 @@ Always consult a qualified healthcare professional.
                 justifyContent: "space-between",
                 marginBottom: "8px",
                 fontSize: "0.85rem",
-                color: "rgba(224,247,255,0.6)",
+                color: "var(--text-secondary)",
               }}
             >
               <span>Confidence Level</span>
-              <span
-                style={{
-                  color: "#00f5ff",
-                  fontWeight: 700,
-                  textShadow: "0 0 8px rgba(0,245,255,0.6)",
-                }}
-              >
-                {top.confidence}%
+              <span style={{ color: "var(--accent)", fontWeight: 700 }}>
+                {confidenceDisplay}%
               </span>
             </div>
             <div
               style={{
                 height: "8px",
-                background: "rgba(0,245,255,0.1)",
+                background: "var(--accent-dim)",
                 borderRadius: "4px",
                 overflow: "hidden",
               }}
@@ -271,10 +294,9 @@ Always consult a qualified healthcare professional.
                 style={{
                   height: "100%",
                   width: `${top.confidence}%`,
-                  background: "linear-gradient(90deg, #0080ff, #00f5ff)",
+                  background: "linear-gradient(90deg, #800020, #a00028)",
                   borderRadius: "4px",
-                  boxShadow:
-                    "0 0 10px rgba(0,245,255,0.7), 0 0 20px rgba(0,128,255,0.4)",
+                  boxShadow: "0 0 10px rgba(128,0,32,0.5)",
                   transition: "width 1s ease",
                 }}
               />
@@ -295,32 +317,32 @@ Always consult a qualified healthcare professional.
                 label: "Recommended Diet",
                 icon: "🥗",
                 content: top.diet,
-                color: "#00ff88",
+                color: "var(--severity-mild-color)",
               },
               {
                 label: "Precautions",
                 icon: "⚠️",
                 content: top.precautions,
-                color: "#facc15",
+                color: "var(--severity-moderate-color)",
               },
               {
                 label: "Medicines",
                 icon: "💊",
                 content: top.medicines,
-                color: "#60b3ff",
+                color: "var(--accent)",
               },
               {
                 label: "When to See Doctor",
                 icon: "🏥",
                 content: top.whenToSeeDoctor,
-                color: "#ff80ff",
+                color: "var(--severity-severe-color)",
               },
             ].map((item) => (
               <div
                 key={item.label}
                 style={{
-                  background: "rgba(0,245,255,0.03)",
-                  border: "1px solid rgba(0,245,255,0.12)",
+                  background: "var(--accent-dim)",
+                  border: "1px solid var(--border-color)",
                   borderRadius: "12px",
                   padding: "16px",
                 }}
@@ -332,7 +354,6 @@ Always consult a qualified healthcare professional.
                     textTransform: "uppercase",
                     letterSpacing: "1px",
                     color: item.color,
-                    textShadow: `0 0 6px ${item.color}88`,
                     marginBottom: "8px",
                     display: "flex",
                     alignItems: "center",
@@ -344,7 +365,7 @@ Always consult a qualified healthcare professional.
                 <p
                   style={{
                     fontSize: "0.85rem",
-                    color: "rgba(224,247,255,0.7)",
+                    color: "var(--text-secondary)",
                     lineHeight: 1.6,
                   }}
                 >
@@ -358,8 +379,8 @@ Always consult a qualified healthcare professional.
           {/* Step-by-Step Action Plan */}
           <div
             style={{
-              background: "rgba(0,128,255,0.05)",
-              border: "1px solid rgba(0,128,255,0.25)",
+              background: "var(--accent-dim)",
+              border: "1px solid var(--border-color)",
               borderRadius: "16px",
               padding: "24px",
               marginBottom: "20px",
@@ -369,8 +390,7 @@ Always consult a qualified healthcare professional.
               style={{
                 fontSize: "1rem",
                 fontWeight: 700,
-                color: "#00f5ff",
-                textShadow: "0 0 10px rgba(0,245,255,0.5)",
+                color: "var(--accent)",
                 marginBottom: "20px",
                 display: "flex",
                 alignItems: "center",
@@ -388,7 +408,7 @@ Always consult a qualified healthcare professional.
                   step: 1,
                   title: "Stay Calm & Assess",
                   desc: `Take a deep breath. Your symptoms suggest ${top.name}. Do not panic.`,
-                  color: "#00f5ff",
+                  color: STEP_COLORS[0],
                 },
                 {
                   step: 2,
@@ -396,7 +416,7 @@ Always consult a qualified healthcare professional.
                   desc:
                     top.diet ||
                     "Follow a balanced, nutritious diet and stay well hydrated.",
-                  color: "#00ff88",
+                  color: STEP_COLORS[1],
                 },
                 {
                   step: 3,
@@ -404,7 +424,7 @@ Always consult a qualified healthcare professional.
                   desc:
                     top.precautions ||
                     "Rest adequately, avoid physical exertion, monitor symptoms closely.",
-                  color: "#facc15",
+                  color: STEP_COLORS[2],
                 },
                 {
                   step: 4,
@@ -412,7 +432,7 @@ Always consult a qualified healthcare professional.
                   desc:
                     top.medicines ||
                     "Do not self-medicate. Consult a licensed healthcare professional.",
-                  color: "#60b3ff",
+                  color: STEP_COLORS[3],
                 },
                 {
                   step: 5,
@@ -420,7 +440,7 @@ Always consult a qualified healthcare professional.
                   desc:
                     top.whenToSeeDoctor ||
                     "If symptoms persist or worsen after 48 hours, seek immediate medical care.",
-                  color: "#ff00ff",
+                  color: STEP_COLORS[4],
                 },
               ].map((item) => (
                 <div
@@ -445,8 +465,7 @@ Always consult a qualified healthcare professional.
                       fontWeight: 800,
                       color: item.color,
                       flexShrink: 0,
-                      boxShadow: `0 0 10px ${item.color}66, 0 0 20px ${item.color}33`,
-                      textShadow: `0 0 6px ${item.color}`,
+                      background: `${item.color}18`,
                     }}
                   >
                     {item.step}
@@ -457,7 +476,6 @@ Always consult a qualified healthcare professional.
                         fontWeight: 700,
                         fontSize: "0.9rem",
                         color: item.color,
-                        textShadow: `0 0 6px ${item.color}66`,
                         marginBottom: "4px",
                       }}
                     >
@@ -466,7 +484,7 @@ Always consult a qualified healthcare professional.
                     <p
                       style={{
                         fontSize: "0.85rem",
-                        color: "rgba(224,247,255,0.65)",
+                        color: "var(--text-secondary)",
                         lineHeight: 1.6,
                       }}
                     >
@@ -483,6 +501,7 @@ Always consult a qualified healthcare professional.
             type="button"
             data-ocid="results.download_button"
             onClick={downloadPlan}
+            className="btn-gradient"
             style={{
               display: "flex",
               alignItems: "center",
@@ -490,27 +509,7 @@ Always consult a qualified healthcare professional.
               gap: "8px",
               width: "100%",
               padding: "13px",
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, #ff00ff, #bf00ff)",
-              border: "none",
-              color: "white",
-              fontWeight: 700,
               fontSize: "0.95rem",
-              cursor: "pointer",
-              boxShadow:
-                "0 0 20px rgba(255,0,255,0.4), 0 0 40px rgba(191,0,255,0.3)",
-              transition: "all 0.3s",
-              fontFamily: "Poppins, sans-serif",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 0 30px rgba(255,0,255,0.6), 0 0 60px rgba(191,0,255,0.4)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 0 20px rgba(255,0,255,0.4), 0 0 40px rgba(191,0,255,0.3)";
-              e.currentTarget.style.transform = "none";
             }}
           >
             ⬇ Download Action Plan
@@ -518,7 +517,7 @@ Always consult a qualified healthcare professional.
 
           <p
             style={{
-              color: "rgba(224,247,255,0.35)",
+              color: "var(--text-muted)",
               fontSize: "0.75rem",
               textAlign: "center",
               marginTop: "16px",
@@ -530,14 +529,14 @@ Always consult a qualified healthcare professional.
           </p>
         </div>
 
-        {/* Other possible conditions */}
+        {/* Other possible conditions — staggered entrance */}
         {results.length > 1 && (
           <div style={{ marginBottom: "24px" }}>
             <h3
               style={{
                 fontSize: "1.1rem",
                 fontWeight: 700,
-                color: "rgba(224,247,255,0.7)",
+                color: "var(--text-secondary)",
                 marginBottom: "16px",
                 paddingLeft: "4px",
               }}
@@ -548,18 +547,19 @@ Always consult a qualified healthcare professional.
               style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
               {results.slice(1).map((r, i) => {
-                const sev = getSeverityNeon(r.severity);
+                const sev = getSeverityStyle(r.severity);
                 const isExpanded = expandedIdx === i;
                 return (
                   <div
                     key={r.name}
                     data-ocid={`results.item.${i + 2}`}
                     style={{
-                      background: "rgba(0,245,255,0.03)",
-                      border: "1px solid rgba(0,245,255,0.12)",
+                      background: "var(--bg-card)",
+                      border: "1px solid var(--border-color)",
                       borderRadius: "12px",
                       overflow: "hidden",
                       transition: "all 0.3s",
+                      animation: `fadeSlideUp 0.5s ease ${0.1 * (i + 1)}s both`,
                     }}
                   >
                     <button
@@ -580,7 +580,7 @@ Always consult a qualified healthcare professional.
                       <span
                         style={{
                           fontWeight: 700,
-                          color: "#e0f7ff",
+                          color: "var(--text-primary)",
                           flex: 1,
                           fontSize: "0.95rem",
                         }}
@@ -597,24 +597,22 @@ Always consult a qualified healthcare professional.
                           fontSize: "0.75rem",
                           fontWeight: 600,
                           textTransform: "capitalize",
-                          boxShadow: `0 0 6px ${sev.glow}`,
                         }}
                       >
                         {r.severity}
                       </span>
                       <span
                         style={{
-                          color: "#00f5ff",
+                          color: "var(--accent)",
                           fontWeight: 700,
                           fontSize: "0.85rem",
-                          textShadow: "0 0 6px rgba(0,245,255,0.5)",
                         }}
                       >
                         {r.confidence}%
                       </span>
                       <span
                         style={{
-                          color: "rgba(0,245,255,0.5)",
+                          color: "var(--text-muted)",
                           fontSize: "0.8rem",
                         }}
                       >
@@ -627,7 +625,7 @@ Always consult a qualified healthcare professional.
                       <div
                         style={{
                           height: "3px",
-                          background: "rgba(0,245,255,0.1)",
+                          background: "var(--accent-dim)",
                           borderRadius: "2px",
                           overflow: "hidden",
                         }}
@@ -637,8 +635,7 @@ Always consult a qualified healthcare professional.
                             height: "100%",
                             width: `${r.confidence}%`,
                             background:
-                              "linear-gradient(90deg, #0080ff, #00f5ff)",
-                            boxShadow: "0 0 6px rgba(0,245,255,0.5)",
+                              "linear-gradient(90deg, #800020, #a00028)",
                           }}
                         />
                       </div>
@@ -648,29 +645,34 @@ Always consult a qualified healthcare professional.
                       <div
                         style={{
                           padding: "16px 20px",
-                          borderTop: "1px solid rgba(0,245,255,0.1)",
+                          borderTop: "1px solid var(--border-color)",
                           display: "grid",
                           gridTemplateColumns:
                             "repeat(auto-fit, minmax(200px, 1fr))",
                           gap: "12px",
+                          animation: "fadeSlideUp 0.3s ease forwards",
                         }}
                       >
                         {[
-                          { label: "Diet", content: r.diet, color: "#00ff88" },
+                          {
+                            label: "Diet",
+                            content: r.diet,
+                            color: "var(--severity-mild-color)",
+                          },
                           {
                             label: "Precautions",
                             content: r.precautions,
-                            color: "#facc15",
+                            color: "var(--severity-moderate-color)",
                           },
                           {
                             label: "Medicines",
                             content: r.medicines,
-                            color: "#60b3ff",
+                            color: "var(--accent)",
                           },
                           {
                             label: "See Doctor If",
                             content: r.whenToSeeDoctor,
-                            color: "#ff80ff",
+                            color: "var(--severity-severe-color)",
                           },
                         ].map((detail) => (
                           <div key={detail.label}>
@@ -681,7 +683,6 @@ Always consult a qualified healthcare professional.
                                 textTransform: "uppercase",
                                 letterSpacing: "1px",
                                 color: detail.color,
-                                textShadow: `0 0 6px ${detail.color}66`,
                                 marginBottom: "4px",
                               }}
                             >
@@ -690,7 +691,7 @@ Always consult a qualified healthcare professional.
                             <p
                               style={{
                                 fontSize: "0.82rem",
-                                color: "rgba(224,247,255,0.6)",
+                                color: "var(--text-secondary)",
                                 lineHeight: 1.5,
                               }}
                             >
@@ -714,24 +715,23 @@ Always consult a qualified healthcare professional.
             data-ocid="results.toggle"
             onClick={() => setShowDb((v) => !v)}
             style={{
-              background: "rgba(0,245,255,0.05)",
-              border: "1px solid rgba(0,245,255,0.2)",
+              background: "var(--accent-dim)",
+              border: "1px solid var(--border-color)",
               borderRadius: "999px",
               padding: "10px 28px",
-              color: "#00f5ff",
+              color: "var(--accent)",
               fontWeight: 600,
               cursor: "pointer",
               fontSize: "0.9rem",
               fontFamily: "Poppins, sans-serif",
               transition: "all 0.2s",
-              textShadow: "0 0 8px rgba(0,245,255,0.4)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(0,245,255,0.1)";
-              e.currentTarget.style.boxShadow = "0 0 15px rgba(0,245,255,0.3)";
+              e.currentTarget.style.background = "rgba(128,0,32,0.2)";
+              e.currentTarget.style.boxShadow = "var(--glow-soft)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(0,245,255,0.05)";
+              e.currentTarget.style.background = "var(--accent-dim)";
               e.currentTarget.style.boxShadow = "none";
             }}
           >

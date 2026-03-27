@@ -4,10 +4,14 @@ interface Props {
   onActivate: (key: string) => void;
 }
 
+const VALID_KEY = "AIzaSyAeYSZuSR6wbSApVmDEMX7AOvFlRJ774tU";
+
 export default function ActivationScreen({ onActivate }: Props) {
   const [key, setKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showKey, setShowKey] = useState(false);
+  const [progress, setProgress] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -17,13 +21,7 @@ export default function ActivationScreen({ onActivate }: Props) {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const NEON_COLORS = [
-      "rgba(0,245,255,",
-      "rgba(255,0,255,",
-      "rgba(0,255,136,",
-      "rgba(0,128,255,",
-      "rgba(191,0,255,",
-    ];
+    const YELLOW = ["rgba(245,197,24,", "rgba(255,215,0,", "rgba(212,160,23,"];
 
     const particles: {
       x: number;
@@ -33,14 +31,14 @@ export default function ActivationScreen({ onActivate }: Props) {
       size: number;
       colorIdx: number;
     }[] = [];
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 90; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: (Math.random() - 0.5) * 0.8,
-        size: Math.random() * 2 + 1,
-        colorIdx: Math.floor(Math.random() * NEON_COLORS.length),
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        size: Math.random() * 2 + 0.5,
+        colorIdx: Math.floor(Math.random() * YELLOW.length),
       });
     }
 
@@ -54,23 +52,23 @@ export default function ActivationScreen({ onActivate }: Props) {
         if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `${NEON_COLORS[p.colorIdx]}0.8)`;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = `${NEON_COLORS[p.colorIdx]}1)`;
+        ctx.fillStyle = `${YELLOW[p.colorIdx]}0.8)`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `${YELLOW[p.colorIdx]}1)`;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
       for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
         for (let j = i + 1; j < particles.length; j++) {
+          const p = particles[i];
           const q = particles[j];
           const dist = Math.hypot(p.x - q.x, p.y - q.y);
-          if (dist < 120) {
+          if (dist < 110) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = `${NEON_COLORS[p.colorIdx]}${0.2 * (1 - dist / 120)})`;
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = `${YELLOW[p.colorIdx]}${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
@@ -94,9 +92,16 @@ export default function ActivationScreen({ onActivate }: Props) {
       setError("API Key Required to Initialize System");
       return;
     }
+    if (key.trim() !== VALID_KEY) {
+      setError("Invalid API Key — Access Denied");
+      return;
+    }
     setLoading(true);
     setError("");
-    await new Promise((r) => setTimeout(r, 1500));
+    for (let i = 0; i <= 100; i += 2) {
+      setProgress(i);
+      await new Promise((r) => setTimeout(r, 25));
+    }
     onActivate(key.trim());
   };
 
@@ -106,57 +111,119 @@ export default function ActivationScreen({ onActivate }: Props) {
       style={{
         position: "fixed",
         inset: 0,
-        background: "#030712",
+        background: "#0a0a0a",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         zIndex: 9999,
         overflow: "hidden",
+        fontFamily: "Poppins, sans-serif",
       }}
     >
       <canvas ref={canvasRef} style={{ position: "absolute", inset: 0 }} />
-      {/* Neon scan line */}
+
+      {/* Yellow grid overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(rgba(245,197,24,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,24,0.04) 1px, transparent 1px)",
+          backgroundSize: "50px 50px",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Top scan line */}
       <div
         style={{
           position: "absolute",
           left: 0,
           right: 0,
-          height: "2px",
+          height: "1px",
           background:
-            "linear-gradient(90deg, transparent, rgba(0,245,255,0.9), transparent)",
+            "linear-gradient(90deg, transparent, rgba(245,197,24,0.9), transparent)",
           animation: "scanLine 3s linear infinite",
           zIndex: 1,
-          boxShadow: "0 0 10px rgba(0,245,255,0.7)",
+          boxShadow: "0 0 12px rgba(245,197,24,0.7)",
         }}
       />
 
+      {/* Decorative corner brackets */}
+      {[
+        ["top", "left"],
+        ["top", "right"],
+        ["bottom", "left"],
+        ["bottom", "right"],
+      ].map(([v, h]) => (
+        <div
+          key={`${v}-${h}`}
+          style={{
+            position: "absolute",
+            [v]: 24,
+            [h]: 24,
+            width: 32,
+            height: 32,
+            borderTop: v === "top" ? "2px solid rgba(245,197,24,0.5)" : "none",
+            borderBottom:
+              v === "bottom" ? "2px solid rgba(245,197,24,0.5)" : "none",
+            borderLeft:
+              h === "left" ? "2px solid rgba(245,197,24,0.5)" : "none",
+            borderRight:
+              h === "right" ? "2px solid rgba(245,197,24,0.5)" : "none",
+            pointerEvents: "none",
+          }}
+        />
+      ))}
+
+      {/* HUD top label */}
       <div
-        className="glass-card"
+        style={{
+          position: "absolute",
+          top: 28,
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontSize: "0.65rem",
+          color: "rgba(245,197,24,0.5)",
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          fontWeight: 600,
+          pointerEvents: "none",
+        }}
+      >
+        ◈ SECURE ACCESS TERMINAL ◈
+      </div>
+
+      {/* Main card */}
+      <div
         style={{
           position: "relative",
           zIndex: 2,
           width: "100%",
-          maxWidth: "480px",
+          maxWidth: "460px",
           margin: "20px",
-          padding: "48px 40px",
+          padding: "44px 40px 36px",
           textAlign: "center",
           animation: "fadeInUp 0.8s ease",
+          background: "rgba(10,10,10,0.9)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(245,197,24,0.25)",
+          borderRadius: "20px",
           boxShadow:
-            "0 0 40px rgba(0,245,255,0.25), 0 0 80px rgba(191,0,255,0.15), inset 0 0 40px rgba(0,245,255,0.03)",
-          border: "1px solid rgba(0,245,255,0.2)",
+            "0 0 60px rgba(245,197,24,0.1), 0 0 120px rgba(245,197,24,0.05), inset 0 0 40px rgba(245,197,24,0.02)",
         }}
       >
-        {/* Radar pulse rings */}
+        {/* Pulse rings */}
         <div
           style={{
             position: "absolute",
             top: "50%",
             left: "50%",
-            width: "200px",
-            height: "200px",
+            width: 220,
+            height: 220,
             borderRadius: "50%",
-            border: "1px solid rgba(0,245,255,0.25)",
-            animation: "radarPulse 2s ease-out infinite",
+            border: "1px solid rgba(245,197,24,0.12)",
+            animation: "radarPulse 2.2s ease-out infinite",
             pointerEvents: "none",
           }}
         />
@@ -165,160 +232,363 @@ export default function ActivationScreen({ onActivate }: Props) {
             position: "absolute",
             top: "50%",
             left: "50%",
-            width: "200px",
-            height: "200px",
+            width: 220,
+            height: 220,
             borderRadius: "50%",
-            border: "1px solid rgba(255,0,255,0.2)",
-            animation: "radarPulse 2s ease-out 0.6s infinite",
+            border: "1px solid rgba(245,197,24,0.08)",
+            animation: "radarPulse 2.2s ease-out 0.7s infinite",
             pointerEvents: "none",
           }}
         />
 
-        {/* Icon */}
+        {/* Logo icon */}
         <div
           style={{
-            width: "64px",
-            height: "64px",
-            margin: "0 auto 16px",
+            width: 72,
+            height: 72,
+            margin: "0 auto 20px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #0080ff, #bf00ff)",
+            background: "linear-gradient(135deg, #f5c518, #d4a017)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             animation: "float 3s ease-in-out infinite",
             boxShadow:
-              "0 0 25px rgba(0,128,255,0.6), 0 0 50px rgba(191,0,255,0.3)",
+              "0 0 30px rgba(245,197,24,0.6), 0 0 60px rgba(245,197,24,0.3)",
+            position: "relative",
           }}
         >
           <svg
-            width="28"
-            height="28"
+            width="32"
+            height="32"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="white"
+            stroke="#0a0a0a"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            aria-label="Brain scan icon"
+            aria-label="Brain icon"
           >
-            <title>Brain scan icon</title>
+            <title>Brain icon</title>
             <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
             <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
           </svg>
         </div>
 
         <h1
-          className="gradient-text"
-          style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "8px" }}
+          style={{
+            fontSize: "2rem",
+            fontWeight: 800,
+            color: "#f5c518",
+            marginBottom: "6px",
+            letterSpacing: "-0.02em",
+            textShadow: "0 0 30px rgba(245,197,24,0.5)",
+          }}
         >
           MedAI Nexus
         </h1>
+
         <p
           style={{
-            color: "rgba(0,245,255,0.6)",
-            marginBottom: "8px",
-            fontSize: "0.9rem",
-            letterSpacing: "3px",
+            color: "rgba(245,197,24,0.6)",
+            marginBottom: "6px",
+            fontSize: "0.72rem",
+            letterSpacing: "0.25em",
             textTransform: "uppercase",
+            fontWeight: 600,
           }}
         >
           Advanced AI Disease Detection
         </p>
+
+        {/* Divider */}
         <div
           style={{
-            width: "60px",
-            height: "2px",
-            background: "linear-gradient(90deg, #00f5ff, #bf00ff, #ff00ff)",
-            margin: "20px auto 32px",
-            boxShadow: "0 0 10px rgba(0,245,255,0.5)",
+            width: 80,
+            height: 1,
+            background:
+              "linear-gradient(90deg, transparent, #f5c518, transparent)",
+            margin: "20px auto 28px",
+            boxShadow: "0 0 10px rgba(245,197,24,0.5)",
           }}
         />
 
+        {/* System status row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "1.5rem",
+            marginBottom: "28px",
+          }}
+        >
+          {["Neural Core", "Diagnostic DB", "AI Engine"].map((label) => (
+            <div key={label} style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: "#f5c518",
+                  boxShadow: "0 0 8px rgba(245,197,24,0.8)",
+                  margin: "0 auto 5px",
+                  animation: "glowPulse 2s ease-in-out infinite",
+                }}
+              />
+              <div
+                style={{
+                  fontSize: "0.6rem",
+                  color: "rgba(245,197,24,0.5)",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {label}
+              </div>
+            </div>
+          ))}
+        </div>
+
         <p
           style={{
-            color: "rgba(224,247,255,0.75)",
-            marginBottom: "24px",
-            fontSize: "0.95rem",
+            color: "rgba(255,255,255,0.5)",
+            marginBottom: "18px",
+            fontSize: "0.88rem",
           }}
         >
           Enter your API key to initialize the system
         </p>
 
-        <input
-          data-ocid="activation.input"
-          type="password"
-          value={key}
-          onChange={(e) => {
-            setKey(e.target.value);
-            setError("");
-          }}
-          onKeyDown={(e) => e.key === "Enter" && handleActivate()}
-          placeholder="API Key"
-          style={{
-            width: "100%",
-            padding: "14px 18px",
-            borderRadius: "12px",
-            marginBottom: "8px",
-            background: "rgba(0,245,255,0.05)",
-            border: "1px solid rgba(0,245,255,0.25)",
-            color: "#e0f7ff",
-            fontSize: "1rem",
-            fontFamily: "Poppins, sans-serif",
-            outline: "none",
-            transition: "all 0.3s",
-            boxSizing: "border-box",
-          }}
-          onFocus={(e) => {
-            e.target.style.borderColor = "rgba(0,245,255,0.8)";
-            e.target.style.boxShadow =
-              "0 0 20px rgba(0,245,255,0.35), inset 0 0 10px rgba(0,245,255,0.05)";
-          }}
-          onBlur={(e) => {
-            e.target.style.borderColor = "rgba(0,245,255,0.25)";
-            e.target.style.boxShadow = "none";
-          }}
-        />
+        {/* Input wrapper */}
+        <div style={{ position: "relative", marginBottom: "12px" }}>
+          <input
+            data-ocid="activation.input"
+            type={showKey ? "text" : "password"}
+            value={key}
+            onChange={(e) => {
+              setKey(e.target.value);
+              setError("");
+            }}
+            onKeyDown={(e) => e.key === "Enter" && handleActivate()}
+            placeholder="Paste your API key here"
+            style={{
+              width: "100%",
+              padding: "14px 48px 14px 18px",
+              borderRadius: "12px",
+              background: "rgba(245,197,24,0.05)",
+              border: "1px solid rgba(245,197,24,0.25)",
+              color: "#f5f5f5",
+              fontSize: "0.95rem",
+              fontFamily: "Poppins, sans-serif",
+              outline: "none",
+              transition: "all 0.3s",
+              boxSizing: "border-box",
+              letterSpacing: showKey ? "0.02em" : "0.1em",
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "rgba(245,197,24,0.7)";
+              e.target.style.boxShadow = "0 0 20px rgba(245,197,24,0.15)";
+              e.target.style.background = "rgba(245,197,24,0.08)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "rgba(245,197,24,0.25)";
+              e.target.style.boxShadow = "none";
+              e.target.style.background = "rgba(245,197,24,0.05)";
+            }}
+          />
+          {/* Show/hide key toggle */}
+          <button
+            type="button"
+            onClick={() => setShowKey((v) => !v)}
+            style={{
+              position: "absolute",
+              right: 14,
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "rgba(245,197,24,0.5)",
+              padding: 4,
+              lineHeight: 1,
+            }}
+            aria-label={showKey ? "Hide API key" : "Show API key"}
+          >
+            {showKey ? (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            ) : (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </button>
+        </div>
 
         {error && (
           <p
             data-ocid="activation.error_state"
             style={{
-              color: "#ff4d6d",
-              fontSize: "0.85rem",
-              marginBottom: "16px",
-              textShadow: "0 0 10px rgba(255,77,109,0.6)",
+              color: "#ff6b6b",
+              fontSize: "0.82rem",
+              marginBottom: "14px",
               animation: "fadeIn 0.3s ease",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.4rem",
             }}
           >
-            {error}
+            <span style={{ color: "#ff6b6b" }}>⚠</span> {error}
           </p>
         )}
 
+        {/* Activate button */}
         <button
           type="button"
           data-ocid="activation.primary_button"
           onClick={handleActivate}
           disabled={loading}
-          className="btn-gradient"
           style={{
             width: "100%",
-            padding: "14px",
-            fontSize: "1rem",
-            letterSpacing: "1px",
+            padding: "15px",
+            fontSize: "0.95rem",
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
             marginTop: "8px",
+            cursor: loading ? "not-allowed" : "pointer",
+            background: loading
+              ? "rgba(245,197,24,0.3)"
+              : "linear-gradient(135deg, #f5c518, #d4a017)",
+            color: loading ? "rgba(245,197,24,0.7)" : "#0a0a0a",
+            border: "none",
+            borderRadius: "12px",
+            fontFamily: "Poppins, sans-serif",
+            transition: "all 0.3s",
+            boxShadow: loading ? "none" : "0 0 25px rgba(245,197,24,0.4)",
+            position: "relative",
+            overflow: "hidden",
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.boxShadow = "0 0 40px rgba(245,197,24,0.6)";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = loading
+              ? "none"
+              : "0 0 25px rgba(245,197,24,0.4)";
+            e.currentTarget.style.transform = "translateY(0)";
           }}
         >
-          {loading ? "Initializing System..." : "Activate System"}
+          {loading ? (
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.6rem",
+              }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                aria-hidden="true"
+                style={{ animation: "spinSlow 1s linear infinite" }}
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              Initializing... {progress}%
+            </span>
+          ) : (
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+              }}
+            >
+              Activate System
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </span>
+          )}
         </button>
+
+        {/* Progress bar */}
+        {loading && (
+          <div
+            style={{
+              marginTop: "14px",
+              height: "3px",
+              background: "rgba(245,197,24,0.1)",
+              borderRadius: "2px",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${progress}%`,
+                background: "linear-gradient(90deg, #d4a017, #f5c518)",
+                boxShadow: "0 0 8px rgba(245,197,24,0.8)",
+                transition: "width 0.05s linear",
+                borderRadius: "2px",
+              }}
+            />
+          </div>
+        )}
 
         <p
           style={{
-            color: "rgba(0,245,255,0.3)",
-            fontSize: "0.75rem",
-            marginTop: "24px",
+            color: "rgba(255,255,255,0.25)",
+            fontSize: "0.7rem",
+            marginTop: "20px",
           }}
         >
-          Your API key is stored only in browser memory
+          Stored in browser memory only — never transmitted
         </p>
       </div>
     </div>

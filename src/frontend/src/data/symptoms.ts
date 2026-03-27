@@ -298,3 +298,41 @@ for (const s of SYMPTOMS.critical) {
 for (const s of SYMPTOMS.rare) {
   SYMPTOM_CATEGORIES[s] = "rare";
 }
+
+export const SYMPTOM_PACKS: Record<string, string[]> = {
+  "🤧 Flu Pack": [
+    "Fever",
+    "Fatigue",
+    "Headache",
+    "Chills",
+    "Muscle pain",
+    "Sore throat",
+    "Runny nose",
+    "Cough",
+  ],
+  "🤕 Headache Pack": [
+    "Headache",
+    "Sensitivity to light",
+    "Nausea",
+    "Dizziness",
+    "Neck pain",
+    "Blurred vision",
+  ],
+  "🫁 Respiratory Pack": [
+    "Cough",
+    "Shortness of breath",
+    "Wheezing",
+    "Chest tightness",
+    "Dry cough",
+    "Nasal congestion",
+  ],
+  "🤢 Digestive Pack": [
+    "Nausea",
+    "Vomiting",
+    "Abdominal pain",
+    "Diarrhea",
+    "Bloating",
+    "Loss of appetite",
+    "Heartburn",
+  ],
+};

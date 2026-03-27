@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 
-export default function ParticleBackground() {
+interface Props {
+  isDark: boolean;
+}
+
+export default function ParticleBackground({ isDark }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -24,13 +28,16 @@ export default function ParticleBackground() {
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
         size: Math.random() * 2 + 0.5,
-        opacity: Math.random() * 0.4 + 0.1,
+        opacity: Math.random() * 0.3 + 0.05,
       });
     }
 
     let animId: number;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const r = isDark ? 192 : 128;
+      const g = isDark ? 48 : 0;
+      const b = isDark ? 74 : 32;
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
@@ -38,7 +45,7 @@ export default function ParticleBackground() {
         if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${p.opacity})`;
+        ctx.fillStyle = `rgba(${r},${g},${b},${p.opacity})`;
         ctx.fill();
       }
       for (let i = 0; i < particles.length; i++) {
@@ -50,7 +57,7 @@ export default function ParticleBackground() {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = `rgba(255,255,255,${0.08 * (1 - dist / 100)})`;
+            ctx.strokeStyle = `rgba(${r},${g},${b},${0.06 * (1 - dist / 100)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -68,7 +75,7 @@ export default function ParticleBackground() {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [isDark]);
 
   return (
     <canvas
