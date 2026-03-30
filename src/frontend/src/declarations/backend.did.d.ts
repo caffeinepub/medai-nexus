@@ -16,6 +16,14 @@ export interface ContactSubmission {
   'message' : string,
   'timestamp' : Time,
 }
+export interface FeedbackEntry {
+  'age' : bigint,
+  'description' : string,
+  'gender' : string,
+  'timestamp' : Time,
+  'disease' : string,
+  'rating' : bigint,
+}
 export interface ImageUpload {
   'status' : string,
   'filename' : string,
@@ -27,9 +35,14 @@ export interface _SERVICE {
   'addContactSubmission' : ActorMethod<[string, string, string], boolean>,
   'addImageUpload' : ActorMethod<[string, string], boolean>,
   'getContactSubmissions' : ActorMethod<[], Array<ContactSubmission>>,
+  'getFeedbacks' : ActorMethod<[], Array<FeedbackEntry>>,
   'getImageUploadByFilename' : ActorMethod<[string], [] | [ImageUpload]>,
   'getImageUploads' : ActorMethod<[], Array<ImageUpload>>,
   'getStats' : ActorMethod<[], [] | [PlatformStats]>,
+  'submitFeedback' : ActorMethod<
+    [bigint, string, string, bigint, string],
+    boolean
+  >,
   'updateStats' : ActorMethod<[bigint, number], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;

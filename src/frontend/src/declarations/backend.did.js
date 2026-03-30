@@ -15,6 +15,14 @@ export const ContactSubmission = IDL.Record({
   'message' : IDL.Text,
   'timestamp' : Time,
 });
+export const FeedbackEntry = IDL.Record({
+  'age' : IDL.Nat,
+  'description' : IDL.Text,
+  'gender' : IDL.Text,
+  'timestamp' : Time,
+  'disease' : IDL.Text,
+  'rating' : IDL.Nat,
+});
 export const ImageUpload = IDL.Record({
   'status' : IDL.Text,
   'filename' : IDL.Text,
@@ -37,6 +45,7 @@ export const idlService = IDL.Service({
       [IDL.Vec(ContactSubmission)],
       ['query'],
     ),
+  'getFeedbacks' : IDL.Func([], [IDL.Vec(FeedbackEntry)], ['query']),
   'getImageUploadByFilename' : IDL.Func(
       [IDL.Text],
       [IDL.Opt(ImageUpload)],
@@ -44,6 +53,11 @@ export const idlService = IDL.Service({
     ),
   'getImageUploads' : IDL.Func([], [IDL.Vec(ImageUpload)], ['query']),
   'getStats' : IDL.Func([], [IDL.Opt(PlatformStats)], ['query']),
+  'submitFeedback' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Text],
+      [IDL.Bool],
+      [],
+    ),
   'updateStats' : IDL.Func([IDL.Nat, IDL.Float64], [IDL.Bool], []),
 });
 
@@ -56,6 +70,14 @@ export const idlFactory = ({ IDL }) => {
     'email' : IDL.Text,
     'message' : IDL.Text,
     'timestamp' : Time,
+  });
+  const FeedbackEntry = IDL.Record({
+    'age' : IDL.Nat,
+    'description' : IDL.Text,
+    'gender' : IDL.Text,
+    'timestamp' : Time,
+    'disease' : IDL.Text,
+    'rating' : IDL.Nat,
   });
   const ImageUpload = IDL.Record({
     'status' : IDL.Text,
@@ -79,6 +101,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ContactSubmission)],
         ['query'],
       ),
+    'getFeedbacks' : IDL.Func([], [IDL.Vec(FeedbackEntry)], ['query']),
     'getImageUploadByFilename' : IDL.Func(
         [IDL.Text],
         [IDL.Opt(ImageUpload)],
@@ -86,6 +109,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getImageUploads' : IDL.Func([], [IDL.Vec(ImageUpload)], ['query']),
     'getStats' : IDL.Func([], [IDL.Opt(PlatformStats)], ['query']),
+    'submitFeedback' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Text],
+        [IDL.Bool],
+        [],
+      ),
     'updateStats' : IDL.Func([IDL.Nat, IDL.Float64], [IDL.Bool], []),
   });
 };

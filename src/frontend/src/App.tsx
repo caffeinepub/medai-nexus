@@ -31,19 +31,11 @@ export default function App() {
   const [userAge, setUserAge] = useState<number>(0);
   const [userGender, setUserGender] = useState<string>("");
   const [showFeedback, setShowFeedback] = useState(false);
-  const [isDark, setIsDark] = useState(
-    () => localStorage.getItem("theme") === "dark",
-  );
+  const [reviewHover, setReviewHover] = useState(false);
 
   useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-theme",
-      isDark ? "dark" : "light",
-    );
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  }, [isDark]);
-
-  const handleToggleTheme = () => setIsDark((prev) => !prev);
+    document.documentElement.setAttribute("data-theme", "light");
+  }, []);
 
   const handleActivate = (key: string) => {
     setApiKey(key);
@@ -101,25 +93,29 @@ export default function App() {
 
     setAnalysisResults(ranked);
     setIsAnalyzing(false);
-    setTimeout(() => setShowFeedback(true), 1200);
+    // No auto-popup — user clicks the floating button to leave a review
   };
 
   if (!activated) {
     return (
-      <div data-theme={isDark ? "dark" : "light"}>
+      <div data-theme="light">
         <ActivationScreen onActivate={handleActivate} />
       </div>
     );
   }
 
+  const reviewBtnTransform = reviewHover
+    ? "translateY(-50%) translateX(-4px)"
+    : "translateY(-50%) translateX(0)";
+
   return (
     <div
-      data-theme={isDark ? "dark" : "light"}
+      data-theme="light"
       style={{ position: "relative", minHeight: "100vh" }}
     >
-      <ParticleBackground isDark={isDark} />
+      <ParticleBackground isDark={false} />
       <div style={{ position: "relative", zIndex: 1 }}>
-        <Navbar isDark={isDark} onToggle={handleToggleTheme} />
+        <Navbar />
         <Hero />
         <SymptomPanel onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         <ResultDashboard
@@ -132,9 +128,69 @@ export default function App() {
         <AboutSection />
         <Footer />
       </div>
+
+      {/* Floating Give Review Button */}
+      <button
+        type="button"
+        onClick={() => setShowFeedback(true)}
+        onMouseEnter={() => setReviewHover(true)}
+        onMouseLeave={() => setReviewHover(false)}
+        aria-label="Give us a review"
+        style={{
+          position: "fixed",
+          right: 0,
+          top: "50%",
+          transform: reviewBtnTransform,
+          zIndex: 99990,
+          background: reviewHover
+            ? "linear-gradient(135deg, #8387C3, #4E7AB1)"
+            : "linear-gradient(135deg, #4E7AB1, #506980)",
+          color: "#fff",
+          border: "none",
+          borderRadius: "12px 0 0 12px",
+          padding: "14px 10px",
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 6,
+          boxShadow: reviewHover
+            ? "-4px 0 24px rgba(131,135,195,0.5), -2px 0 8px rgba(0,0,0,0.2)"
+            : "-2px 0 12px rgba(78,122,177,0.35)",
+          transition: "all 0.25s cubic-bezier(0.23, 1, 0.32, 1)",
+          fontFamily: "Poppins, sans-serif",
+          writingMode: "vertical-rl",
+          textOrientation: "mixed",
+          fontSize: "0.78rem",
+          fontWeight: 700,
+          letterSpacing: "0.06em",
+        }}
+      >
+        <svg
+          role="img"
+          aria-label="Review icon"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ flexShrink: 0, rotate: "90deg" }}
+        >
+          <title>Review icon</title>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        <span>Review</span>
+      </button>
+
       <FeedbackModal
         isOpen={showFeedback}
         onClose={() => setShowFeedback(false)}
+        disease={analysisResults[0]?.name ?? ""}
+        age={userAge}
+        gender={userGender}
       />
     </div>
   );

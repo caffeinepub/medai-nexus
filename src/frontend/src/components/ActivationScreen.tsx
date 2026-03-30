@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import AdminPage from "./AdminPage";
 
 interface Props {
   onActivate: (key: string) => void;
@@ -119,9 +120,24 @@ export default function ActivationScreen({ onActivate }: Props) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showKey, setShowKey] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const isLastSlide = slide === SLIDES.length;
+
+  // Live feedback stats from localStorage
+  const feedbackStats = (() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("medai_feedback") || "[]");
+      if (!Array.isArray(stored) || stored.length === 0) return null;
+      const avg =
+        stored.reduce((s: number, f: { rating: number }) => s + f.rating, 0) /
+        stored.length;
+      return { count: stored.length, avg: avg.toFixed(1) };
+    } catch {
+      return null;
+    }
+  })();
 
   // Particle canvas — light with soft Cyan Azure particles
   useEffect(() => {
@@ -136,10 +152,10 @@ export default function ActivationScreen({ onActivate }: Props) {
     window.addEventListener("resize", resize);
 
     const COLORS = [
-      "rgba(78,122,177,",
-      "rgba(125,191,192,",
-      "rgba(78,122,177,",
-      "rgba(232,200,228,",
+      "rgba(131,135,195,",
+      "rgba(149,187,181,",
+      "rgba(131,135,195,",
+      "rgba(131,135,195,",
     ];
     const particles = Array.from({ length: 70 }, () => ({
       x: Math.random() * canvas.width,
@@ -203,6 +219,11 @@ export default function ActivationScreen({ onActivate }: Props) {
       setError("API Key Required to Initialize System");
       return;
     }
+    // Admin PIN check
+    if (trimmed === "dickyaddu@admin2026") {
+      setShowAdmin(true);
+      return;
+    }
     if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
       setError("API Key must contain only letters, numbers, and underscores");
       return;
@@ -237,6 +258,12 @@ export default function ActivationScreen({ onActivate }: Props) {
   };
 
   const isActive = slideState === "idle";
+
+  if (showAdmin) {
+    return (
+      <AdminPage alreadyAuthenticated onClose={() => setShowAdmin(false)} />
+    );
+  }
 
   return (
     <>
@@ -277,16 +304,16 @@ export default function ActivationScreen({ onActivate }: Props) {
           50% { transform: translateY(-14px) skewX(2deg); }
         }
         @keyframes statPulse {
-          0%, 100% { box-shadow: 0 0 14px rgba(78,122,177,0.25), 0 0 30px rgba(78,122,177,0.1); }
-          50% { box-shadow: 0 0 28px rgba(78,122,177,0.45), 0 0 55px rgba(125,191,192,0.2); }
+          0%, 100% { box-shadow: 0 0 14px rgba(131,135,195,0.25), 0 0 30px rgba(131,135,195,0.1); }
+          50% { box-shadow: 0 0 28px rgba(131,135,195,0.45), 0 0 55px rgba(149,187,181,0.2); }
         }
         @keyframes countUp {
           from { opacity: 0; transform: scale(0.5); }
           to { opacity: 1; transform: scale(1); }
         }
         @keyframes dotLight {
-          0%, 100% { background: rgba(78,122,177,0.18); box-shadow: none; }
-          50% { background: #4E7AB1; box-shadow: 0 0 8px rgba(78,122,177,0.7); }
+          0%, 100% { background: rgba(131,135,195,0.18); box-shadow: none; }
+          50% { background: #4E7AB1; box-shadow: 0 0 8px rgba(78,122,177,0.5); }
         }
         @keyframes cardSlideLeft {
           from { opacity: 0; transform: translateX(-40px) rotateY(15deg); }
@@ -301,8 +328,8 @@ export default function ActivationScreen({ onActivate }: Props) {
           to { width: 100%; }
         }
         @keyframes shieldPulse {
-          0%, 100% { filter: drop-shadow(0 0 8px rgba(78,122,177,0.5)); }
-          50% { filter: drop-shadow(0 0 20px rgba(78,122,177,0.8)) drop-shadow(0 0 35px rgba(125,191,192,0.4)); }
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(131,135,195,0.5)); }
+          50% { filter: drop-shadow(0 0 20px rgba(131,135,195,0.8)) drop-shadow(0 0 35px rgba(149,187,181,0.4)); }
         }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-4px); }
@@ -340,7 +367,7 @@ export default function ActivationScreen({ onActivate }: Props) {
           overflow: "hidden",
           fontFamily: "Poppins, sans-serif",
           background:
-            "linear-gradient(135deg, #102853 0%, #1a3a60 50%, #506980 100%)",
+            "linear-gradient(135deg, #f8f9ff 0%, #eef3ff 60%, #f0f8f8 100%)",
         }}
       >
         {/* Light grid overlay */}
@@ -349,7 +376,7 @@ export default function ActivationScreen({ onActivate }: Props) {
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "linear-gradient(rgba(125,191,192,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(125,191,192,0.08) 1px, transparent 1px)",
+              "linear-gradient(rgba(78,122,177,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(78,122,177,0.05) 1px, transparent 1px)",
             backgroundSize: "55px 55px",
             zIndex: 1,
             pointerEvents: "none",
@@ -367,7 +394,7 @@ export default function ActivationScreen({ onActivate }: Props) {
             height: "60vmax",
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(207,155,212,0.15) 0%, rgba(78,122,177,0.12) 40%, transparent 70%)",
+              "radial-gradient(circle, rgba(78,122,177,0.1) 0%, rgba(78,122,177,0.07) 40%, transparent 70%)",
             zIndex: 1,
             pointerEvents: "none",
           }}
@@ -387,10 +414,10 @@ export default function ActivationScreen({ onActivate }: Props) {
             right: 0,
             height: "1px",
             background:
-              "linear-gradient(90deg, transparent 0%, rgba(78,122,177,0.0) 15%, rgba(78,122,177,0.7) 50%, rgba(78,122,177,0.0) 85%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, rgba(78,122,177,0.0) 15%, rgba(78,122,177,0.5) 50%, rgba(78,122,177,0.0) 85%, transparent 100%)",
             animation: "scanLine 5.5s linear infinite",
             zIndex: 3,
-            boxShadow: "0 0 22px rgba(78,122,177,0.35)",
+            boxShadow: "0 0 22px rgba(78,122,177,0.2)",
           }}
         />
 
@@ -406,16 +433,16 @@ export default function ActivationScreen({ onActivate }: Props) {
                 width: 38,
                 height: 38,
                 borderTop:
-                  v === "top" ? "2px solid rgba(78,122,177,0.5)" : "none",
+                  v === "top" ? "2px solid rgba(78,122,177,0.3)" : "none",
                 borderBottom:
-                  v === "bottom" ? "2px solid rgba(78,122,177,0.5)" : "none",
+                  v === "bottom" ? "2px solid rgba(78,122,177,0.3)" : "none",
                 borderLeft:
-                  h === "left" ? "2px solid rgba(78,122,177,0.5)" : "none",
+                  h === "left" ? "2px solid rgba(78,122,177,0.3)" : "none",
                 borderRight:
-                  h === "right" ? "2px solid rgba(78,122,177,0.5)" : "none",
+                  h === "right" ? "2px solid rgba(78,122,177,0.3)" : "none",
                 zIndex: 4,
                 pointerEvents: "none",
-                filter: "drop-shadow(0 0 6px rgba(78,122,177,0.3))",
+                filter: "drop-shadow(0 0 6px rgba(78,122,177,0.15))",
               }}
             />
           )),
@@ -429,7 +456,7 @@ export default function ActivationScreen({ onActivate }: Props) {
             left: "50%",
             transform: "translateX(-50%)",
             fontSize: "0.58rem",
-            color: "rgba(207,155,212,0.8)",
+            color: "rgba(78,122,177,0.7)",
             letterSpacing: "0.35em",
             textTransform: "uppercase",
             fontWeight: 700,
@@ -452,7 +479,7 @@ export default function ActivationScreen({ onActivate }: Props) {
               left: 20,
               zIndex: 10,
               background: "rgba(78,122,177,0.08)",
-              border: "1px solid rgba(78,122,177,0.3)",
+              border: "1px solid rgba(78,122,177,0.22)",
               borderRadius: 20,
               color: "#4E7AB1",
               fontSize: 12,
@@ -467,7 +494,7 @@ export default function ActivationScreen({ onActivate }: Props) {
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLButtonElement).style.opacity = "1";
               (e.currentTarget as HTMLButtonElement).style.background =
-                "rgba(78,122,177,0.15)";
+                "rgba(78,122,177,0.12)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.opacity = "0.75";
@@ -500,12 +527,12 @@ export default function ActivationScreen({ onActivate }: Props) {
                 borderRadius: 4,
                 background:
                   i === slide && !isLastSlide
-                    ? "#4E7AB1"
-                    : "rgba(78,122,177,0.2)",
+                    ? "#8387C3"
+                    : "rgba(78,122,177,0.18)",
                 transition: "all 0.3s ease",
                 boxShadow:
                   i === slide && !isLastSlide
-                    ? "0 0 10px rgba(78,122,177,0.7)"
+                    ? "0 0 10px rgba(78,122,177,0.4)"
                     : "none",
               }}
             />
@@ -515,10 +542,10 @@ export default function ActivationScreen({ onActivate }: Props) {
               width: isLastSlide ? 22 : 7,
               height: 7,
               borderRadius: 4,
-              background: isLastSlide ? "#7DBFC0" : "rgba(125,191,192,0.25)",
+              background: isLastSlide ? "#95BBB5" : "rgba(149,187,181,0.25)",
               transition: "all 0.3s ease",
               boxShadow: isLastSlide
-                ? "0 0 10px rgba(125,191,192,0.8)"
+                ? "0 0 10px rgba(149,187,181,0.8)"
                 : "none",
             }}
           />
@@ -534,13 +561,13 @@ export default function ActivationScreen({ onActivate }: Props) {
             maxWidth: 560,
             margin: "20px",
             textAlign: "center",
-            background: "rgba(16,40,83,0.92)",
+            background: "rgba(255,255,255,0.96)",
             backdropFilter: "blur(36px)",
             WebkitBackdropFilter: "blur(36px)",
-            border: "1px solid rgba(125,191,192,0.3)",
+            border: "1px solid rgba(78,122,177,0.18)",
             borderRadius: 24,
             boxShadow:
-              "0 0 80px rgba(207,155,212,0.2), 0 20px 60px rgba(16,40,83,0.4), inset 0 1px 0 rgba(125,191,192,0.1)",
+              "0 8px 48px rgba(16,40,83,0.1), 0 2px 16px rgba(78,122,177,0.1), inset 0 1px 0 rgba(215,182,212,0.2)",
             overflow: "hidden",
             perspective: "1200px",
             transformStyle: "preserve-3d",
@@ -588,13 +615,13 @@ export default function ActivationScreen({ onActivate }: Props) {
                       margin: "0 auto 32px",
                       borderRadius: "50%",
                       background:
-                        "radial-gradient(circle, rgba(78,122,177,0.08) 0%, rgba(232,200,228,0.15) 60%, transparent 100%)",
-                      border: "1.5px solid rgba(78,122,177,0.35)",
+                        "radial-gradient(circle, rgba(78,122,177,0.07) 0%, rgba(78,122,177,0.12) 60%, transparent 100%)",
+                      border: "1.5px solid rgba(78,122,177,0.25)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       boxShadow:
-                        "0 0 35px rgba(78,122,177,0.15), 0 0 18px rgba(125,191,192,0.1), inset 0 0 20px rgba(78,122,177,0.04)",
+                        "0 0 24px rgba(78,122,177,0.1), 0 0 12px rgba(125,191,192,0.08)",
                       animation: isActive
                         ? "floatIcon 3.8s ease-in-out infinite"
                         : "none",
@@ -606,7 +633,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         position: "absolute",
                         inset: -14,
                         borderRadius: "50%",
-                        border: "1px solid rgba(125,191,192,0.3)",
+                        border: "1px solid rgba(78,122,177,0.18)",
                         animation: isActive
                           ? "pulseRing 2.6s ease-out infinite"
                           : "none",
@@ -617,7 +644,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         position: "absolute",
                         inset: -28,
                         borderRadius: "50%",
-                        border: "1px solid rgba(78,122,177,0.1)",
+                        border: "1px solid rgba(78,122,177,0.12)",
                         animation: isActive
                           ? "pulseRing 2.6s ease-out 0.9s infinite"
                           : "none",
@@ -637,7 +664,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       borderRadius: 2,
                       marginBottom: 20,
                       boxShadow:
-                        "0 0 12px rgba(78,122,177,0.4), 0 0 6px rgba(125,191,192,0.3)",
+                        "0 0 12px rgba(78,122,177,0.2), 0 0 6px rgba(125,191,192,0.15)",
                     }}
                   />
 
@@ -697,7 +724,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     <p
                       style={{
                         fontSize: "0.7rem",
-                        color: "rgba(78,122,177,0.7)",
+                        color: "rgba(78,122,177,0.6)",
                         letterSpacing: "0.2em",
                         textTransform: "uppercase",
                         fontWeight: 700,
@@ -711,7 +738,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                           fontSize: "1.8rem",
                           fontWeight: 900,
                           color: "#4E7AB1",
-                          textShadow: "0 0 20px rgba(78,122,177,0.5)",
+                          textShadow: "0 0 20px rgba(131,135,195,0.5)",
                           marginRight: 6,
                         }}
                       >
@@ -728,7 +755,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     style={{
                       fontSize: "2rem",
                       fontWeight: 900,
-                      color: "#f0f4ff",
+                      color: "#102853",
                       marginBottom: 8,
                       letterSpacing: "-0.02em",
                       lineHeight: 1.15,
@@ -741,7 +768,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     key={`sub-${slide}`}
                     style={{
                       fontSize: "0.78rem",
-                      color: "rgba(207,155,212,0.9)",
+                      color: "#506980",
                       letterSpacing: "0.12em",
                       textTransform: "uppercase",
                       fontWeight: 600,
@@ -767,9 +794,9 @@ export default function ActivationScreen({ onActivate }: Props) {
                           flex: 1,
                           padding: "18px 14px",
                           background: "rgba(78,122,177,0.06)",
-                          border: "1px solid rgba(78,122,177,0.25)",
+                          border: "1px solid rgba(78,122,177,0.18)",
                           borderRadius: 14,
-                          boxShadow: "0 0 20px rgba(78,122,177,0.1)",
+                          boxShadow: "0 0 12px rgba(78,122,177,0.08)",
                         }}
                       >
                         <div
@@ -783,7 +810,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 0 15px rgba(78,122,177,0.3)",
+                            boxShadow: "0 0 12px rgba(78,122,177,0.2)",
                             fontSize: "1rem",
                             fontWeight: 800,
                             color: "#fff",
@@ -795,7 +822,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                           style={{
                             fontSize: "0.82rem",
                             fontWeight: 700,
-                            color: "#f0f4ff",
+                            color: "#102853",
                             marginBottom: 4,
                           }}
                         >
@@ -804,7 +831,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         <div
                           style={{
                             fontSize: "0.65rem",
-                            color: "rgba(78,122,177,0.7)",
+                            color: "rgba(78,122,177,0.6)",
                             letterSpacing: "0.06em",
                             textTransform: "uppercase",
                             fontWeight: 600,
@@ -818,10 +845,10 @@ export default function ActivationScreen({ onActivate }: Props) {
                         style={{
                           flex: 1,
                           padding: "18px 14px",
-                          background: "rgba(125,191,192,0.06)",
-                          border: "1px solid rgba(125,191,192,0.3)",
+                          background: "rgba(125,191,192,0.08)",
+                          border: "1px solid rgba(78,122,177,0.18)",
                           borderRadius: 14,
-                          boxShadow: "0 0 20px rgba(125,191,192,0.1)",
+                          boxShadow: "0 0 12px rgba(125,191,192,0.1)",
                         }}
                       >
                         <div
@@ -835,7 +862,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 0 15px rgba(125,191,192,0.4)",
+                            boxShadow: "0 0 12px rgba(125,191,192,0.25)",
                             fontSize: "1rem",
                             fontWeight: 800,
                             color: "#fff",
@@ -847,7 +874,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                           style={{
                             fontSize: "0.82rem",
                             fontWeight: 700,
-                            color: "#f0f4ff",
+                            color: "#102853",
                             marginBottom: 4,
                           }}
                         >
@@ -856,7 +883,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         <div
                           style={{
                             fontSize: "0.65rem",
-                            color: "rgba(125,191,192,0.75)",
+                            color: "#506980",
                             letterSpacing: "0.06em",
                             textTransform: "uppercase",
                             fontWeight: 600,
@@ -871,7 +898,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       className="slide-desc"
                       key={`desc-${slide}`}
                       style={{
-                        color: "#506980",
+                        color: "#7a95aa",
                         fontSize: "0.96rem",
                         lineHeight: 1.8,
                         marginBottom: 28,
@@ -892,7 +919,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       gap: 8,
                       padding: "9px 20px",
                       background: "rgba(78,122,177,0.07)",
-                      border: "1px solid rgba(125,191,192,0.3)",
+                      border: "1px solid rgba(78,122,177,0.18)",
                       borderRadius: 999,
                       marginBottom: 32,
                       animation: isActive
@@ -906,7 +933,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         height: 7,
                         borderRadius: "50%",
                         background: "#4E7AB1",
-                        boxShadow: "0 0 10px rgba(78,122,177,0.7)",
+                        boxShadow: "0 0 10px rgba(78,122,177,0.4)",
                         animation: isActive
                           ? "glowBlink 1.6s ease-in-out infinite"
                           : "none",
@@ -915,7 +942,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     <span
                       style={{
                         fontSize: "0.72rem",
-                        color: "rgba(125,191,192,0.95)",
+                        color: "#4E7AB1",
                         fontWeight: 700,
                         letterSpacing: "0.1em",
                         textTransform: "uppercase",
@@ -924,6 +951,32 @@ export default function ActivationScreen({ onActivate }: Props) {
                       {currentSlideData.stat}
                     </span>
                   </div>
+
+                  {/* Feedback stats badge - shown on slide 0 when feedback exists */}
+                  {slide === 0 && feedbackStats && (
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "7px 16px",
+                        background: "rgba(78,122,177,0.08)",
+                        border: "1px solid rgba(78,122,177,0.18)",
+                        borderRadius: 999,
+                        marginBottom: 16,
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        color: "#7DBFC0",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      <span style={{ color: "#D7B6D4", fontSize: "0.85rem" }}>
+                        ★
+                      </span>
+                      {feedbackStats.avg}/5 from {feedbackStats.count} user
+                      {feedbackStats.count !== 1 ? "s" : ""}
+                    </div>
+                  )}
 
                   {/* Next button */}
                   <button
@@ -955,7 +1008,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       cursor: "pointer",
                       fontFamily: "Poppins, sans-serif",
                       letterSpacing: "0.06em",
-                      boxShadow: "0 0 20px rgba(78,122,177,0.35)",
+                      boxShadow: "0 4px 16px rgba(78,122,177,0.25)",
                       transition: "all 0.2s ease",
                     }}
                   >
@@ -986,7 +1039,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     animation:
                       "floatIcon 3.5s ease-in-out infinite, shieldPulse 2.5s ease-in-out infinite",
                     boxShadow:
-                      "0 0 40px rgba(78,122,177,0.4), 0 0 80px rgba(78,122,177,0.2)",
+                      "0 0 32px rgba(78,122,177,0.25), 0 0 60px rgba(78,122,177,0.12)",
                     position: "relative",
                   }}
                 >
@@ -995,7 +1048,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       position: "absolute",
                       inset: -12,
                       borderRadius: "50%",
-                      border: "1px solid rgba(78,122,177,0.25)",
+                      border: "1px solid rgba(78,122,177,0.18)",
                       animation: "pulseRing 2.4s ease-out infinite",
                     }}
                   />
@@ -1004,7 +1057,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       position: "absolute",
                       inset: -24,
                       borderRadius: "50%",
-                      border: "1px solid rgba(78,122,177,0.15)",
+                      border: "1px solid rgba(78,122,177,0.1)",
                       animation: "pulseRing 2.4s ease-out 0.8s infinite",
                     }}
                   />
@@ -1034,7 +1087,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     borderRadius: 2,
                     marginBottom: 18,
                     boxShadow:
-                      "0 0 12px rgba(78,122,177,0.4), 0 0 6px rgba(125,191,192,0.3)",
+                      "0 0 12px rgba(78,122,177,0.2), 0 0 6px rgba(125,191,192,0.15)",
                   }}
                 />
 
@@ -1051,12 +1104,12 @@ export default function ActivationScreen({ onActivate }: Props) {
                     style={{
                       fontSize: "0.65rem",
                       letterSpacing: "0.3em",
-                      color: "rgba(78,122,177,0.65)",
+                      color: "rgba(131,135,195,0.65)",
                       fontWeight: 700,
                       textTransform: "uppercase",
                       display: "inline-block",
                       overflow: "hidden",
-                      borderRight: "2px solid rgba(78,122,177,0.6)",
+                      borderRight: "2px solid rgba(131,135,195,0.6)",
                       whiteSpace: "nowrap",
                       animation:
                         "typewriter 1.8s steps(22) 0.2s both, glowBlink 0.8s step-end infinite",
@@ -1071,7 +1124,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                   style={{
                     fontSize: "1.8rem",
                     fontWeight: 900,
-                    color: "#f0f4ff",
+                    color: "#102853",
                     marginBottom: 6,
                     letterSpacing: "-0.02em",
                   }}
@@ -1112,7 +1165,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         gap: 6,
                         padding: "5px 12px",
                         background: "rgba(78,122,177,0.05)",
-                        border: "1px solid rgba(78,122,177,0.18)",
+                        border: "1px solid rgba(131,135,195,0.18)",
                         borderRadius: 999,
                       }}
                     >
@@ -1129,7 +1182,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       <span
                         style={{
                           fontSize: "0.62rem",
-                          color: "#506980",
+                          color: "#7a95aa",
                           letterSpacing: "0.06em",
                           fontWeight: 600,
                           textTransform: "uppercase",
@@ -1157,9 +1210,9 @@ export default function ActivationScreen({ onActivate }: Props) {
                       width: "100%",
                       padding: "15px 52px 15px 18px",
                       borderRadius: 14,
-                      background: "rgba(125,191,192,0.08)",
-                      border: "1px solid rgba(125,191,192,0.3)",
-                      color: "#f0f4ff",
+                      background: "rgba(125,191,192,0.07)",
+                      border: "1px solid rgba(78,122,177,0.18)",
+                      color: "#102853",
                       fontSize: "0.95rem",
                       fontFamily: "Poppins, sans-serif",
                       outline: "none",
@@ -1168,13 +1221,13 @@ export default function ActivationScreen({ onActivate }: Props) {
                       letterSpacing: showKey ? "0.02em" : "0.1em",
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = "rgba(78,122,177,0.7)";
+                      e.target.style.borderColor = "rgba(78,122,177,0.6)";
                       e.target.style.boxShadow =
-                        "0 0 25px rgba(78,122,177,0.15), 0 0 8px rgba(78,122,177,0.1)";
+                        "0 0 20px rgba(78,122,177,0.1), 0 0 6px rgba(78,122,177,0.08)";
                       e.target.style.background = "rgba(78,122,177,0.07)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = "rgba(78,122,177,0.3)";
+                      e.target.style.borderColor = "rgba(78,122,177,0.18)";
                       e.target.style.boxShadow = "none";
                       e.target.style.background = "rgba(78,122,177,0.04)";
                     }}
@@ -1190,7 +1243,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "rgba(78,122,177,0.55)",
+                      color: "rgba(78,122,177,0.4)",
                       padding: 4,
                       lineHeight: 1,
                     }}
@@ -1234,7 +1287,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                   <p
                     data-ocid="activation.error_state"
                     style={{
-                      color: "#c03030",
+                      color: "#b03030",
                       fontSize: "0.82rem",
                       marginBottom: 12,
                       animation: "fadeIn 0.3s ease",
@@ -1265,30 +1318,30 @@ export default function ActivationScreen({ onActivate }: Props) {
                     marginTop: 8,
                     cursor: loading ? "not-allowed" : "pointer",
                     background: loading
-                      ? "rgba(78,122,177,0.2)"
+                      ? "rgba(78,122,177,0.15)"
                       : "linear-gradient(135deg, #4E7AB1 0%, #7DBFC0 50%, #3a6090 100%)",
-                    color: loading ? "#506980" : "#fff",
+                    color: loading ? "#7a95aa" : "#fff",
                     border: "none",
                     borderRadius: 14,
                     fontFamily: "Poppins, sans-serif",
                     transition: "all 0.3s",
                     boxShadow: loading
                       ? "none"
-                      : "0 0 30px rgba(78,122,177,0.4), 0 4px 20px rgba(78,122,177,0.25)",
+                      : "0 4px 20px rgba(78,122,177,0.3), 0 2px 10px rgba(78,122,177,0.18)",
                     position: "relative",
                     overflow: "hidden",
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
                       e.currentTarget.style.boxShadow =
-                        "0 0 50px rgba(78,122,177,0.6), 0 0 20px rgba(125,191,192,0.2)";
+                        "0 6px 28px rgba(78,122,177,0.4), 0 2px 12px rgba(125,191,192,0.2)";
                       e.currentTarget.style.transform = "translateY(-2px)";
                     }
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.boxShadow = loading
                       ? "none"
-                      : "0 0 30px rgba(78,122,177,0.4)";
+                      : "0 4px 16px rgba(78,122,177,0.25)";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
@@ -1360,7 +1413,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         background:
                           "linear-gradient(90deg, #4E7AB1, #7DBFC0, #3a6090)",
                         boxShadow:
-                          "0 0 10px rgba(78,122,177,0.6), 0 0 5px rgba(125,191,192,0.4)",
+                          "0 0 10px rgba(78,122,177,0.4), 0 0 5px rgba(125,191,192,0.25)",
                         transition: "width 0.05s linear",
                         borderRadius: 2,
                       }}
@@ -1370,7 +1423,7 @@ export default function ActivationScreen({ onActivate }: Props) {
 
                 <p
                   style={{
-                    color: "rgba(80,105,128,0.5)",
+                    color: "#7a95aa",
                     fontSize: "0.65rem",
                     marginTop: 14,
                   }}

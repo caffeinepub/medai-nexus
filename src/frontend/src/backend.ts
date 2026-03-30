@@ -99,6 +99,14 @@ export interface ImageUpload {
     filename: string;
     timestamp: Time;
 }
+export interface FeedbackEntry {
+    age: bigint;
+    description: string;
+    gender: string;
+    timestamp: Time;
+    disease: string;
+    rating: bigint;
+}
 export interface ContactSubmission {
     name: string;
     email: string;
@@ -109,9 +117,11 @@ export interface backendInterface {
     addContactSubmission(name: string, email: string, message: string): Promise<boolean>;
     addImageUpload(filename: string, status: string): Promise<boolean>;
     getContactSubmissions(): Promise<Array<ContactSubmission>>;
+    getFeedbacks(): Promise<Array<FeedbackEntry>>;
     getImageUploadByFilename(filename: string): Promise<ImageUpload | null>;
     getImageUploads(): Promise<Array<ImageUpload>>;
     getStats(): Promise<PlatformStats | null>;
+    submitFeedback(rating: bigint, description: string, disease: string, age: bigint, gender: string): Promise<boolean>;
     updateStats(totalAnalyses: bigint, accuracy: number): Promise<boolean>;
 }
 import type { ImageUpload as _ImageUpload, PlatformStats as _PlatformStats } from "./declarations/backend.did.d.ts";
@@ -159,6 +169,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getFeedbacks(): Promise<Array<FeedbackEntry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getFeedbacks();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getFeedbacks();
+            return result;
+        }
+    }
     async getImageUploadByFilename(arg0: string): Promise<ImageUpload | null> {
         if (this.processError) {
             try {
@@ -199,6 +223,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getStats();
             return from_candid_opt_n2(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async submitFeedback(arg0: bigint, arg1: string, arg2: string, arg3: bigint, arg4: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitFeedback(arg0, arg1, arg2, arg3, arg4);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitFeedback(arg0, arg1, arg2, arg3, arg4);
+            return result;
         }
     }
     async updateStats(arg0: bigint, arg1: number): Promise<boolean> {

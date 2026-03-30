@@ -47,7 +47,7 @@ function getSeverityStyle(severity: string) {
   return vars[s] || vars.moderate;
 }
 
-const STEP_COLORS = ["#4E7AB1", "#2d8a55", "#7DBFC0", "#102853", "#4E7AB1"];
+const STEP_COLORS = ["#8387C3", "#4db87a", "#95BBB5", "#8C8CAC", "#8387C3"];
 
 function useCountUp(target: number, active: boolean) {
   const [value, setValue] = useState(0);
@@ -171,7 +171,7 @@ export default function ResultDashboard({
     };
 
     try {
-      const geminiKey = "AIzaSyAeYSZuSR6wbSApVmDEMX7AOvFlRJ774tU";
+      const geminiKey = "AIzaSyCh9pjh8wG5u_pKCTWCQ3urGk4LGKgt9OQ";
       const prompt = `You are a medical information assistant. For the disease "${top.name}", provide a JSON response with these exact fields:
 {
   "diseaseExplanation": "2-3 sentence simple explanation of what this disease is",
@@ -184,7 +184,7 @@ export default function ResultDashboard({
 Respond ONLY with valid JSON, no markdown.`;
 
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -193,8 +193,26 @@ Respond ONLY with valid JSON, no markdown.`;
         },
       );
       const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-      genderInsights = JSON.parse(text);
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+      const cleanText = rawText.replace(/```json\n?|```/g, "").trim();
+      const parsed = JSON.parse(cleanText || "{}");
+      const fallback = {
+        diseaseExplanation: `${top.name} is a medical condition that affects the body's normal functions. It requires proper medical attention and timely treatment.`,
+        maleImpact: `In males, ${top.name} may present with typical symptoms and moderate risk. Regular health monitoring is advised.`,
+        femaleImpact: `In females, ${top.name} can have varied presentations. Hormonal factors may influence symptom severity and progression.`,
+        otherImpact: `For all genders, ${top.name} requires early diagnosis and appropriate treatment for the best outcomes.`,
+        personalizedNote: `As a ${age}-year-old ${gender} patient, it's important to follow your doctor's advice closely and monitor your symptoms regularly.`,
+        generalOutlook: `With proper medical care and lifestyle adjustments, most patients with ${top.name} can manage their condition effectively.`,
+      };
+      genderInsights = {
+        diseaseExplanation:
+          parsed.diseaseExplanation || fallback.diseaseExplanation,
+        maleImpact: parsed.maleImpact || fallback.maleImpact,
+        femaleImpact: parsed.femaleImpact || fallback.femaleImpact,
+        otherImpact: parsed.otherImpact || fallback.otherImpact,
+        personalizedNote: parsed.personalizedNote || fallback.personalizedNote,
+        generalOutlook: parsed.generalOutlook || fallback.generalOutlook,
+      };
     } catch {
       genderInsights = {
         diseaseExplanation: `${top.name} is a medical condition that affects the body's normal functions. It requires proper medical attention and timely treatment.`,
@@ -216,7 +234,7 @@ Respond ONLY with valid JSON, no markdown.`;
     const symptomsHtml = selectedSymptoms
       .map(
         (s) =>
-          `<span style="display:inline-block;background:#f0eef6;color:#4E7AB1;border:1px solid rgba(78,122,177,0.3);border-radius:20px;padding:4px 12px;margin:3px;font-size:12px;">${s}</span>`,
+          `<span style="display:inline-block;background:#f0eef6;color:#8387C3;border:1px solid rgba(131,135,195,0.3);border-radius:20px;padding:4px 12px;margin:3px;font-size:12px;">${s}</span>`,
       )
       .join("");
 
@@ -261,16 +279,16 @@ Respond ONLY with valid JSON, no markdown.`;
     const stepsHtml = steps
       .map(
         (step) => `
-      <div style="display:flex;gap:16px;margin-bottom:20px;background:linear-gradient(135deg,#f0eef6,#ffffff);border:1px solid rgba(78,122,177,0.2);border-radius:12px;padding:20px;page-break-inside:avoid;box-shadow:0 4px 20px #00000044;">
-        <div style="flex-shrink:0;width:48px;height:48px;background:linear-gradient(135deg,#4E7AB1,#7DBFC0);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px #d2b48c55;">
+      <div style="display:flex;gap:16px;margin-bottom:20px;background:linear-gradient(135deg,#f0eef6,#ffffff);border:1px solid rgba(131,135,195,0.2);border-radius:12px;padding:20px;page-break-inside:avoid;box-shadow:0 4px 20px #00000044;">
+        <div style="flex-shrink:0;width:48px;height:48px;background:linear-gradient(135deg,#8387C3,#95BBB5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px #d2b48c55;">
           ${step.icon}
         </div>
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span style="color:#4E7AB1;font-size:11px;font-weight:700;letter-spacing:2px;">STEP ${step.num}</span>
-            <span style="color:#102853;font-weight:700;font-size:15px;">${step.title}</span>
+            <span style="color:#8387C3;font-size:11px;font-weight:700;letter-spacing:2px;">STEP ${step.num}</span>
+            <span style="color:#0A1123;font-weight:700;font-size:15px;">${step.title}</span>
           </div>
-          <p style="color:#506980;font-size:13px;line-height:1.7;margin:0;">${step.content}</p>
+          <p style="color:#8C8CAC;font-size:13px;line-height:1.7;margin:0;">${step.content}</p>
         </div>
       </div>
     `,
@@ -288,9 +306,9 @@ Respond ONLY with valid JSON, no markdown.`;
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #f7f4f9;
-      background-image: linear-gradient(rgba(78,122,177,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(78,122,177,0.06) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(131,135,195,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(131,135,195,0.06) 1px, transparent 1px);
       background-size: 40px 40px;
-      color: #102853;
+      color: #0A1123;
       padding: 48px 44px;
       min-height: 100vh;
     }
@@ -301,87 +319,87 @@ Respond ONLY with valid JSON, no markdown.`;
 
   <!-- Print Button -->
   <div class="no-print" style="position:fixed;top:20px;right:20px;z-index:999;">
-    <button onclick="window.print()" style="background:linear-gradient(135deg,#4E7AB1,#7DBFC0);color:white;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-family:Poppins,sans-serif;font-weight:700;font-size:13px;box-shadow:0 0 20px rgba(78,122,177,0.4);letter-spacing:0.5px;">🖨 Print / Save PDF</button>
+    <button onclick="window.print()" style="background:linear-gradient(135deg,#8387C3,#95BBB5);color:white;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-family:Poppins,sans-serif;font-weight:700;font-size:13px;box-shadow:0 0 20px rgba(131,135,195,0.4);letter-spacing:0.5px;">🖨 Print / Save PDF</button>
   </div>
 
   <!-- Top accent bar -->
-  <div style="height:3px;background:linear-gradient(90deg,#4E7AB1,#7DBFC0,#4E7AB1);border-radius:2px;margin-bottom:36px;box-shadow:0 0 12px rgba(78,122,177,0.3);"></div>
+  <div style="height:3px;background:linear-gradient(90deg,#8387C3,#95BBB5,#8387C3);border-radius:2px;margin-bottom:36px;box-shadow:0 0 12px rgba(131,135,195,0.3);"></div>
 
   <!-- Header -->
-  <div style="text-align:center;margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid rgba(78,122,177,0.15);position:relative;">
-    <div style="position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid #4E7AB1;border-left:2px solid #4E7AB1;"></div>
-    <div style="position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid #4E7AB1;border-right:2px solid #4E7AB1;"></div>
+  <div style="text-align:center;margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid rgba(131,135,195,0.15);position:relative;">
+    <div style="position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid #8387C3;border-left:2px solid #8387C3;"></div>
+    <div style="position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid #8387C3;border-right:2px solid #8387C3;"></div>
     <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:14px;">
-      <div style="width:52px;height:52px;background:linear-gradient(135deg,#4E7AB1,#7DBFC0);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 20px #d2b48c66,0 0 40px #b89a7244;">⚕</div>
-      <span style="font-size:30px;font-weight:800;background:linear-gradient(90deg,#4E7AB1,#7DBFC0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">MedAI Nexus</span>
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,#8387C3,#95BBB5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 20px #d2b48c66,0 0 40px #b89a7244;">⚕</div>
+      <span style="font-size:30px;font-weight:800;background:linear-gradient(90deg,#8387C3,#95BBB5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">MedAI Nexus</span>
     </div>
-    <p style="color:#4E7AB1;font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;">AI-Powered Step-by-Step Action Plan</p>
-    <p style="color:#506980;font-size:11px;margin-top:8px;">Generated on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+    <p style="color:#8387C3;font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;">AI-Powered Step-by-Step Action Plan</p>
+    <p style="color:#8C8CAC;font-size:11px;margin-top:8px;">Generated on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
   </div>
 
   <!-- Patient Information Card -->
-  <div style="background:linear-gradient(135deg,#f0eef6,#ffffff);border:1px solid rgba(78,122,177,0.25);border-radius:16px;padding:24px;margin-bottom:28px;">
-    <p style="color:#4E7AB1;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:16px;">Patient Information</p>
+  <div style="background:linear-gradient(135deg,#f0eef6,#ffffff);border:1px solid rgba(131,135,195,0.25);border-radius:16px;padding:24px;margin-bottom:28px;">
+    <p style="color:#8387C3;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:16px;">Patient Information</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div style="background:#ffffff;border:1px solid rgba(78,122,177,0.2);border-radius:10px;padding:14px;">
-        <p style="color:#7DBFC0;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Age</p>
-        <p style="color:#102853;font-size:22px;font-weight:800;">${age} <span style="font-size:12px;color:#506980;font-weight:400;">years</span></p>
+      <div style="background:#ffffff;border:1px solid rgba(131,135,195,0.2);border-radius:10px;padding:14px;">
+        <p style="color:#95BBB5;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Age</p>
+        <p style="color:#0A1123;font-size:22px;font-weight:800;">${age} <span style="font-size:12px;color:#8C8CAC;font-weight:400;">years</span></p>
       </div>
-      <div style="background:#ffffff;border:1px solid rgba(78,122,177,0.2);border-radius:10px;padding:14px;">
-        <p style="color:#7DBFC0;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Gender</p>
-        <p style="color:#102853;font-size:22px;font-weight:800;text-transform:capitalize;">${gender}</p>
+      <div style="background:#ffffff;border:1px solid rgba(131,135,195,0.2);border-radius:10px;padding:14px;">
+        <p style="color:#95BBB5;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Gender</p>
+        <p style="color:#0A1123;font-size:22px;font-weight:800;text-transform:capitalize;">${gender}</p>
       </div>
     </div>
   </div>
 
   <!-- Diagnosis Card -->
-  <div style="background:linear-gradient(135deg,#f0eef6,#ffffff);border:2px solid rgba(78,122,177,0.3);border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 8px 32px rgba(78,122,177,0.1),inset 0 0 20px rgba(78,122,177,0.04);">
+  <div style="background:linear-gradient(135deg,#f0eef6,#ffffff);border:2px solid rgba(131,135,195,0.3);border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 8px 32px rgba(131,135,195,0.1),inset 0 0 20px rgba(131,135,195,0.04);">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
       <div>
-        <p style="color:#7DBFC0;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Primary Diagnosis</p>
-        <h1 style="font-size:28px;font-weight:800;"><span style="background:linear-gradient(90deg,#4E7AB1,#7DBFC0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${top.name}</span></h1>
+        <p style="color:#95BBB5;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Primary Diagnosis</p>
+        <h1 style="font-size:28px;font-weight:800;"><span style="background:linear-gradient(90deg,#8387C3,#95BBB5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${top.name}</span></h1>
       </div>
       <div style="text-align:right;">
         <div style="background:${severityColor}22;border:1px solid ${severityColor};border-radius:8px;padding:8px 18px;display:inline-block;margin-bottom:10px;">
           <p style="color:${severityColor};font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">${top.severity} Severity</p>
         </div>
-        <p style="color:#4E7AB1;font-size:26px;font-weight:800;">${top.confidence}% <span style="font-size:13px;color:#506980;font-weight:400;">Confidence</span></p>
-        <div style="height:6px;background:rgba(78,122,177,0.1);border-radius:3px;margin-top:8px;overflow:hidden;">
-          <div style="height:100%;width:${top.confidence}%;background:linear-gradient(90deg,#4E7AB1,#7DBFC0);border-radius:3px;box-shadow:0 0 8px rgba(78,122,177,0.4);"></div>
+        <p style="color:#8387C3;font-size:26px;font-weight:800;">${top.confidence}% <span style="font-size:13px;color:#8C8CAC;font-weight:400;">Confidence</span></p>
+        <div style="height:6px;background:rgba(131,135,195,0.1);border-radius:3px;margin-top:8px;overflow:hidden;">
+          <div style="height:100%;width:${top.confidence}%;background:linear-gradient(90deg,#8387C3,#95BBB5);border-radius:3px;box-shadow:0 0 8px rgba(131,135,195,0.4);"></div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- About This Condition -->
-  <div style="background:#f0eef6;border-left:3px solid #4E7AB1;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:28px;">
-    <p style="color:#4E7AB1;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px;">About This Condition</p>
-    <p style="color:#506980;font-size:13px;line-height:1.8;">${genderInsights.diseaseExplanation}</p>
+  <div style="background:#f0eef6;border-left:3px solid #8387C3;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:28px;">
+    <p style="color:#8387C3;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px;">About This Condition</p>
+    <p style="color:#8C8CAC;font-size:13px;line-height:1.8;">${genderInsights.diseaseExplanation}</p>
   </div>
 
   <!-- Symptoms -->
   <div style="margin-bottom:28px;">
-    <p style="color:#7DBFC0;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Symptoms Analyzed (${selectedSymptoms.length})</p>
+    <p style="color:#95BBB5;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Symptoms Analyzed (${selectedSymptoms.length})</p>
     <div style="line-height:2;">${symptomsHtml}</div>
   </div>
 
   <!-- Impact by Gender -->
   <div style="margin-bottom:28px;">
-    <p style="color:#7DBFC0;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:16px;">Impact by Gender</p>
+    <p style="color:#95BBB5;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:16px;">Impact by Gender</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-      <div style="background:linear-gradient(135deg,#f0f4ff,#ffffff);border:1px solid rgba(78,122,177,0.2);border-radius:12px;padding:18px;">
+      <div style="background:linear-gradient(135deg,#f0f4ff,#ffffff);border:1px solid rgba(131,135,195,0.2);border-radius:12px;padding:18px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <div style="width:28px;height:28px;background:rgba(78,122,177,0.1);border:1px solid #4E7AB1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">♂</div>
-          <span style="color:#4E7AB1;font-weight:700;font-size:13px;">Male</span>
+          <div style="width:28px;height:28px;background:rgba(131,135,195,0.1);border:1px solid #8387C3;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">♂</div>
+          <span style="color:#8387C3;font-weight:700;font-size:13px;">Male</span>
         </div>
-        <p style="color:#506980;font-size:12px;line-height:1.7;">${genderInsights.maleImpact}</p>
+        <p style="color:#8C8CAC;font-size:12px;line-height:1.7;">${genderInsights.maleImpact}</p>
       </div>
       <div style="background:linear-gradient(135deg,#fdf0fd,#ffffff);border:1px solid rgba(232,200,228,0.4);border-radius:12px;padding:18px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
           <div style="width:28px;height:28px;background:rgba(232,200,228,0.4);border:1px solid #E8C8E4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">♀</div>
           <span style="color:#9070a0;font-weight:700;font-size:13px;">Female</span>
         </div>
-        <p style="color:#506980;font-size:12px;line-height:1.7;">${genderInsights.femaleImpact}</p>
+        <p style="color:#8C8CAC;font-size:12px;line-height:1.7;">${genderInsights.femaleImpact}</p>
       </div>
     </div>
     <div style="background:linear-gradient(135deg,#f0fff4,#ffffff);border:1px solid rgba(45,138,85,0.2);border-radius:12px;padding:18px;">
@@ -389,38 +407,38 @@ Respond ONLY with valid JSON, no markdown.`;
         <div style="width:28px;height:28px;background:rgba(45,138,85,0.1);border:1px solid #2d8a55;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">⚧</div>
         <span style="color:#2d8a55;font-weight:700;font-size:13px;">All Genders</span>
       </div>
-      <p style="color:#506980;font-size:12px;line-height:1.7;">${genderInsights.otherImpact}</p>
+      <p style="color:#8C8CAC;font-size:12px;line-height:1.7;">${genderInsights.otherImpact}</p>
     </div>
   </div>
 
   <!-- What This Means for You -->
-  <div style="background:linear-gradient(135deg,#eff8ff,#ffffff);border:2px solid rgba(78,122,177,0.2);border-radius:16px;padding:24px;margin-bottom:28px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(78,122,177,0.08);border-radius:50%;"></div>
-    <p style="color:#4E7AB1;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">What This Means for You</p>
-    <p style="color:#102853;font-size:14px;line-height:1.8;font-style:italic;">&ldquo;${genderInsights.personalizedNote}&rdquo;</p>
+  <div style="background:linear-gradient(135deg,#eff8ff,#ffffff);border:2px solid rgba(131,135,195,0.2);border-radius:16px;padding:24px;margin-bottom:28px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(131,135,195,0.08);border-radius:50%;"></div>
+    <p style="color:#8387C3;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">What This Means for You</p>
+    <p style="color:#0A1123;font-size:14px;line-height:1.8;font-style:italic;">&ldquo;${genderInsights.personalizedNote}&rdquo;</p>
   </div>
 
   <!-- Steps -->
   <div style="margin-bottom:28px;">
-    <p style="color:#7DBFC0;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px;">Step-by-Step Action Plan</p>
+    <p style="color:#95BBB5;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px;">Step-by-Step Action Plan</p>
     ${stepsHtml}
   </div>
 
   <!-- Disclaimer -->
   <div style="background:#fff5f5;border:1px solid rgba(192,48,48,0.2);border-radius:10px;padding:18px;text-align:center;box-shadow:0 4px 16px rgba(192,48,48,0.05);margin-bottom:24px;">
     <p style="color:#ef4444;font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:1px;">⚠ MEDICAL DISCLAIMER</p>
-    <p style="color:#506980;font-size:11px;line-height:1.7;">This report is generated by an AI system for educational purposes only. It does not constitute medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before making any health decisions.</p>
+    <p style="color:#8C8CAC;font-size:11px;line-height:1.7;">This report is generated by an AI system for educational purposes only. It does not constitute medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before making any health decisions.</p>
   </div>
 
   <!-- General Outlook -->
-  <div style="background:linear-gradient(135deg,#f0f9ff,#ffffff);border:1px solid rgba(125,191,192,0.25);border-radius:14px;padding:22px;margin-bottom:24px;">
-    <p style="color:#4E7AB1;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">General Outlook</p>
-    <p style="color:#506980;font-size:13px;line-height:1.8;">${genderInsights.generalOutlook}</p>
+  <div style="background:linear-gradient(135deg,#f0f9ff,#ffffff);border:1px solid rgba(149,187,181,0.25);border-radius:14px;padding:22px;margin-bottom:24px;">
+    <p style="color:#8387C3;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">General Outlook</p>
+    <p style="color:#8C8CAC;font-size:13px;line-height:1.8;">${genderInsights.generalOutlook}</p>
   </div>
 
   <!-- Footer -->
-  <div style="text-align:center;padding-top:16px;border-top:1px solid rgba(78,122,177,0.15);">
-    <p style="color:#7DBFC0;font-size:10px;letter-spacing:1px;">MedAI Nexus &nbsp;|&nbsp; Designed by Deekshith Kumar &nbsp;|&nbsp; Developed by Advaith Sreejith</p>
+  <div style="text-align:center;padding-top:16px;border-top:1px solid rgba(131,135,195,0.15);">
+    <p style="color:#95BBB5;font-size:10px;letter-spacing:1px;">MedAI Nexus &nbsp;|&nbsp; Designed by Deekshith Kumar &nbsp;|&nbsp; Developed by Advaith Sreejith</p>
   </div>
 
 </body>
@@ -551,9 +569,9 @@ Respond ONLY with valid JSON, no markdown.`;
                 style={{
                   height: "100%",
                   width: `${top.confidence}%`,
-                  background: "linear-gradient(90deg, #4E7AB1, #7DBFC0)",
+                  background: "linear-gradient(90deg, #8387C3, #95BBB5)",
                   borderRadius: "4px",
-                  boxShadow: "0 0 10px rgba(78,122,177,0.35)",
+                  boxShadow: "0 0 10px rgba(131,135,195,0.35)",
                   transition: "width 1s ease",
                 }}
               />

@@ -19,7 +19,7 @@ export default function Hero() {
       dur: "18s",
       rev: false,
       style: "dashed",
-      color: "rgba(78,122,177,0.15)",
+      color: "rgba(131,135,195,0.15)",
     },
     {
       size: 280,
@@ -27,7 +27,7 @@ export default function Hero() {
       dur: "12s",
       rev: false,
       style: "dashed",
-      color: "rgba(125,191,192,0.25)",
+      color: "rgba(149,187,181,0.25)",
     },
     {
       size: 230,
@@ -35,7 +35,7 @@ export default function Hero() {
       dur: "9s",
       rev: true,
       style: "solid",
-      color: "rgba(78,122,177,0.35)",
+      color: "rgba(131,135,195,0.35)",
     },
     {
       size: 185,
@@ -43,7 +43,7 @@ export default function Hero() {
       dur: "14s",
       rev: false,
       style: "dashed",
-      color: "rgba(125,191,192,0.3)",
+      color: "rgba(149,187,181,0.3)",
     },
     {
       size: 145,
@@ -51,7 +51,7 @@ export default function Hero() {
       dur: "7s",
       rev: true,
       style: "solid",
-      color: "rgba(78,122,177,0.5)",
+      color: "rgba(131,135,195,0.5)",
     },
     {
       size: 105,
@@ -59,7 +59,7 @@ export default function Hero() {
       dur: "5s",
       rev: false,
       style: "solid",
-      color: "rgba(125,191,192,0.6)",
+      color: "rgba(149,187,181,0.6)",
     },
     {
       size: 68,
@@ -67,7 +67,7 @@ export default function Hero() {
       dur: "3.5s",
       rev: true,
       style: "solid",
-      color: "rgba(78,122,177,0.7)",
+      color: "rgba(131,135,195,0.7)",
     },
   ];
 
@@ -143,7 +143,7 @@ export default function Hero() {
           className="radar-sweep"
           style={{
             background:
-              "conic-gradient(from 180deg, transparent 70%, rgba(125,191,192,0.2) 85%, rgba(78,122,177,0.3) 95%, rgba(125,191,192,0.08) 100%)",
+              "conic-gradient(from 180deg, transparent 70%, rgba(149,187,181,0.2) 85%, rgba(131,135,195,0.3) 95%, rgba(149,187,181,0.08) 100%)",
             animation: "radar2 4.5s linear infinite",
           }}
         />
@@ -173,8 +173,8 @@ export default function Hero() {
                 y2={170 + outerR * Math.sin(angle)}
                 stroke={
                   i % 2 === 0
-                    ? "rgba(78,122,177,0.45)"
-                    : "rgba(125,191,192,0.35)"
+                    ? "rgba(131,135,195,0.45)"
+                    : "rgba(149,187,181,0.35)"
                 }
                 strokeWidth={i % 6 === 0 ? 1.5 : 0.8}
               />
@@ -189,7 +189,7 @@ export default function Hero() {
                 y1={170 + 34 * Math.sin(rad)}
                 x2={170 + 52 * Math.cos(rad)}
                 y2={170 + 52 * Math.sin(rad)}
-                stroke="#4E7AB1"
+                stroke="#8387C3"
                 strokeWidth="1"
                 opacity="0.6"
               />
@@ -210,7 +210,7 @@ export default function Hero() {
               cx="30"
               cy="30"
               r="20"
-              stroke="rgba(125,191,192,0.5)"
+              stroke="rgba(149,187,181,0.5)"
               strokeWidth="1"
               opacity="0.5"
             />
@@ -218,11 +218,11 @@ export default function Hero() {
               cx="30"
               cy="30"
               r="12"
-              stroke="#4E7AB1"
+              stroke="#8387C3"
               strokeWidth="1.5"
               opacity="0.75"
             />
-            <circle cx="30" cy="30" r="5" fill="#4E7AB1" />
+            <circle cx="30" cy="30" r="5" fill="#8387C3" />
             {ringAngles.map((deg) => {
               const rad = (deg * Math.PI) / 180;
               return (
@@ -232,7 +232,7 @@ export default function Hero() {
                   y1={30 + 12 * Math.sin(rad)}
                   x2={30 + 20 * Math.cos(rad)}
                   y2={30 + 20 * Math.sin(rad)}
-                  stroke="#4E7AB1"
+                  stroke="#8387C3"
                   strokeWidth="1"
                   opacity="0.7"
                 />

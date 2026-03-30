@@ -25,9 +25,19 @@ actor {
     accuracy : Float;
   };
 
+  type FeedbackEntry = {
+    rating : Nat;
+    description : Text;
+    timestamp : Time.Time;
+    disease : Text;
+    age : Nat;
+    gender : Text;
+  };
+
   let contactSubmissions = List.empty<ContactSubmission>();
   let imageUploads = List.empty<ImageUpload>();
   let stats = Map.empty<Text, PlatformStats>();
+  let feedbackEntries = List.empty<FeedbackEntry>();
 
   public shared ({ caller }) func addContactSubmission(name : Text, email : Text, message : Text) : async Bool {
     let submission : ContactSubmission = {
@@ -59,6 +69,19 @@ actor {
     true;
   };
 
+  public shared ({ caller }) func submitFeedback(rating : Nat, description : Text, disease : Text, age : Nat, gender : Text) : async Bool {
+    let feedback : FeedbackEntry = {
+      rating;
+      description;
+      timestamp = Time.now();
+      disease;
+      age;
+      gender;
+    };
+    feedbackEntries.add(feedback);
+    true;
+  };
+
   public query ({ caller }) func getContactSubmissions() : async [ContactSubmission] {
     contactSubmissions.toArray();
   };
@@ -73,5 +96,9 @@ actor {
 
   public query ({ caller }) func getImageUploadByFilename(filename : Text) : async ?ImageUpload {
     imageUploads.values().find(func(upload) { upload.filename == filename });
+  };
+
+  public query ({ caller }) func getFeedbacks() : async [FeedbackEntry] {
+    feedbackEntries.toArray();
   };
 };

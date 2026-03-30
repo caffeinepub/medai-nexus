@@ -5,8 +5,8 @@ export default function Footer() {
     <footer
       style={{
         padding: "48px 24px",
-        borderTop: "1px solid rgba(78,122,177,0.15)",
-        background: "#102853",
+        borderTop: "1px solid rgba(131,135,195,0.15)",
+        background: "#0A1123",
         position: "relative",
         overflow: "hidden",
       }}
@@ -21,9 +21,9 @@ export default function Footer() {
           width: "60%",
           height: "1px",
           background:
-            "linear-gradient(90deg, transparent, #4E7AB1 30%, #7DBFC0 50%, #4E7AB1 70%, transparent)",
+            "linear-gradient(90deg, transparent, #8387C3 30%, #95BBB5 50%, #8387C3 70%, transparent)",
           boxShadow:
-            "0 0 20px rgba(78,122,177,0.5), 0 0 8px rgba(125,191,192,0.4)",
+            "0 0 20px rgba(131,135,195,0.5), 0 0 8px rgba(149,187,181,0.4)",
         }}
       />
       <div
@@ -43,11 +43,11 @@ export default function Footer() {
             height="22"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#7DBFC0"
+            stroke="#95BBB5"
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ filter: "drop-shadow(0 0 6px rgba(125,191,192,0.7))" }}
+            style={{ filter: "drop-shadow(0 0 6px rgba(149,187,181,0.7))" }}
             aria-hidden="true"
           >
             <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
@@ -85,11 +85,11 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              color: "#7DBFC0",
+              color: "#95BBB5",
               textDecoration: "none",
               fontWeight: 600,
               transition: "opacity 0.2s",
-              textShadow: "0 0 8px rgba(125,191,192,0.5)",
+              textShadow: "0 0 8px rgba(149,187,181,0.5)",
             }}
             onMouseEnter={(e) => {
               (e.target as HTMLElement).style.opacity = "0.7";

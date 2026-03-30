@@ -1,15 +1,26 @@
 import { useState } from "react";
+import { useActor } from "../hooks/useActor";
 
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
+  disease?: string;
+  age?: number;
+  gender?: string;
 }
 
-export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
+export default function FeedbackModal({
+  isOpen,
+  onClose,
+  disease = "",
+  age = 0,
+  gender = "",
+}: FeedbackModalProps) {
   const [slide, setSlide] = useState(0);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [description, setDescription] = useState("");
+  const { actor } = useActor();
 
   if (!isOpen) return null;
 
@@ -19,6 +30,37 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     setHoverRating(0);
     setDescription("");
     onClose();
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (actor)
+        await actor.submitFeedback(
+          BigInt(rating),
+          description,
+          disease,
+          BigInt(age),
+          gender,
+        );
+    } catch {
+      // Silent fail — don't block UX
+    }
+    // Save to localStorage for intro slide stats
+    try {
+      const stored = JSON.parse(localStorage.getItem("medai_feedback") || "[]");
+      stored.push({
+        rating,
+        description,
+        disease,
+        age,
+        gender,
+        timestamp: Date.now(),
+      });
+      localStorage.setItem("medai_feedback", JSON.stringify(stored));
+    } catch {
+      // ignore
+    }
+    setSlide(2);
   };
 
   const isPositive = rating >= 4;
@@ -42,7 +84,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         .fb-star:hover { transform: scale(1.2); }
         .fb-star.selected { animation: starBounce 0.3s ease; }
         .fb-slide { animation: fbSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) both; }
-        .fb-textarea:focus { outline: none; border-color: rgba(78,122,177,0.7) !important; box-shadow: 0 0 16px rgba(78,122,177,0.15); }
+        .fb-textarea:focus { outline: none; border-color: rgba(131,135,195,0.7) !important; box-shadow: 0 0 16px rgba(131,135,195,0.15); }
       `}</style>
       <div
         data-ocid="feedback.modal"
@@ -50,7 +92,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           position: "fixed",
           inset: 0,
           zIndex: 99999,
-          background: "rgba(16, 40, 83, 0.55)",
+          background: "rgba(10,17,35, 0.55)",
           backdropFilter: "blur(8px)",
           display: "flex",
           alignItems: "center",
@@ -61,15 +103,15 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       >
         <div
           style={{
-            background: "rgba(255, 255, 255, 0.98)",
+            background: "rgba(10,17,35,0.96)",
             backdropFilter: "blur(24px)",
-            border: "1px solid rgba(78, 122, 177, 0.25)",
+            border: "1px solid rgba(131,135,195, 0.25)",
             borderRadius: 24,
             padding: "40px 36px",
             maxWidth: 480,
             width: "100%",
             boxShadow:
-              "0 0 60px rgba(78, 122, 177, 0.12), 0 20px 60px rgba(16,40,83,0.1), inset 0 1px 0 rgba(255,255,255,0.9)",
+              "0 0 80px rgba(131,135,195,0.25), 0 20px 60px rgba(10,17,35,0.5), inset 0 1px 0 rgba(131,135,195,0.1)",
             animation: "fbFadeIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) both",
             position: "relative",
             textAlign: "center",
@@ -91,7 +133,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   width: i === slide ? 24 : 8,
                   height: 8,
                   borderRadius: 4,
-                  background: i <= slide ? "#4E7AB1" : "rgba(78,122,177,0.15)",
+                  background: i <= slide ? "#8387C3" : "rgba(131,135,195,0.15)",
                   transition: "all 0.3s ease",
                 }}
               />
@@ -107,13 +149,13 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               position: "absolute",
               top: 16,
               right: 16,
-              background: "rgba(78, 122, 177, 0.08)",
-              border: "1px solid rgba(78, 122, 177, 0.2)",
+              background: "rgba(131,135,195, 0.08)",
+              border: "1px solid rgba(131,135,195, 0.2)",
               borderRadius: "50%",
               width: 32,
               height: 32,
               cursor: "pointer",
-              color: "#4E7AB1",
+              color: "#8387C3",
               fontSize: 16,
               display: "flex",
               alignItems: "center",
@@ -129,7 +171,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>⭐</div>
               <h2
                 style={{
-                  color: "#4E7AB1",
+                  color: "#8387C3",
                   fontSize: "1.4rem",
                   fontWeight: 800,
                   marginBottom: 8,
@@ -139,7 +181,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               </h2>
               <p
                 style={{
-                  color: "#506980",
+                  color: "rgba(131,135,195,0.7)",
                   fontSize: "0.9rem",
                   marginBottom: 28,
                 }}
@@ -166,8 +208,8 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                     style={{
                       color:
                         (hoverRating || rating) >= star
-                          ? "#4E7AB1"
-                          : "rgba(80,105,128,0.25)",
+                          ? "#8387C3"
+                          : "rgba(58,62,108,0.25)",
                       background: "none",
                       border: "none",
                       padding: 0,
@@ -188,15 +230,15 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   borderRadius: 999,
                   background:
                     rating > 0
-                      ? "linear-gradient(135deg, #4E7AB1, #7DBFC0)"
-                      : "rgba(78, 122, 177, 0.1)",
-                  color: rating > 0 ? "#fff" : "rgba(80,105,128,0.4)",
+                      ? "linear-gradient(135deg, #8387C3, #95BBB5)"
+                      : "rgba(131,135,195, 0.1)",
+                  color: rating > 0 ? "#fff" : "rgba(58,62,108,0.4)",
                   border: "none",
                   fontSize: "0.95rem",
                   fontWeight: 700,
                   cursor: rating > 0 ? "pointer" : "not-allowed",
                   boxShadow:
-                    rating > 0 ? "0 0 20px rgba(78, 122, 177, 0.3)" : "none",
+                    rating > 0 ? "0 0 20px rgba(131,135,195, 0.3)" : "none",
                   transition: "all 0.25s",
                   fontFamily: "Poppins, sans-serif",
                 }}
@@ -212,7 +254,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>💬</div>
               <h2
                 style={{
-                  color: "#4E7AB1",
+                  color: "#8387C3",
                   fontSize: "1.4rem",
                   fontWeight: 800,
                   marginBottom: 8,
@@ -222,7 +264,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               </h2>
               <p
                 style={{
-                  color: "#506980",
+                  color: "rgba(131,135,195,0.7)",
                   fontSize: "0.9rem",
                   marginBottom: 24,
                 }}
@@ -241,9 +283,9 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   boxSizing: "border-box",
                   padding: "14px 16px",
                   borderRadius: 14,
-                  background: "rgba(78, 122, 177, 0.04)",
-                  border: "1px solid rgba(78, 122, 177, 0.25)",
-                  color: "#102853",
+                  background: "rgba(58,62,108,0.4)",
+                  border: "1px solid rgba(131,135,195, 0.25)",
+                  color: "#ffffff",
                   fontSize: "0.9rem",
                   fontFamily: "Poppins, sans-serif",
                   resize: "vertical",
@@ -254,17 +296,17 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               <button
                 type="button"
                 data-ocid="feedback.submit_button"
-                onClick={() => setSlide(2)}
+                onClick={handleSubmit}
                 style={{
                   padding: "13px 40px",
                   borderRadius: 999,
-                  background: "linear-gradient(135deg, #4E7AB1, #7DBFC0)",
+                  background: "linear-gradient(135deg, #8387C3, #95BBB5)",
                   color: "#fff",
                   border: "none",
                   fontSize: "0.95rem",
                   fontWeight: 700,
                   cursor: "pointer",
-                  boxShadow: "0 0 20px rgba(78, 122, 177, 0.3)",
+                  boxShadow: "0 0 20px rgba(131,135,195, 0.3)",
                   fontFamily: "Poppins, sans-serif",
                 }}
               >
@@ -281,7 +323,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               </div>
               <h2
                 style={{
-                  color: isPositive ? "#4E7AB1" : "#7DBFC0",
+                  color: isPositive ? "#8387C3" : "#95BBB5",
                   fontSize: "1.5rem",
                   fontWeight: 900,
                   marginBottom: 12,
@@ -292,11 +334,11 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               {description ? (
                 <div
                   style={{
-                    background: "rgba(78, 122, 177, 0.05)",
-                    border: "1px solid rgba(78, 122, 177, 0.2)",
+                    background: "rgba(58,62,108,0.4)",
+                    border: "1px solid rgba(131,135,195,0.2)",
                     borderRadius: 14,
                     padding: "14px 18px",
-                    color: "#506980",
+                    color: "rgba(255,255,255,0.8)",
                     fontSize: "0.9rem",
                     lineHeight: 1.6,
                     marginBottom: 24,
@@ -309,7 +351,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               ) : (
                 <p
                   style={{
-                    color: "#506980",
+                    color: "#8C8CAC",
                     marginBottom: 24,
                     fontSize: "0.9rem",
                   }}
@@ -326,13 +368,13 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 style={{
                   padding: "13px 40px",
                   borderRadius: 999,
-                  background: "linear-gradient(135deg, #4E7AB1, #7DBFC0)",
+                  background: "linear-gradient(135deg, #8387C3, #95BBB5)",
                   color: "#fff",
                   border: "none",
                   fontSize: "0.95rem",
                   fontWeight: 700,
                   cursor: "pointer",
-                  boxShadow: "0 0 20px rgba(78, 122, 177, 0.3)",
+                  boxShadow: "0 0 20px rgba(131,135,195, 0.3)",
                   fontFamily: "Poppins, sans-serif",
                 }}
               >
