@@ -145,42 +145,175 @@ export default function ResultDashboard({
   const topSev = getSeverityStyle(top.severity);
 
   const downloadPlan = () => {
-    const content = `
-MedAI Nexus — Step-by-Step Action Plan
-======================================
-Diagnosis: ${top.name}
-Severity: ${top.severity}
-Confidence: ${top.confidence}%
+    const severityColor =
+      top.severity.toLowerCase() === "mild"
+        ? "#22c55e"
+        : top.severity.toLowerCase() === "moderate"
+          ? "#f59e0b"
+          : "#ef4444";
 
-Symptoms Analyzed:
-${selectedSymptoms.map((s) => `  • ${s}`).join("\n")}
+    const symptomsHtml = selectedSymptoms
+      .map(
+        (s) =>
+          `<span style="display:inline-block;background:#1a1400;color:#f5c518;border:1px solid #b8860b;border-radius:20px;padding:4px 12px;margin:3px;font-size:12px;">${s}</span>`,
+      )
+      .join("");
 
-Step 1 — Stay Calm & Assess
-Take a deep breath. Avoid self-diagnosis panic. Your symptoms suggest ${top.name}.
+    const steps = [
+      {
+        num: "01",
+        title: "Stay Calm & Assess",
+        icon: "🧠",
+        content: `Take a deep breath. Avoid self-diagnosis panic. Your symptoms suggest <strong>${top.name}</strong>.`,
+      },
+      {
+        num: "02",
+        title: "Recommended Diet",
+        icon: "🥗",
+        content:
+          top.diet || "Follow a balanced, nutritious diet. Stay hydrated.",
+      },
+      {
+        num: "03",
+        title: "Precautions",
+        icon: "🛡️",
+        content:
+          top.precautions ||
+          "Rest well, avoid exertion, monitor your symptoms closely.",
+      },
+      {
+        num: "04",
+        title: "Medicines",
+        icon: "💊",
+        content: `${top.medicines || "Do not self-medicate. Consult a healthcare professional."}<br/><em style="color:#f59e0b;font-size:11px;">⚠ Consult a doctor before taking any medication.</em>`,
+      },
+      {
+        num: "05",
+        title: "When to See a Doctor",
+        icon: "🏥",
+        content:
+          top.whenToSeeDoctor ||
+          "Seek immediate medical care if symptoms worsen.",
+      },
+    ];
 
-Step 2 — Recommended Diet
-${top.diet || "Follow a balanced, nutritious diet. Stay hydrated."}
+    const stepsHtml = steps
+      .map(
+        (step) => `
+      <div style="display:flex;gap:16px;margin-bottom:20px;background:linear-gradient(135deg,#0d1535,#111827);border:1px solid #b8860b44;border-radius:12px;padding:20px;page-break-inside:avoid;box-shadow:0 4px 20px #00000044;">
+        <div style="flex-shrink:0;width:48px;height:48px;background:linear-gradient(135deg,#cc0000,#b8860b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px #cc000055;">
+          ${step.icon}
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="color:#f5c518;font-size:11px;font-weight:700;letter-spacing:2px;">STEP ${step.num}</span>
+            <span style="color:#ffffff;font-weight:700;font-size:15px;">${step.title}</span>
+          </div>
+          <p style="color:#d1d5db;font-size:13px;line-height:1.7;margin:0;">${step.content}</p>
+        </div>
+      </div>
+    `,
+      )
+      .join("");
 
-Step 3 — Precautions
-${top.precautions || "Rest well, avoid exertion, monitor your symptoms closely."}
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>MedAI Nexus — Action Plan</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #0a0f2e;
+      background-image: linear-gradient(rgba(184,134,11,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,11,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      color: #ffffff;
+      padding: 48px 44px;
+      min-height: 100vh;
+    }
+    @media print { body { padding: 28px; } .no-print { display: none !important; } }
+  </style>
+</head>
+<body>
 
-Step 4 — Medicines (Consult doctor before taking)
-${top.medicines || "Do not self-medicate. Consult a healthcare professional."}
+  <!-- Print Button -->
+  <div class="no-print" style="position:fixed;top:20px;right:20px;z-index:999;">
+    <button onclick="window.print()" style="background:linear-gradient(135deg,#cc0000,#b8860b);color:white;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-family:Poppins,sans-serif;font-weight:700;font-size:13px;box-shadow:0 0 20px #cc000066;letter-spacing:0.5px;">🖨 Print / Save PDF</button>
+  </div>
 
-Step 5 — When to See a Doctor
-${top.whenToSeeDoctor || "Seek immediate medical care if symptoms worsen."}
+  <!-- Top accent bar -->
+  <div style="height:3px;background:linear-gradient(90deg,#cc0000,#f5c518,#b8860b);border-radius:2px;margin-bottom:36px;box-shadow:0 0 12px #f5c51844;"></div>
 
----
-DISCLAIMER: This is for educational purposes only.
-Always consult a qualified healthcare professional.
-    `;
-    const blob = new Blob([content], { type: "text/plain" });
+  <!-- Header -->
+  <div style="text-align:center;margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid #b8860b33;position:relative;">
+    <div style="position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid #b8860b;border-left:2px solid #b8860b;"></div>
+    <div style="position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid #b8860b;border-right:2px solid #b8860b;"></div>
+    <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:14px;">
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,#cc0000,#b8860b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 20px #cc000066,0 0 40px #b8860b44;">⚕</div>
+      <span style="font-size:30px;font-weight:800;background:linear-gradient(90deg,#cc0000,#f5c518);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">MedAI Nexus</span>
+    </div>
+    <p style="color:#b8860b;font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;">AI-Powered Step-by-Step Action Plan</p>
+    <p style="color:#4b5563;font-size:11px;margin-top:8px;">Generated on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+  </div>
+
+  <!-- Diagnosis Card -->
+  <div style="background:linear-gradient(135deg,#1a0a00,#0d1535);border:2px solid #b8860b;border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 0 30px #b8860b22,inset 0 0 20px #cc000011;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+      <div>
+        <p style="color:#b8860b;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Primary Diagnosis</p>
+        <h1 style="font-size:28px;font-weight:800;"><span style="background:linear-gradient(90deg,#cc0000,#f5c518);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${top.name}</span></h1>
+      </div>
+      <div style="text-align:right;">
+        <div style="background:${severityColor}22;border:1px solid ${severityColor};border-radius:8px;padding:8px 18px;display:inline-block;margin-bottom:10px;">
+          <p style="color:${severityColor};font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">${top.severity} Severity</p>
+        </div>
+        <p style="color:#f5c518;font-size:26px;font-weight:800;">${top.confidence}% <span style="font-size:13px;color:#9ca3af;font-weight:400;">Confidence</span></p>
+        <div style="height:6px;background:#1a1a2e;border-radius:3px;margin-top:8px;overflow:hidden;">
+          <div style="height:100%;width:${top.confidence}%;background:linear-gradient(90deg,#cc0000,#f5c518);border-radius:3px;box-shadow:0 0 8px #f5c51866;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Symptoms -->
+  <div style="margin-bottom:28px;">
+    <p style="color:#b8860b;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Symptoms Analyzed (${selectedSymptoms.length})</p>
+    <div style="line-height:2;">${symptomsHtml}</div>
+  </div>
+
+  <!-- Steps -->
+  <div style="margin-bottom:28px;">
+    <p style="color:#b8860b;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px;">Step-by-Step Action Plan</p>
+    ${stepsHtml}
+  </div>
+
+  <!-- Disclaimer -->
+  <div style="background:#1a0808;border:1px solid #cc000055;border-radius:10px;padding:18px;text-align:center;box-shadow:0 0 15px #cc000022;margin-bottom:24px;">
+    <p style="color:#ef4444;font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:1px;">⚠ MEDICAL DISCLAIMER</p>
+    <p style="color:#9ca3af;font-size:11px;line-height:1.7;">This report is generated by an AI system for educational purposes only. It does not constitute medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before making any health decisions.</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding-top:16px;border-top:1px solid #b8860b33;">
+    <p style="color:#b8860b;font-size:10px;letter-spacing:1px;">MedAI Nexus &nbsp;|&nbsp; Designed by Deekshith Kumar &nbsp;|&nbsp; Developed by Advaith Sreejith</p>
+  </div>
+
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `MedAI-ActionPlan-${top.name.replace(/\s+/g, "-")}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const printWin = window.open(url, "_blank", "width=900,height=700");
+    if (!printWin) {
+      // fallback if popup blocked
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `MedAI-ActionPlan-${top.name.replace(/\s+/g, "-")}.html`;
+      a.click();
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   };
 
   return (
