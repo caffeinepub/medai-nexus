@@ -241,7 +241,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                         fontSize: "0.88rem",
                         transition: "all 0.2s cubic-bezier(0.34,1.56,0.64,1)",
                         background: isActive
-                          ? "linear-gradient(135deg, rgba(210,180,140,0.28), rgba(232,207,168,0.22))"
+                          ? "linear-gradient(135deg, rgba(78,122,177,0.18), rgba(125,191,192,0.12))"
                           : "transparent",
                         border: `1.5px solid ${isActive ? "var(--accent)" : "var(--border-color)"}`,
                         color: isActive ? "var(--accent)" : "var(--text-muted)",
@@ -354,7 +354,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                     fontSize: "0.85rem",
                     transition: "all 0.25s",
                     background: isActive
-                      ? "linear-gradient(135deg, rgba(210,180,140,0.22), rgba(232,207,168,0.14))"
+                      ? "linear-gradient(135deg, rgba(78,122,177,0.12), rgba(125,191,192,0.08))"
                       : "transparent",
                     border: `1px solid ${isActive ? "var(--accent)" : "var(--border-color)"}`,
                     color: isActive ? "var(--accent)" : "var(--text-muted)",
@@ -394,7 +394,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="rgba(210,180,140,0.5)"
+                  stroke="rgba(78,122,177,0.5)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -528,7 +528,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                     fontFamily: "Poppins, sans-serif",
                     fontWeight: 500,
                     background: isSelected
-                      ? "linear-gradient(135deg, rgba(210,180,140,0.25), rgba(232,207,168,0.2))"
+                      ? "linear-gradient(135deg, rgba(78,122,177,0.15), rgba(125,191,192,0.1))"
                       : "var(--accent-dim)",
                     border: `${isSelected ? "1.5px" : "1px"} solid ${isSelected ? "var(--accent)" : "var(--border-color)"}`,
                     color: isSelected ? "var(--accent)" : "var(--text-muted)",
@@ -694,7 +694,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(210,180,140,0.2)";
+                  e.currentTarget.style.background = "rgba(78,122,177,0.15)";
                   e.currentTarget.style.boxShadow = "var(--glow-soft)";
                 }}
                 onMouseLeave={(e) => {
@@ -795,7 +795,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 100,
-            background: canSubmit ? undefined : "rgba(210,180,140,0.3)",
+            background: canSubmit ? undefined : "rgba(78,122,177,0.2)",
             color: canSubmit ? "#ffffff" : "var(--text-muted)",
             border: "none",
             borderRadius: "999px",

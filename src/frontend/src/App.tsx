@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AboutSection from "./components/AboutSection";
 import ActivationScreen from "./components/ActivationScreen";
+import FeedbackModal from "./components/FeedbackModal";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import ParticleBackground from "./components/ParticleBackground";
@@ -29,6 +30,20 @@ export default function App() {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [userAge, setUserAge] = useState<number>(0);
   const [userGender, setUserGender] = useState<string>("");
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isDark, setIsDark] = useState(
+    () => localStorage.getItem("theme") === "dark",
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-theme",
+      isDark ? "dark" : "light",
+    );
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
+
+  const handleToggleTheme = () => setIsDark((prev) => !prev);
 
   const handleActivate = (key: string) => {
     setApiKey(key);
@@ -86,21 +101,25 @@ export default function App() {
 
     setAnalysisResults(ranked);
     setIsAnalyzing(false);
+    setTimeout(() => setShowFeedback(true), 1200);
   };
 
   if (!activated) {
     return (
-      <div data-theme="dark">
+      <div data-theme={isDark ? "dark" : "light"}>
         <ActivationScreen onActivate={handleActivate} />
       </div>
     );
   }
 
   return (
-    <div data-theme="dark" style={{ position: "relative", minHeight: "100vh" }}>
-      <ParticleBackground isDark={true} />
+    <div
+      data-theme={isDark ? "dark" : "light"}
+      style={{ position: "relative", minHeight: "100vh" }}
+    >
+      <ParticleBackground isDark={isDark} />
       <div style={{ position: "relative", zIndex: 1 }}>
-        <Navbar />
+        <Navbar isDark={isDark} onToggle={handleToggleTheme} />
         <Hero />
         <SymptomPanel onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         <ResultDashboard
@@ -113,6 +132,10 @@ export default function App() {
         <AboutSection />
         <Footer />
       </div>
+      <FeedbackModal
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+      />
     </div>
   );
 }

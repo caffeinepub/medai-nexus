@@ -11,7 +11,7 @@ export default function Hero() {
     "dot-tl2",
   ];
 
-  // Alternating red / gold rings
+  // Cyan Azure / Air Superiority Blue rings
   const rings = [
     {
       size: 320,
@@ -19,7 +19,7 @@ export default function Hero() {
       dur: "18s",
       rev: false,
       style: "dashed",
-      color: "rgba(204,0,0,0.18)",
+      color: "rgba(78,122,177,0.15)",
     },
     {
       size: 280,
@@ -27,7 +27,7 @@ export default function Hero() {
       dur: "12s",
       rev: false,
       style: "dashed",
-      color: "rgba(245,197,24,0.3)",
+      color: "rgba(125,191,192,0.25)",
     },
     {
       size: 230,
@@ -35,7 +35,7 @@ export default function Hero() {
       dur: "9s",
       rev: true,
       style: "solid",
-      color: "rgba(184,134,11,0.4)",
+      color: "rgba(78,122,177,0.35)",
     },
     {
       size: 185,
@@ -43,7 +43,7 @@ export default function Hero() {
       dur: "14s",
       rev: false,
       style: "dashed",
-      color: "rgba(204,0,0,0.28)",
+      color: "rgba(125,191,192,0.3)",
     },
     {
       size: 145,
@@ -51,7 +51,7 @@ export default function Hero() {
       dur: "7s",
       rev: true,
       style: "solid",
-      color: "rgba(245,197,24,0.55)",
+      color: "rgba(78,122,177,0.5)",
     },
     {
       size: 105,
@@ -59,7 +59,7 @@ export default function Hero() {
       dur: "5s",
       rev: false,
       style: "solid",
-      color: "rgba(204,0,0,0.65)",
+      color: "rgba(125,191,192,0.6)",
     },
     {
       size: 68,
@@ -67,7 +67,7 @@ export default function Hero() {
       dur: "3.5s",
       rev: true,
       style: "solid",
-      color: "rgba(245,197,24,0.75)",
+      color: "rgba(78,122,177,0.7)",
     },
   ];
 
@@ -137,13 +137,13 @@ export default function Hero() {
           />
         ))}
 
-        {/* Dual radar sweeps: red + gold */}
+        {/* Dual radar sweeps: Cyan Azure + Air Superiority Blue */}
         <div className="radar-sweep" />
         <div
           className="radar-sweep"
           style={{
             background:
-              "conic-gradient(from 180deg, transparent 70%, rgba(245,197,24,0.25) 85%, rgba(184,134,11,0.4) 95%, rgba(245,197,24,0.1) 100%)",
+              "conic-gradient(from 180deg, transparent 70%, rgba(125,191,192,0.2) 85%, rgba(78,122,177,0.3) 95%, rgba(125,191,192,0.08) 100%)",
             animation: "radar2 4.5s linear infinite",
           }}
         />
@@ -172,7 +172,9 @@ export default function Hero() {
                 x2={170 + outerR * Math.cos(angle)}
                 y2={170 + outerR * Math.sin(angle)}
                 stroke={
-                  i % 2 === 0 ? "rgba(204,0,0,0.5)" : "rgba(245,197,24,0.4)"
+                  i % 2 === 0
+                    ? "rgba(78,122,177,0.45)"
+                    : "rgba(125,191,192,0.35)"
                 }
                 strokeWidth={i % 6 === 0 ? 1.5 : 0.8}
               />
@@ -187,7 +189,7 @@ export default function Hero() {
                 y1={170 + 34 * Math.sin(rad)}
                 x2={170 + 52 * Math.cos(rad)}
                 y2={170 + 52 * Math.sin(rad)}
-                stroke="#d2b48c"
+                stroke="#4E7AB1"
                 strokeWidth="1"
                 opacity="0.6"
               />
@@ -208,7 +210,7 @@ export default function Hero() {
               cx="30"
               cy="30"
               r="20"
-              stroke="rgba(245,197,24,0.55)"
+              stroke="rgba(125,191,192,0.5)"
               strokeWidth="1"
               opacity="0.5"
             />
@@ -216,11 +218,11 @@ export default function Hero() {
               cx="30"
               cy="30"
               r="12"
-              stroke="#d2b48c"
+              stroke="#4E7AB1"
               strokeWidth="1.5"
               opacity="0.75"
             />
-            <circle cx="30" cy="30" r="5" fill="#d2b48c" />
+            <circle cx="30" cy="30" r="5" fill="#4E7AB1" />
             {ringAngles.map((deg) => {
               const rad = (deg * Math.PI) / 180;
               return (
@@ -230,7 +232,7 @@ export default function Hero() {
                   y1={30 + 12 * Math.sin(rad)}
                   x2={30 + 20 * Math.cos(rad)}
                   y2={30 + 20 * Math.sin(rad)}
-                  stroke={deg % 120 === 0 ? "#d2b48c" : "#d2b48c"}
+                  stroke="#4E7AB1"
                   strokeWidth="1"
                   opacity="0.7"
                 />

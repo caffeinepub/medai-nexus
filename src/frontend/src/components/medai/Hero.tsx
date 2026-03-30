@@ -17,43 +17,43 @@ function setupReveal() {
 const RINGS = [
   {
     size: 340,
-    border: "rgba(245,197,24,0.45)",
-    glow: "rgba(245,197,24,0.2)",
+    border: "rgba(112, 191, 192, 0.45)",
+    glow: "rgba(112, 191, 192, 0.2)",
     anim: "rotateRing",
     dur: "8s",
   },
   {
     size: 290,
-    border: "rgba(255,215,0,0.35)",
-    glow: "rgba(255,215,0,0.18)",
+    border: "rgba(76, 122, 177, 0.35)",
+    glow: "rgba(76, 122, 177, 0.18)",
     anim: "rotateRingXR",
     dur: "11s",
   },
   {
     size: 240,
-    border: "rgba(212,160,23,0.4)",
-    glow: "rgba(212,160,23,0.2)",
+    border: "rgba(247, 180, 212, 0.3)",
+    glow: "rgba(247, 180, 212, 0.15)",
     anim: "rotateRingY",
     dur: "9s",
   },
   {
     size: 200,
-    border: "rgba(245,197,24,0.32)",
-    glow: "rgba(245,197,24,0.15)",
+    border: "rgba(112, 191, 192, 0.32)",
+    glow: "rgba(112, 191, 192, 0.15)",
     anim: "rotateRingD",
     dur: "14s",
   },
   {
     size: 160,
-    border: "rgba(255,215,0,0.42)",
-    glow: "rgba(255,215,0,0.2)",
+    border: "rgba(76, 122, 177, 0.42)",
+    glow: "rgba(76, 122, 177, 0.2)",
     anim: "rotateRingRev",
     dur: "7s",
   },
   {
     size: 120,
-    border: "rgba(245,197,24,0.5)",
-    glow: "rgba(245,197,24,0.28)",
+    border: "rgba(112, 191, 192, 0.5)",
+    glow: "rgba(112, 191, 192, 0.28)",
     anim: "rotateRingX",
     dur: "6s",
   },
@@ -490,7 +490,7 @@ export default function Hero() {
                   left: "50%",
                   borderRadius: "50%",
                   background:
-                    "conic-gradient(from 0deg, transparent 0deg, rgba(245,197,24,0.22) 45deg, transparent 70deg)",
+                    "conic-gradient(from 0deg, transparent 0deg, rgba(112,191,192,0.22) 45deg, transparent 70deg)",
                   animation: "radar 3.5s linear infinite",
                 }}
               />
@@ -505,7 +505,7 @@ export default function Hero() {
                   left: "50%",
                   borderRadius: "50%",
                   background:
-                    "conic-gradient(from 180deg, transparent 0deg, rgba(212,160,23,0.18) 40deg, transparent 60deg)",
+                    "conic-gradient(from 180deg, transparent 0deg, rgba(76,122,177,0.18) 40deg, transparent 60deg)",
                   animation: "radar2 5s linear infinite",
                 }}
               />
@@ -528,9 +528,9 @@ export default function Hero() {
                       width: 8,
                       height: 8,
                       borderRadius: "50%",
-                      background: "#d2b48c",
+                      background: "#70BFC0",
                       boxShadow:
-                        "0 0 12px #d2b48c, 0 0 24px rgba(245,197,24,0.6)",
+                        "0 0 12px #70BFC0, 0 0 24px rgba(112,191,192,0.6)",
                       "--orbit-r": "130px",
                       animation: "orbit-dot 4s linear infinite",
                     } as React.CSSProperties
@@ -554,9 +554,9 @@ export default function Hero() {
                       width: 6,
                       height: 6,
                       borderRadius: "50%",
-                      background: "#d4a017",
+                      background: "#4C7AB1",
                       boxShadow:
-                        "0 0 10px #d4a017, 0 0 20px rgba(212,160,23,0.5)",
+                        "0 0 10px #4C7AB1, 0 0 20px rgba(76,122,177,0.5)",
                       "--orbit-r": "100px",
                       animation: "orbit-dot 6.5s linear infinite reverse",
                     } as React.CSSProperties
@@ -575,13 +575,13 @@ export default function Hero() {
                   transform: "translate(-50%, -50%)",
                   zIndex: 4,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #d2b48c, #d4a017)",
+                  background: "linear-gradient(135deg, #70BFC0, #4C7AB1)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   animation: "core-pulse 2.5s ease-in-out infinite",
                   boxShadow:
-                    "0 0 25px rgba(245,197,24,0.7), 0 0 50px rgba(245,197,24,0.4)",
+                    "0 0 25px rgba(112,191,192,0.7), 0 0 50px rgba(112,191,192,0.4)",
                 }}
               >
                 <svg
@@ -609,7 +609,7 @@ export default function Hero() {
                   top: "50%",
                   left: "50%",
                   borderRadius: "50%",
-                  border: "1px solid rgba(245,197,24,0.12)",
+                  border: "1px solid rgba(112,191,192,0.12)",
                   animation: "pulse-ring 3.5s ease-in-out infinite",
                 }}
               />

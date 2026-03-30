@@ -4,7 +4,7 @@ interface Props {
   isDark: boolean;
 }
 
-export default function ParticleBackground({ isDark }: Props) {
+export default function ParticleBackground({ isDark: _isDark }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -28,16 +28,17 @@ export default function ParticleBackground({ isDark }: Props) {
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
         size: Math.random() * 2 + 0.5,
-        opacity: Math.random() * 0.3 + 0.05,
+        opacity: Math.random() * 0.25 + 0.04,
       });
     }
 
     let animId: number;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const r = isDark ? 192 : 128;
-      const g = isDark ? 48 : 0;
-      const b = isDark ? 74 : 32;
+      // Light theme: soft Cyan Azure / Air Superiority Blue particles
+      const r = 78;
+      const g = 122;
+      const b = 177;
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
@@ -57,7 +58,7 @@ export default function ParticleBackground({ isDark }: Props) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = `rgba(${r},${g},${b},${0.06 * (1 - dist / 100)})`;
+            ctx.strokeStyle = `rgba(${r},${g},${b},${0.04 * (1 - dist / 100)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -75,7 +76,7 @@ export default function ParticleBackground({ isDark }: Props) {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
-  }, [isDark]);
+  }, []);
 
   return (
     <canvas
