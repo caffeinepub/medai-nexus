@@ -213,6 +213,13 @@ export default function ActivationScreen({ onActivate }: Props) {
     return () => clearTimeout(t);
   }, [slide, isLastSlide]);
 
+  const skipToEnd = () => {
+    if (isLastSlide) return;
+    transitioning.current = false;
+    setSlide(SLIDES.length);
+    setSlideState("idle");
+  };
+
   const handleActivate = async () => {
     if (!apiKey.trim()) {
       setError("API Key Required to Initialize System");
@@ -462,6 +469,44 @@ export default function ActivationScreen({ onActivate }: Props) {
         >
           ◈ MEDAI NEXUS — SECURE ACCESS ◈
         </div>
+
+        {/* Skip credits button */}
+        {!isLastSlide && (
+          <button
+            type="button"
+            onClick={skipToEnd}
+            style={{
+              position: "absolute",
+              top: 20,
+              left: 20,
+              zIndex: 10,
+              background: "rgba(210,180,140,0.08)",
+              border: "1px solid rgba(210,180,140,0.35)",
+              borderRadius: 20,
+              color: "#d2b48c",
+              fontSize: 12,
+              fontFamily: "Poppins, Inter, sans-serif",
+              letterSpacing: "0.08em",
+              padding: "5px 14px",
+              cursor: "pointer",
+              backdropFilter: "blur(8px)",
+              transition: "all 0.2s ease",
+              opacity: 0.75,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "rgba(210,180,140,0.18)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.opacity = "0.75";
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "rgba(210,180,140,0.08)";
+            }}
+          >
+            Skip ›
+          </button>
+        )}
 
         {/* Step dots */}
         <div
