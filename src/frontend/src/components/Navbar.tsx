@@ -1,12 +1,6 @@
-import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-interface Props {
-  isDark: boolean;
-  onToggleTheme: () => void;
-}
-
-export default function Navbar({ isDark, onToggleTheme }: Props) {
+export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -26,13 +20,12 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
 
   return (
     <nav
+      className="navbar-glossy"
       style={{
         position: "sticky",
         top: 0,
         zIndex: 100,
-        background: scrolled
-          ? "rgba(10, 15, 46, 0.92)"
-          : "rgba(10, 15, 46, 0.0)",
+        background: scrolled ? "rgba(0, 33, 71, 0.92)" : "rgba(0, 33, 71, 0.0)",
         backdropFilter: scrolled ? "blur(24px)" : "none",
         WebkitBackdropFilter: scrolled ? "blur(24px)" : "none",
         borderBottom: scrolled
@@ -72,7 +65,7 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
             height="22"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#cc0000"
+            stroke="#d2b48c"
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -116,7 +109,7 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
               onMouseEnter={(e) => {
                 (e.target as HTMLElement).style.background =
                   "rgba(245,197,24,0.1)";
-                (e.target as HTMLElement).style.color = "#f5c518";
+                (e.target as HTMLElement).style.color = "#d2b48c";
               }}
               onMouseLeave={(e) => {
                 (e.target as HTMLElement).style.background = "none";
@@ -135,7 +128,7 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
                 width: "8px",
                 height: "8px",
                 borderRadius: "50%",
-                background: "#cc0000",
+                background: "#d2b48c",
                 boxShadow: "0 0 8px rgba(204,0,0,0.9)",
                 animation: "blink 1.5s ease-in-out infinite",
                 display: "inline-block",
@@ -153,38 +146,6 @@ export default function Navbar({ isDark, onToggleTheme }: Props) {
               SYS ONLINE
             </span>
           </div>
-
-          {/* Theme toggle */}
-          <button
-            type="button"
-            data-ocid="nav.toggle"
-            onClick={onToggleTheme}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "38px",
-              height: "38px",
-              borderRadius: "10px",
-              background: "rgba(245,197,24,0.1)",
-              border: "1px solid rgba(245,197,24,0.35)",
-              color: "#f5c518",
-              cursor: "pointer",
-              transition: "all 0.2s",
-              flexShrink: 0,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(245,197,24,0.2)";
-              e.currentTarget.style.boxShadow = "0 0 12px rgba(245,197,24,0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(245,197,24,0.1)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
         </div>
       </div>
     </nav>

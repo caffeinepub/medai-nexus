@@ -187,7 +187,7 @@ export default function Hero() {
                 y1={170 + 34 * Math.sin(rad)}
                 x2={170 + 52 * Math.cos(rad)}
                 y2={170 + 52 * Math.sin(rad)}
-                stroke="#f5c518"
+                stroke="#d2b48c"
                 strokeWidth="1"
                 opacity="0.6"
               />
@@ -216,11 +216,11 @@ export default function Hero() {
               cx="30"
               cy="30"
               r="12"
-              stroke="#cc0000"
+              stroke="#d2b48c"
               strokeWidth="1.5"
               opacity="0.75"
             />
-            <circle cx="30" cy="30" r="5" fill="#f5c518" />
+            <circle cx="30" cy="30" r="5" fill="#d2b48c" />
             {ringAngles.map((deg) => {
               const rad = (deg * Math.PI) / 180;
               return (
@@ -230,7 +230,7 @@ export default function Hero() {
                   y1={30 + 12 * Math.sin(rad)}
                   x2={30 + 20 * Math.cos(rad)}
                   y2={30 + 20 * Math.sin(rad)}
-                  stroke={deg % 120 === 0 ? "#cc0000" : "#f5c518"}
+                  stroke={deg % 120 === 0 ? "#d2b48c" : "#d2b48c"}
                   strokeWidth="1"
                   opacity="0.7"
                 />

@@ -20,7 +20,7 @@ const SLIDES = [
         height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#cc0000"
+        stroke="#d2b48c"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -44,7 +44,7 @@ const SLIDES = [
         height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#cc0000"
+        stroke="#d2b48c"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -68,7 +68,7 @@ const SLIDES = [
         height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#cc0000"
+        stroke="#d2b48c"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -93,7 +93,7 @@ const SLIDES = [
         height="64"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#cc0000"
+        stroke="#d2b48c"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -302,7 +302,7 @@ export default function ActivationScreen({ onActivate }: Props) {
         }
         @keyframes dotLight {
           0%, 100% { background: rgba(184,134,11,0.2); box-shadow: none; }
-          50% { background: #f5c518; box-shadow: 0 0 8px rgba(245,197,24,0.9); }
+          50% { background: #d2b48c; box-shadow: 0 0 8px rgba(245,197,24,0.9); }
         }
         @keyframes cardSlideLeft {
           from { opacity: 0; transform: translateX(-40px) rotateY(15deg); }
@@ -361,7 +361,7 @@ export default function ActivationScreen({ onActivate }: Props) {
           zIndex: 9999,
           overflow: "hidden",
           fontFamily: "Poppins, sans-serif",
-          background: "#0a0f2e",
+          background: "#002147",
         }}
       >
         {/* Dark-blue grid overlay */}
@@ -484,7 +484,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                 borderRadius: 4,
                 background:
                   i === slide && !isLastSlide
-                    ? "#f5c518"
+                    ? "#d2b48c"
                     : "rgba(245,197,24,0.2)",
                 transition: "all 0.3s ease",
                 boxShadow:
@@ -499,7 +499,7 @@ export default function ActivationScreen({ onActivate }: Props) {
               width: isLastSlide ? 22 : 7,
               height: 7,
               borderRadius: 4,
-              background: isLastSlide ? "#cc0000" : "rgba(204,0,0,0.25)",
+              background: isLastSlide ? "#d2b48c" : "rgba(204,0,0,0.25)",
               transition: "all 0.3s ease",
               boxShadow: isLastSlide ? "0 0 10px rgba(204,0,0,0.9)" : "none",
             }}
@@ -508,6 +508,7 @@ export default function ActivationScreen({ onActivate }: Props) {
 
         {/* Main card */}
         <div
+          className="slide-card-glossy"
           style={{
             position: "relative",
             zIndex: 6,
@@ -545,7 +546,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                 style={{
                   height: "100%",
                   background:
-                    "linear-gradient(90deg, #cc0000, #f5c518, #b8860b)",
+                    "linear-gradient(90deg, #d2b48c, #d2b48c, #b89a72)",
                   boxShadow:
                     "0 0 10px rgba(245,197,24,0.8), 0 0 20px rgba(204,0,0,0.4)",
                   borderRadius: 2,
@@ -642,7 +643,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     style={{
                       height: 2,
                       background:
-                        "linear-gradient(90deg, transparent, #cc0000 40%, #f5c518 60%, transparent)",
+                        "linear-gradient(90deg, transparent, #d2b48c 40%, #d2b48c 60%, transparent)",
                       borderRadius: 2,
                       marginBottom: 20,
                       boxShadow:
@@ -691,7 +692,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         height="28"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#cc0000"
+                        stroke="#d2b48c"
                         strokeWidth="2"
                         strokeLinecap="round"
                         aria-hidden="true"
@@ -719,7 +720,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         style={{
                           fontSize: "1.8rem",
                           fontWeight: 900,
-                          color: "#f5c518",
+                          color: "#d2b48c",
                           textShadow: "0 0 20px rgba(245,197,24,0.8)",
                           marginRight: 6,
                         }}
@@ -737,7 +738,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     style={{
                       fontSize: "2rem",
                       fontWeight: 900,
-                      color: "#cc0000",
+                      color: "#d2b48c",
                       marginBottom: 8,
                       letterSpacing: "-0.02em",
                       lineHeight: 1.15,
@@ -789,7 +790,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                             height: 38,
                             borderRadius: "50%",
                             background:
-                              "linear-gradient(135deg, #cc0000, #8b0000)",
+                              "linear-gradient(135deg, #d2b48c, #8b0000)",
                             margin: "0 auto 10px",
                             display: "flex",
                             alignItems: "center",
@@ -841,7 +842,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                             height: 38,
                             borderRadius: "50%",
                             background:
-                              "linear-gradient(135deg, #f5c518, #b8860b)",
+                              "linear-gradient(135deg, #d2b48c, #b89a72)",
                             margin: "0 auto 10px",
                             display: "flex",
                             alignItems: "center",
@@ -849,7 +850,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                             boxShadow: "0 0 15px rgba(245,197,24,0.5)",
                             fontSize: "1rem",
                             fontWeight: 800,
-                            color: "#0a0f2e",
+                            color: "#002147",
                           }}
                         >
                           A
@@ -916,8 +917,8 @@ export default function ActivationScreen({ onActivate }: Props) {
                         width: 7,
                         height: 7,
                         borderRadius: "50%",
-                        background: "#f5c518",
-                        boxShadow: "0 0 10px #f5c518",
+                        background: "#d2b48c",
+                        boxShadow: "0 0 10px #d2b48c",
                         animation: isActive
                           ? "glowBlink 1.6s ease-in-out infinite"
                           : "none",
@@ -953,7 +954,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     height: 76,
                     margin: "0 auto 22px",
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, #cc0000, #8b0000)",
+                    background: "linear-gradient(135deg, #d2b48c, #8b0000)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -1004,7 +1005,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                   style={{
                     height: 2,
                     background:
-                      "linear-gradient(90deg, transparent, #cc0000 40%, #f5c518 60%, transparent)",
+                      "linear-gradient(90deg, transparent, #d2b48c 40%, #d2b48c 60%, transparent)",
                     borderRadius: 2,
                     marginBottom: 18,
                     boxShadow:
@@ -1045,7 +1046,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                   style={{
                     fontSize: "1.8rem",
                     fontWeight: 900,
-                    color: "#cc0000",
+                    color: "#d2b48c",
                     marginBottom: 6,
                     letterSpacing: "-0.02em",
                     textShadow: "0 0 40px rgba(204,0,0,0.8)",
@@ -1076,7 +1077,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                 >
                   {[
                     { label: "Neural Core", color: "#4ade80" },
-                    { label: "Diagnostic DB", color: "#f5c518" },
+                    { label: "Diagnostic DB", color: "#d2b48c" },
                     { label: "AI Engine", color: "#4ade80" },
                   ].map(({ label, color }) => (
                     <div
@@ -1241,7 +1242,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     cursor: loading ? "not-allowed" : "pointer",
                     background: loading
                       ? "rgba(204,0,0,0.3)"
-                      : "linear-gradient(135deg, #cc0000 0%, #e10600 50%, #8b0000 100%)",
+                      : "linear-gradient(135deg, #d2b48c 0%, #e8cfa8 50%, #8b0000 100%)",
                     color: "#fff",
                     border: "none",
                     borderRadius: 14,
@@ -1333,7 +1334,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         height: "100%",
                         width: `${progress}%`,
                         background:
-                          "linear-gradient(90deg, #cc0000, #f5c518, #b8860b)",
+                          "linear-gradient(90deg, #d2b48c, #d2b48c, #b89a72)",
                         boxShadow:
                           "0 0 10px rgba(245,197,24,0.8), 0 0 5px rgba(204,0,0,0.6)",
                         transition: "width 0.05s linear",

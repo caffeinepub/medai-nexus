@@ -342,7 +342,7 @@ export default function Hero() {
                 type="button"
                 data-ocid="hero.primary_button"
                 onClick={() => scrollTo("#symptoms")}
-                className="btn-gradient"
+                className="btn-gradient btn-cta-blink"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -351,7 +351,7 @@ export default function Hero() {
                   fontSize: "1rem",
                 }}
               >
-                Start Analysis <ArrowRight size={16} />
+                Start Analysis <span className="btn-cta-chevron">↓</span>
               </button>
               <button
                 type="button"
@@ -528,9 +528,9 @@ export default function Hero() {
                       width: 8,
                       height: 8,
                       borderRadius: "50%",
-                      background: "#f5c518",
+                      background: "#d2b48c",
                       boxShadow:
-                        "0 0 12px #f5c518, 0 0 24px rgba(245,197,24,0.6)",
+                        "0 0 12px #d2b48c, 0 0 24px rgba(245,197,24,0.6)",
                       "--orbit-r": "130px",
                       animation: "orbit-dot 4s linear infinite",
                     } as React.CSSProperties
@@ -575,7 +575,7 @@ export default function Hero() {
                   transform: "translate(-50%, -50%)",
                   zIndex: 4,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #f5c518, #d4a017)",
+                  background: "linear-gradient(135deg, #d2b48c, #d4a017)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

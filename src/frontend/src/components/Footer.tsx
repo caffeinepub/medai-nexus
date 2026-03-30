@@ -21,7 +21,7 @@ export default function Footer() {
           width: "60%",
           height: "1px",
           background:
-            "linear-gradient(90deg, transparent, #cc0000 30%, #f5c518 50%, #b8860b 70%, transparent)",
+            "linear-gradient(90deg, transparent, #d2b48c 30%, #d2b48c 50%, #b89a72 70%, transparent)",
           boxShadow: "0 0 20px rgba(245,197,24,0.4), 0 0 8px rgba(204,0,0,0.4)",
         }}
       />
@@ -42,7 +42,7 @@ export default function Footer() {
             height="22"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#cc0000"
+            stroke="#d2b48c"
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -84,7 +84,7 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              color: "#f5c518",
+              color: "#d2b48c",
               textDecoration: "none",
               fontWeight: 600,
               transition: "opacity 0.2s",

@@ -27,17 +27,22 @@ export default function App() {
   const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [isDark, setIsDark] = useState(false);
-
-  const toggleTheme = () => setIsDark((v) => !v);
+  const [userAge, setUserAge] = useState<number>(0);
+  const [userGender, setUserGender] = useState<string>("");
 
   const handleActivate = (key: string) => {
     setApiKey(key);
     setActivated(true);
   };
 
-  const handleAnalyze = async (symptoms: string[]) => {
+  const handleAnalyze = async (
+    symptoms: string[],
+    age: number,
+    gender: string,
+  ) => {
     setSelectedSymptoms(symptoms);
+    setUserAge(age);
+    setUserGender(gender);
     setIsAnalyzing(true);
     setAnalysisResults([]);
     setTimeout(() => {
@@ -72,7 +77,7 @@ export default function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({ symptoms }),
+        body: JSON.stringify({ symptoms, age, gender }),
         signal: AbortSignal.timeout(3000),
       });
     } catch {
@@ -85,26 +90,25 @@ export default function App() {
 
   if (!activated) {
     return (
-      <div data-theme={isDark ? "dark" : "light"}>
+      <div data-theme="dark">
         <ActivationScreen onActivate={handleActivate} />
       </div>
     );
   }
 
   return (
-    <div
-      data-theme={isDark ? "dark" : "light"}
-      style={{ position: "relative", minHeight: "100vh" }}
-    >
-      <ParticleBackground isDark={isDark} />
+    <div data-theme="dark" style={{ position: "relative", minHeight: "100vh" }}>
+      <ParticleBackground isDark={true} />
       <div style={{ position: "relative", zIndex: 1 }}>
-        <Navbar isDark={isDark} onToggleTheme={toggleTheme} />
+        <Navbar />
         <Hero />
         <SymptomPanel onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         <ResultDashboard
           results={analysisResults}
           isAnalyzing={isAnalyzing}
           selectedSymptoms={selectedSymptoms}
+          age={userAge}
+          gender={userGender}
         />
         <AboutSection />
         <Footer />

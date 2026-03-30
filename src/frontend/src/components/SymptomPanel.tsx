@@ -2,27 +2,9 @@ import { useMemo, useState } from "react";
 import { SYMPTOMS, SYMPTOM_CATEGORIES, SYMPTOM_PACKS } from "../data/symptoms";
 
 interface Props {
-  onAnalyze: (symptoms: string[]) => void;
+  onAnalyze: (symptoms: string[], age: number, gender: string) => void;
   isAnalyzing: boolean;
 }
-
-const CATEGORY_STYLES = {
-  general: {
-    bg: "var(--accent-dim)",
-    border: "var(--border-color)",
-    text: "var(--accent)",
-  },
-  critical: {
-    bg: "rgba(128,0,32,0.15)",
-    border: "rgba(160,0,40,0.45)",
-    text: "var(--accent-hover)",
-  },
-  rare: {
-    bg: "rgba(100,0,25,0.12)",
-    border: "rgba(100,0,25,0.4)",
-    text: "#a00028",
-  },
-};
 
 export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
   const [search, setSearch] = useState("");
@@ -32,6 +14,18 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
   const [selected, setSelected] = useState<string[]>([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [justSelected, setJustSelected] = useState<Set<string>>(new Set());
+
+  // New fields
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [attempted, setAttempted] = useState(false);
+
+  const ageNum = Number.parseInt(age, 10);
+  const ageValid =
+    age !== "" && !Number.isNaN(ageNum) && ageNum >= 1 && ageNum <= 120;
+  const genderValid = gender !== "";
+  const canSubmit =
+    ageValid && genderValid && selected.length > 0 && !isAnalyzing;
 
   const allSymptoms = useMemo(() => {
     if (activeCategory === "all")
@@ -103,7 +97,6 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
     });
   };
 
-  // Severity distribution
   const severityCounts = useMemo(() => {
     let general = 0;
     let critical = 0;
@@ -120,11 +113,41 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
   const totalAll =
     SYMPTOMS.general.length + SYMPTOMS.critical.length + SYMPTOMS.rare.length;
 
-  const CATEGORY_LABELS: Record<string, string> = {
-    all: "All",
-    general: "General",
-    critical: "Critical",
-    rare: "Rare",
+  const handleSubmit = () => {
+    setAttempted(true);
+    if (!canSubmit) return;
+    onAnalyze(selected, ageNum, gender);
+  };
+
+  const inputBase: React.CSSProperties = {
+    width: "100%",
+    padding: "12px 16px",
+    borderRadius: "10px",
+    background: "var(--bg-secondary)",
+    border: "1px solid var(--border-color)",
+    color: "var(--text-primary)",
+    fontSize: "0.95rem",
+    fontFamily: "Poppins, sans-serif",
+    outline: "none",
+    transition: "all 0.3s",
+    boxSizing: "border-box" as const,
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: "0.78rem",
+    fontWeight: 700,
+    textTransform: "uppercase" as const,
+    letterSpacing: "1.5px",
+    color: "var(--text-muted)",
+    marginBottom: "10px",
+    display: "block",
+  };
+
+  const errorStyle: React.CSSProperties = {
+    marginTop: "6px",
+    fontSize: "0.78rem",
+    color: "#f97316",
+    fontWeight: 500,
   };
 
   return (
@@ -144,35 +167,135 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
             <span className="gradient-text">Symptom Selection</span>
           </h2>
           <p style={{ color: "var(--text-muted)" }}>
-            Select all symptoms you are experiencing for AI analysis
+            Enter your details and select all symptoms you are experiencing for
+            AI analysis
           </p>
         </div>
 
-        <div
-          className="glass-card"
-          style={{
-            padding: "32px",
-          }}
-        >
+        <div className="glass-card" style={{ padding: "32px" }}>
+          {/* ── Age & Gender Row ── */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 2fr",
+              gap: "24px",
+              marginBottom: "32px",
+            }}
+          >
+            {/* Age */}
+            <div>
+              <label htmlFor="age-input" style={labelStyle}>
+                Age
+              </label>
+              <input
+                id="age-input"
+                data-ocid="symptoms.input"
+                type="number"
+                min="1"
+                max="120"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="e.g. 28"
+                style={{
+                  ...inputBase,
+                  borderColor:
+                    attempted && !ageValid ? "#f97316" : "var(--border-color)",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--accent)";
+                  e.target.style.boxShadow = "var(--glow-soft)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor =
+                    attempted && !ageValid ? "#f97316" : "var(--border-color)";
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+              {attempted && !ageValid && (
+                <p data-ocid="symptoms.error_state" style={errorStyle}>
+                  Please enter a valid age (1–120)
+                </p>
+              )}
+            </div>
+
+            {/* Gender */}
+            <div>
+              <div style={labelStyle} aria-hidden="true">
+                Gender
+              </div>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                {(["Male", "Female", "Other"] as const).map((g) => {
+                  const isActive = gender === g;
+                  return (
+                    <button
+                      key={g}
+                      type="button"
+                      data-ocid={`symptoms.${g.toLowerCase()}.toggle`}
+                      onClick={() => setGender(g)}
+                      style={{
+                        padding: "10px 22px",
+                        borderRadius: "999px",
+                        cursor: "pointer",
+                        fontFamily: "Poppins, sans-serif",
+                        fontWeight: 600,
+                        fontSize: "0.88rem",
+                        transition: "all 0.2s cubic-bezier(0.34,1.56,0.64,1)",
+                        background: isActive
+                          ? "linear-gradient(135deg, rgba(210,180,140,0.28), rgba(232,207,168,0.22))"
+                          : "transparent",
+                        border: `1.5px solid ${isActive ? "var(--accent)" : "var(--border-color)"}`,
+                        color: isActive ? "var(--accent)" : "var(--text-muted)",
+                        boxShadow: isActive ? "var(--glow-soft)" : "none",
+                        transform: isActive ? "scale(1.04)" : "scale(1)",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.borderColor = "var(--accent)";
+                          e.currentTarget.style.color = "var(--accent-hover)";
+                          e.currentTarget.style.transform = "scale(1.03)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.borderColor =
+                            "var(--border-color)";
+                          e.currentTarget.style.color = "var(--text-muted)";
+                          e.currentTarget.style.transform = "scale(1)";
+                        }
+                      }}
+                    >
+                      {g}
+                    </button>
+                  );
+                })}
+              </div>
+              {attempted && !genderValid && (
+                <p data-ocid="symptoms.gender.error_state" style={errorStyle}>
+                  Please select a gender
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div
+            style={{
+              height: "1px",
+              background:
+                "linear-gradient(to right, transparent, var(--border-color), transparent)",
+              marginBottom: "28px",
+            }}
+          />
+
           {/* Quick Packs */}
           <div style={{ marginBottom: "20px" }}>
-            <div
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "1.5px",
-                color: "var(--text-muted)",
-                marginBottom: "10px",
-              }}
-            >
-              Quick Packs
-            </div>
+            <div style={labelStyle}>Quick Packs</div>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               {Object.entries(SYMPTOM_PACKS).map(([packName, packSymptoms]) => (
                 <button
                   key={packName}
                   type="button"
+                  className="glossy-pill"
                   data-ocid={`symptoms.${packName.replace(/[^a-z0-9]/gi, "-").toLowerCase()}.button`}
                   onClick={() => addPack(packSymptoms)}
                   style={{
@@ -189,7 +312,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                     letterSpacing: "0.2px",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(128,0,32,0.12)";
+                    e.currentTarget.style.background = "var(--accent-dim)";
                     e.currentTarget.style.boxShadow = "var(--glow-soft)";
                     e.currentTarget.style.transform = "translateY(-1px)";
                   }}
@@ -231,14 +354,14 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                     fontSize: "0.85rem",
                     transition: "all 0.25s",
                     background: isActive
-                      ? "linear-gradient(135deg, #80002033, #a0002822)"
+                      ? "linear-gradient(135deg, rgba(210,180,140,0.22), rgba(232,207,168,0.14))"
                       : "transparent",
                     border: `1px solid ${isActive ? "var(--accent)" : "var(--border-color)"}`,
                     color: isActive ? "var(--accent)" : "var(--text-muted)",
                     boxShadow: isActive ? "var(--glow-soft)" : "none",
                   }}
                 >
-                  {CATEGORY_LABELS[cat]}
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
                   <span
                     style={{
                       marginLeft: "6px",
@@ -271,7 +394,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="rgba(128,0,32,0.5)"
+                  stroke="rgba(210,180,140,0.5)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -304,8 +427,8 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   boxSizing: "border-box",
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = "rgba(128,0,32,0.7)";
-                  e.target.style.boxShadow = "0 0 15px rgba(128,0,32,0.15)";
+                  e.target.style.borderColor = "var(--accent)";
+                  e.target.style.boxShadow = "var(--glow-soft)";
                 }}
                 onBlur={(e) => {
                   setTimeout(() => setShowAutocomplete(false), 200);
@@ -362,16 +485,9 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                         fontSize: "0.75rem",
                         padding: "2px 8px",
                         borderRadius: "10px",
-                        background:
-                          CATEGORY_STYLES[SYMPTOM_CATEGORIES[item]]?.bg ||
-                          "var(--accent-dim)",
-                        color:
-                          CATEGORY_STYLES[SYMPTOM_CATEGORIES[item]]?.text ||
-                          "var(--accent)",
-                        border: `1px solid ${
-                          CATEGORY_STYLES[SYMPTOM_CATEGORIES[item]]?.border ||
-                          "var(--border-color)"
-                        }`,
+                        background: "var(--accent-dim)",
+                        color: "var(--accent)",
+                        border: "1px solid var(--border-color)",
                       }}
                     >
                       {SYMPTOM_CATEGORIES[item]}
@@ -395,33 +511,47 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
             }}
           >
             {filtered.map((symptom) => {
-              const cat = SYMPTOM_CATEGORIES[symptom] || "general";
-              const styles = CATEGORY_STYLES[cat];
               const isSelected = selected.includes(symptom);
               const isPopping = justSelected.has(symptom);
               return (
                 <button
                   key={symptom}
                   type="button"
+                  className="glossy-chip"
                   title={`Category: ${SYMPTOM_CATEGORIES[symptom] || "general"}`}
                   onClick={() => toggleSymptom(symptom)}
                   style={{
                     padding: "7px 14px",
-                    borderRadius: "20px",
+                    borderRadius: "999px",
                     cursor: "pointer",
                     fontSize: "0.82rem",
                     fontFamily: "Poppins, sans-serif",
                     fontWeight: 500,
                     background: isSelected
-                      ? "linear-gradient(135deg, rgba(128,0,32,0.3), rgba(160,0,40,0.3))"
-                      : styles.bg,
-                    border: `1px solid ${isSelected ? "rgba(128,0,32,0.8)" : styles.border}`,
-                    color: isSelected ? "var(--accent)" : styles.text,
-                    transition: "all 0.2s",
+                      ? "linear-gradient(135deg, rgba(210,180,140,0.25), rgba(232,207,168,0.2))"
+                      : "var(--accent-dim)",
+                    border: `${isSelected ? "1.5px" : "1px"} solid ${isSelected ? "var(--accent)" : "var(--border-color)"}`,
+                    color: isSelected ? "var(--accent)" : "var(--text-muted)",
+                    transition: "all 0.2s cubic-bezier(0.34,1.56,0.64,1)",
                     boxShadow: isSelected ? "var(--glow-soft)" : "none",
+                    transform: isSelected ? "scale(1.04)" : "scale(1)",
                     animation: isPopping
                       ? "chipPop 0.3s ease forwards"
                       : undefined,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.transform = "scale(1.03)";
+                      e.currentTarget.style.borderColor = "var(--accent)";
+                      e.currentTarget.style.color = "var(--accent-hover)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.transform = "scale(1)";
+                      e.currentTarget.style.borderColor = "var(--border-color)";
+                      e.currentTarget.style.color = "var(--text-muted)";
+                    }
                   }}
                 >
                   {symptom}
@@ -445,16 +575,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
           {/* Severity Distribution Bar */}
           {selected.length > 0 && (
             <div style={{ marginTop: "20px" }}>
-              <div
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "1.5px",
-                  color: "var(--text-muted)",
-                  marginBottom: "8px",
-                }}
-              >
+              <div style={{ ...labelStyle, marginBottom: "8px" }}>
                 Symptom Distribution
               </div>
               <div
@@ -539,10 +660,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
         {selected.length > 0 && (
           <div
             className="glass-card"
-            style={{
-              marginTop: "20px",
-              padding: "20px 24px",
-            }}
+            style={{ marginTop: "20px", padding: "20px 24px" }}
           >
             <div
               style={{
@@ -576,7 +694,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(128,0,32,0.2)";
+                  e.currentTarget.style.background = "rgba(210,180,140,0.2)";
                   e.currentTarget.style.boxShadow = "var(--glow-soft)";
                 }}
                 onMouseLeave={(e) => {
@@ -600,11 +718,11 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   key={s}
                   style={{
                     padding: "5px 12px",
-                    borderRadius: "20px",
+                    borderRadius: "999px",
                     fontSize: "0.8rem",
                     fontWeight: 500,
-                    background: "rgba(128,0,32,0.12)",
-                    border: "1px solid rgba(128,0,32,0.4)",
+                    background: "var(--accent-dim)",
+                    border: "1px solid var(--border-color)",
                     color: "var(--accent)",
                   }}
                 >
@@ -615,10 +733,17 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
             <button
               type="button"
               data-ocid="symptoms.submit_button"
-              disabled={isAnalyzing || selected.length === 0}
-              onClick={() => onAnalyze(selected)}
-              className="btn-gradient"
-              style={{ width: "100%", padding: "14px", fontSize: "1rem" }}
+              disabled={isAnalyzing}
+              onClick={handleSubmit}
+              className={`btn-gradient${canSubmit && !isAnalyzing ? " btn-cta-blink" : ""}`}
+              style={{
+                width: "100%",
+                padding: "14px",
+                fontSize: "1rem",
+                opacity: canSubmit ? 1 : 0.5,
+                cursor: canSubmit ? "pointer" : "not-allowed",
+                transition: "opacity 0.2s",
+              }}
             >
               {isAnalyzing ? (
                 <span
@@ -630,6 +755,7 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
                   }}
                 >
                   <span
+                    data-ocid="symptoms.loading_state"
                     style={{
                       width: "18px",
                       height: "18px",
@@ -655,42 +781,45 @@ export default function SymptomPanel({ onAnalyze, isAnalyzing }: Props) {
         <button
           type="button"
           data-ocid="symptoms.primary_button"
-          onClick={() => onAnalyze(selected)}
+          onClick={handleSubmit}
           disabled={isAnalyzing}
+          title={
+            !ageValid || !genderValid
+              ? "Please fill in Age and Gender first"
+              : undefined
+          }
+          className={canSubmit && !isAnalyzing ? "floating-pill-cta" : ""}
           style={{
             position: "fixed",
             bottom: "28px",
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 100,
-            background: "linear-gradient(135deg, #800020, #a00028)",
-            color: "#fff",
+            background: canSubmit ? undefined : "rgba(210,180,140,0.3)",
+            color: canSubmit ? "#ffffff" : "var(--text-muted)",
             border: "none",
             borderRadius: "999px",
             padding: "14px 32px",
             fontFamily: "Poppins, sans-serif",
             fontWeight: 700,
             fontSize: "0.9rem",
-            cursor: "pointer",
-            boxShadow:
-              "0 4px 28px rgba(128,0,32,0.55), 0 0 0 1px rgba(128,0,32,0.3)",
-            animation: "slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards",
+            cursor: canSubmit ? "pointer" : "not-allowed",
+            boxShadow: canSubmit ? undefined : "none",
+            animation:
+              !canSubmit || isAnalyzing
+                ? "slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards"
+                : undefined,
             whiteSpace: "nowrap",
             letterSpacing: "0.2px",
-            transition: "opacity 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow =
-              "0 6px 38px rgba(128,0,32,0.75), 0 0 0 1px rgba(128,0,32,0.4)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow =
-              "0 4px 28px rgba(128,0,32,0.55), 0 0 0 1px rgba(128,0,32,0.3)";
+            transition: "all 0.25s",
+            opacity: canSubmit ? 1 : 0.6,
           }}
         >
           {isAnalyzing
             ? "Analyzing..."
-            : `${selected.length} symptoms selected — Analyze Now →`}
+            : canSubmit
+              ? `${selected.length} symptoms — Analyze Now →`
+              : `${selected.length} selected · Fill age & gender`}
         </button>
       )}
     </section>

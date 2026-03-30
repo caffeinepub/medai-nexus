@@ -16,6 +16,8 @@ interface Props {
   results: DiagnosisResult[];
   selectedSymptoms: string[];
   isAnalyzing: boolean;
+  age: number;
+  gender: string;
 }
 
 function getSeverityStyle(severity: string) {
@@ -77,9 +79,12 @@ export default function ResultDashboard({
   results,
   selectedSymptoms,
   isAnalyzing,
+  age,
+  gender,
 }: Props) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [showDb, setShowDb] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const hasResults = results.length > 0 && !isAnalyzing;
   const confidenceDisplay = useCountUp(results[0]?.confidence ?? 0, hasResults);
 
@@ -144,7 +149,63 @@ export default function ResultDashboard({
   const top = results[0];
   const topSev = getSeverityStyle(top.severity);
 
-  const downloadPlan = () => {
+  const downloadPlan = async () => {
+    setIsGeneratingPdf(true);
+
+    interface GenderInsights {
+      maleImpact: string;
+      femaleImpact: string;
+      otherImpact: string;
+      personalizedNote: string;
+      generalOutlook: string;
+      diseaseExplanation: string;
+    }
+
+    let genderInsights: GenderInsights = {
+      maleImpact: "",
+      femaleImpact: "",
+      otherImpact: "",
+      personalizedNote: "",
+      generalOutlook: "",
+      diseaseExplanation: "",
+    };
+
+    try {
+      const geminiKey = "AIzaSyAeYSZuSR6wbSApVmDEMX7AOvFlRJ774tU";
+      const prompt = `You are a medical information assistant. For the disease "${top.name}", provide a JSON response with these exact fields:
+{
+  "diseaseExplanation": "2-3 sentence simple explanation of what this disease is",
+  "maleImpact": "How this disease affects males - symptoms, severity, risk level (2-3 sentences)",
+  "femaleImpact": "How this disease affects females - symptoms, severity, risk level (2-3 sentences)",
+  "otherImpact": "General impact for all genders inclusive (1-2 sentences)",
+  "personalizedNote": "A personalized note for a ${age}-year-old ${gender} patient with ${top.name} (2-3 sentences)",
+  "generalOutlook": "Brief general outlook for ${top.name} across all genders (2-3 sentences, not alarming)"
+}
+Respond ONLY with valid JSON, no markdown.`;
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+          signal: AbortSignal.timeout(10000),
+        },
+      );
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+      genderInsights = JSON.parse(text);
+    } catch {
+      genderInsights = {
+        diseaseExplanation: `${top.name} is a medical condition that affects the body's normal functions. It requires proper medical attention and timely treatment.`,
+        maleImpact: `In males, ${top.name} may present with typical symptoms and moderate risk. Regular health monitoring is advised.`,
+        femaleImpact: `In females, ${top.name} can have varied presentations. Hormonal factors may influence symptom severity and progression.`,
+        otherImpact: `For all genders, ${top.name} requires early diagnosis and appropriate treatment for the best outcomes.`,
+        personalizedNote: `As a ${age}-year-old ${gender} patient, it's important to follow your doctor's advice closely and monitor your symptoms regularly.`,
+        generalOutlook: `With proper medical care and lifestyle adjustments, most patients with ${top.name} can manage their condition effectively.`,
+      };
+    }
+
     const severityColor =
       top.severity.toLowerCase() === "mild"
         ? "#22c55e"
@@ -155,7 +216,7 @@ export default function ResultDashboard({
     const symptomsHtml = selectedSymptoms
       .map(
         (s) =>
-          `<span style="display:inline-block;background:#1a1400;color:#f5c518;border:1px solid #b8860b;border-radius:20px;padding:4px 12px;margin:3px;font-size:12px;">${s}</span>`,
+          `<span style="display:inline-block;background:#001530;color:#d2b48c;border:1px solid #b89a72;border-radius:20px;padding:4px 12px;margin:3px;font-size:12px;">${s}</span>`,
       )
       .join("");
 
@@ -200,13 +261,13 @@ export default function ResultDashboard({
     const stepsHtml = steps
       .map(
         (step) => `
-      <div style="display:flex;gap:16px;margin-bottom:20px;background:linear-gradient(135deg,#0d1535,#111827);border:1px solid #b8860b44;border-radius:12px;padding:20px;page-break-inside:avoid;box-shadow:0 4px 20px #00000044;">
-        <div style="flex-shrink:0;width:48px;height:48px;background:linear-gradient(135deg,#cc0000,#b8860b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px #cc000055;">
+      <div style="display:flex;gap:16px;margin-bottom:20px;background:linear-gradient(135deg,#0d1535,#111827);border:1px solid #b89a7244;border-radius:12px;padding:20px;page-break-inside:avoid;box-shadow:0 4px 20px #00000044;">
+        <div style="flex-shrink:0;width:48px;height:48px;background:linear-gradient(135deg,#d2b48c,#b89a72);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px #d2b48c55;">
           ${step.icon}
         </div>
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span style="color:#f5c518;font-size:11px;font-weight:700;letter-spacing:2px;">STEP ${step.num}</span>
+            <span style="color:#d2b48c;font-size:11px;font-weight:700;letter-spacing:2px;">STEP ${step.num}</span>
             <span style="color:#ffffff;font-weight:700;font-size:15px;">${step.title}</span>
           </div>
           <p style="color:#d1d5db;font-size:13px;line-height:1.7;margin:0;">${step.content}</p>
@@ -226,7 +287,7 @@ export default function ResultDashboard({
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #0a0f2e;
+      background-color: #002147;
       background-image: linear-gradient(rgba(184,134,11,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,11,0.06) 1px, transparent 1px);
       background-size: 40px 40px;
       color: #ffffff;
@@ -240,74 +301,137 @@ export default function ResultDashboard({
 
   <!-- Print Button -->
   <div class="no-print" style="position:fixed;top:20px;right:20px;z-index:999;">
-    <button onclick="window.print()" style="background:linear-gradient(135deg,#cc0000,#b8860b);color:white;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-family:Poppins,sans-serif;font-weight:700;font-size:13px;box-shadow:0 0 20px #cc000066;letter-spacing:0.5px;">🖨 Print / Save PDF</button>
+    <button onclick="window.print()" style="background:linear-gradient(135deg,#d2b48c,#b89a72);color:white;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-family:Poppins,sans-serif;font-weight:700;font-size:13px;box-shadow:0 0 20px #d2b48c66;letter-spacing:0.5px;">🖨 Print / Save PDF</button>
   </div>
 
   <!-- Top accent bar -->
-  <div style="height:3px;background:linear-gradient(90deg,#cc0000,#f5c518,#b8860b);border-radius:2px;margin-bottom:36px;box-shadow:0 0 12px #f5c51844;"></div>
+  <div style="height:3px;background:linear-gradient(90deg,#d2b48c,#d2b48c,#b89a72);border-radius:2px;margin-bottom:36px;box-shadow:0 0 12px #d2b48c44;"></div>
 
   <!-- Header -->
-  <div style="text-align:center;margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid #b8860b33;position:relative;">
-    <div style="position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid #b8860b;border-left:2px solid #b8860b;"></div>
-    <div style="position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid #b8860b;border-right:2px solid #b8860b;"></div>
+  <div style="text-align:center;margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid #b89a7233;position:relative;">
+    <div style="position:absolute;top:0;left:0;width:20px;height:20px;border-top:2px solid #b89a72;border-left:2px solid #b89a72;"></div>
+    <div style="position:absolute;top:0;right:0;width:20px;height:20px;border-top:2px solid #b89a72;border-right:2px solid #b89a72;"></div>
     <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:14px;">
-      <div style="width:52px;height:52px;background:linear-gradient(135deg,#cc0000,#b8860b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 20px #cc000066,0 0 40px #b8860b44;">⚕</div>
-      <span style="font-size:30px;font-weight:800;background:linear-gradient(90deg,#cc0000,#f5c518);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">MedAI Nexus</span>
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,#d2b48c,#b89a72);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 20px #d2b48c66,0 0 40px #b89a7244;">⚕</div>
+      <span style="font-size:30px;font-weight:800;background:linear-gradient(90deg,#d2b48c,#d2b48c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">MedAI Nexus</span>
     </div>
-    <p style="color:#b8860b;font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;">AI-Powered Step-by-Step Action Plan</p>
+    <p style="color:#b89a72;font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;">AI-Powered Step-by-Step Action Plan</p>
     <p style="color:#4b5563;font-size:11px;margin-top:8px;">Generated on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
   </div>
 
+  <!-- Patient Information Card -->
+  <div style="background:linear-gradient(135deg,#001a3a,#0a1f3d);border:1px solid #d2b48c88;border-radius:16px;padding:24px;margin-bottom:28px;">
+    <p style="color:#d2b48c;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:16px;">Patient Information</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="background:#002147;border:1px solid #b89a7244;border-radius:10px;padding:14px;">
+        <p style="color:#b89a72;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Age</p>
+        <p style="color:#ffffff;font-size:22px;font-weight:800;">${age} <span style="font-size:12px;color:#9ca3af;font-weight:400;">years</span></p>
+      </div>
+      <div style="background:#002147;border:1px solid #b89a7244;border-radius:10px;padding:14px;">
+        <p style="color:#b89a72;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Gender</p>
+        <p style="color:#ffffff;font-size:22px;font-weight:800;text-transform:capitalize;">${gender}</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Diagnosis Card -->
-  <div style="background:linear-gradient(135deg,#1a0a00,#0d1535);border:2px solid #b8860b;border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 0 30px #b8860b22,inset 0 0 20px #cc000011;">
+  <div style="background:linear-gradient(135deg,#1a0a00,#0d1535);border:2px solid #b89a72;border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 0 30px #b89a7222,inset 0 0 20px #d2b48c11;">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
       <div>
-        <p style="color:#b8860b;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Primary Diagnosis</p>
-        <h1 style="font-size:28px;font-weight:800;"><span style="background:linear-gradient(90deg,#cc0000,#f5c518);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${top.name}</span></h1>
+        <p style="color:#b89a72;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Primary Diagnosis</p>
+        <h1 style="font-size:28px;font-weight:800;"><span style="background:linear-gradient(90deg,#d2b48c,#d2b48c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${top.name}</span></h1>
       </div>
       <div style="text-align:right;">
         <div style="background:${severityColor}22;border:1px solid ${severityColor};border-radius:8px;padding:8px 18px;display:inline-block;margin-bottom:10px;">
           <p style="color:${severityColor};font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;">${top.severity} Severity</p>
         </div>
-        <p style="color:#f5c518;font-size:26px;font-weight:800;">${top.confidence}% <span style="font-size:13px;color:#9ca3af;font-weight:400;">Confidence</span></p>
+        <p style="color:#d2b48c;font-size:26px;font-weight:800;">${top.confidence}% <span style="font-size:13px;color:#9ca3af;font-weight:400;">Confidence</span></p>
         <div style="height:6px;background:#1a1a2e;border-radius:3px;margin-top:8px;overflow:hidden;">
-          <div style="height:100%;width:${top.confidence}%;background:linear-gradient(90deg,#cc0000,#f5c518);border-radius:3px;box-shadow:0 0 8px #f5c51866;"></div>
+          <div style="height:100%;width:${top.confidence}%;background:linear-gradient(90deg,#d2b48c,#d2b48c);border-radius:3px;box-shadow:0 0 8px #d2b48c66;"></div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- About This Condition -->
+  <div style="background:#001a3a;border-left:3px solid #d2b48c;border-radius:0 10px 10px 0;padding:18px 22px;margin-bottom:28px;">
+    <p style="color:#d2b48c;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px;">About This Condition</p>
+    <p style="color:#d1d5db;font-size:13px;line-height:1.8;">${genderInsights.diseaseExplanation}</p>
+  </div>
+
   <!-- Symptoms -->
   <div style="margin-bottom:28px;">
-    <p style="color:#b8860b;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Symptoms Analyzed (${selectedSymptoms.length})</p>
+    <p style="color:#b89a72;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Symptoms Analyzed (${selectedSymptoms.length})</p>
     <div style="line-height:2;">${symptomsHtml}</div>
+  </div>
+
+  <!-- Impact by Gender -->
+  <div style="margin-bottom:28px;">
+    <p style="color:#b89a72;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:16px;">Impact by Gender</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+      <div style="background:linear-gradient(135deg,#001a3a,#002147);border:1px solid #4477aa55;border-radius:12px;padding:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:28px;height:28px;background:#2060a033;border:1px solid #4488cc;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">♂</div>
+          <span style="color:#88aaee;font-weight:700;font-size:13px;">Male</span>
+        </div>
+        <p style="color:#d1d5db;font-size:12px;line-height:1.7;">${genderInsights.maleImpact}</p>
+      </div>
+      <div style="background:linear-gradient(135deg,#1a0030,#150020);border:1px solid #aa44aa55;border-radius:12px;padding:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:28px;height:28px;background:#8822aa33;border:1px solid #aa44cc;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">♀</div>
+          <span style="color:#cc88ee;font-weight:700;font-size:13px;">Female</span>
+        </div>
+        <p style="color:#d1d5db;font-size:12px;line-height:1.7;">${genderInsights.femaleImpact}</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,#0a1a10,#001a0a);border:1px solid #44aa6655;border-radius:12px;padding:18px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="width:28px;height:28px;background:#22aa4433;border:1px solid #44cc66;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">⚧</div>
+        <span style="color:#66cc88;font-weight:700;font-size:13px;">All Genders</span>
+      </div>
+      <p style="color:#d1d5db;font-size:12px;line-height:1.7;">${genderInsights.otherImpact}</p>
+    </div>
+  </div>
+
+  <!-- What This Means for You -->
+  <div style="background:linear-gradient(135deg,#1a1000,#0d1535);border:2px solid #d2b48c44;border-radius:16px;padding:24px;margin-bottom:28px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:#d2b48c11;border-radius:50%;"></div>
+    <p style="color:#d2b48c;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">What This Means for You</p>
+    <p style="color:#f3f4f6;font-size:14px;line-height:1.8;font-style:italic;">&ldquo;${genderInsights.personalizedNote}&rdquo;</p>
   </div>
 
   <!-- Steps -->
   <div style="margin-bottom:28px;">
-    <p style="color:#b8860b;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px;">Step-by-Step Action Plan</p>
+    <p style="color:#b89a72;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px;">Step-by-Step Action Plan</p>
     ${stepsHtml}
   </div>
 
   <!-- Disclaimer -->
-  <div style="background:#1a0808;border:1px solid #cc000055;border-radius:10px;padding:18px;text-align:center;box-shadow:0 0 15px #cc000022;margin-bottom:24px;">
+  <div style="background:#1a0808;border:1px solid #d2b48c55;border-radius:10px;padding:18px;text-align:center;box-shadow:0 0 15px #d2b48c22;margin-bottom:24px;">
     <p style="color:#ef4444;font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:1px;">⚠ MEDICAL DISCLAIMER</p>
     <p style="color:#9ca3af;font-size:11px;line-height:1.7;">This report is generated by an AI system for educational purposes only. It does not constitute medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before making any health decisions.</p>
   </div>
 
+  <!-- General Outlook -->
+  <div style="background:linear-gradient(135deg,#001a20,#001530);border:1px solid #d2b48c33;border-radius:14px;padding:22px;margin-bottom:24px;">
+    <p style="color:#d2b48c;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">General Outlook</p>
+    <p style="color:#d1d5db;font-size:13px;line-height:1.8;">${genderInsights.generalOutlook}</p>
+  </div>
+
   <!-- Footer -->
-  <div style="text-align:center;padding-top:16px;border-top:1px solid #b8860b33;">
-    <p style="color:#b8860b;font-size:10px;letter-spacing:1px;">MedAI Nexus &nbsp;|&nbsp; Designed by Deekshith Kumar &nbsp;|&nbsp; Developed by Advaith Sreejith</p>
+  <div style="text-align:center;padding-top:16px;border-top:1px solid #b89a7233;">
+    <p style="color:#b89a72;font-size:10px;letter-spacing:1px;">MedAI Nexus &nbsp;|&nbsp; Designed by Deekshith Kumar &nbsp;|&nbsp; Developed by Advaith Sreejith</p>
   </div>
 
 </body>
 </html>`;
 
+    setIsGeneratingPdf(false);
+
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const printWin = window.open(url, "_blank", "width=900,height=700");
     if (!printWin) {
-      // fallback if popup blocked
       const a = document.createElement("a");
       a.href = url;
       a.download = `MedAI-ActionPlan-${top.name.replace(/\s+/g, "-")}.html`;
@@ -634,6 +758,7 @@ export default function ResultDashboard({
             type="button"
             data-ocid="results.download_button"
             onClick={downloadPlan}
+            disabled={isGeneratingPdf}
             className="btn-gradient"
             style={{
               display: "flex",
@@ -643,9 +768,28 @@ export default function ResultDashboard({
               width: "100%",
               padding: "13px",
               fontSize: "0.95rem",
+              opacity: isGeneratingPdf ? 0.7 : 1,
+              cursor: isGeneratingPdf ? "not-allowed" : "pointer",
             }}
           >
-            ⬇ Download Action Plan
+            {isGeneratingPdf ? (
+              <>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "14px",
+                    height: "14px",
+                    border: "2px solid rgba(255,255,255,0.3)",
+                    borderTopColor: "#fff",
+                    borderRadius: "50%",
+                    animation: "spinSlow 0.7s linear infinite",
+                  }}
+                />
+                Generating PDF...
+              </>
+            ) : (
+              "⬇ Download Action Plan"
+            )}
           </button>
 
           <p
