@@ -14,9 +14,11 @@ export default function FeedbackModal({
   onClose,
   disease = "",
   age = 0,
-  gender = "",
+  gender: diagnosisGender = "",
 }: FeedbackModalProps) {
   const [slide, setSlide] = useState(0);
+  const [name, setName] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [description, setDescription] = useState("");
@@ -26,6 +28,8 @@ export default function FeedbackModal({
 
   const handleClose = () => {
     setSlide(0);
+    setName("");
+    setSelectedGender("");
     setRating(0);
     setHoverRating(0);
     setDescription("");
@@ -33,6 +37,7 @@ export default function FeedbackModal({
   };
 
   const handleSubmit = async () => {
+    const finalGender = selectedGender || diagnosisGender;
     try {
       if (actor)
         await actor.submitFeedback(
@@ -40,30 +45,56 @@ export default function FeedbackModal({
           description,
           disease,
           BigInt(age),
-          gender,
+          finalGender,
         );
     } catch {
-      // Silent fail — don't block UX
+      // Silent fail
     }
-    // Save to localStorage for intro slide stats
     try {
       const stored = JSON.parse(localStorage.getItem("medai_feedback") || "[]");
       stored.push({
+        name,
         rating,
         description,
         disease,
         age,
-        gender,
+        gender: finalGender,
         timestamp: Date.now(),
       });
       localStorage.setItem("medai_feedback", JSON.stringify(stored));
     } catch {
       // ignore
     }
-    setSlide(2);
+    setSlide(3);
   };
 
   const isPositive = rating >= 4;
+  const genderOptions = ["Male", "Female", "Other"];
+
+  const primaryBtn = (label: string, onClick: () => void, disabled = false) => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        padding: "13px 40px",
+        borderRadius: 999,
+        background: disabled
+          ? "rgba(78,122,177,0.1)"
+          : "linear-gradient(135deg, #4E7AB1, #7DBFC0)",
+        color: disabled ? "rgba(78,122,177,0.4)" : "#fff",
+        border: "none",
+        fontSize: "0.95rem",
+        fontWeight: 700,
+        cursor: disabled ? "not-allowed" : "pointer",
+        boxShadow: disabled ? "none" : "0 0 20px rgba(78,122,177,0.35)",
+        transition: "all 0.25s",
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      {label}
+    </button>
+  );
 
   return (
     <>
@@ -84,7 +115,10 @@ export default function FeedbackModal({
         .fb-star:hover { transform: scale(1.2); }
         .fb-star.selected { animation: starBounce 0.3s ease; }
         .fb-slide { animation: fbSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) both; }
-        .fb-textarea:focus { outline: none; border-color: rgba(131,135,195,0.7) !important; box-shadow: 0 0 16px rgba(131,135,195,0.15); }
+        .fb-textarea:focus { outline: none; border-color: rgba(78,122,177,0.7) !important; box-shadow: 0 0 16px rgba(78,122,177,0.15); }
+        .fb-name-input:focus { outline: none; border-color: rgba(78,122,177,0.7) !important; box-shadow: 0 0 16px rgba(78,122,177,0.15); }
+        .fb-gender-btn { transition: all 0.2s ease; }
+        .fb-gender-btn:hover { transform: scale(1.04); }
       `}</style>
       <div
         data-ocid="feedback.modal"
@@ -92,7 +126,7 @@ export default function FeedbackModal({
           position: "fixed",
           inset: 0,
           zIndex: 99999,
-          background: "rgba(10,17,35, 0.55)",
+          background: "rgba(16,40,83, 0.45)",
           backdropFilter: "blur(8px)",
           display: "flex",
           alignItems: "center",
@@ -103,21 +137,21 @@ export default function FeedbackModal({
       >
         <div
           style={{
-            background: "rgba(10,17,35,0.96)",
+            background: "rgba(255,255,255,0.97)",
             backdropFilter: "blur(24px)",
-            border: "1px solid rgba(131,135,195, 0.25)",
+            border: "1px solid rgba(78,122,177, 0.2)",
             borderRadius: 24,
             padding: "40px 36px",
             maxWidth: 480,
             width: "100%",
             boxShadow:
-              "0 0 80px rgba(131,135,195,0.25), 0 20px 60px rgba(10,17,35,0.5), inset 0 1px 0 rgba(131,135,195,0.1)",
+              "0 0 60px rgba(78,122,177,0.2), 0 20px 60px rgba(16,40,83,0.12), inset 0 1px 0 rgba(255,255,255,0.9)",
             animation: "fbFadeIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) both",
             position: "relative",
             textAlign: "center",
           }}
         >
-          {/* Progress dots */}
+          {/* Progress dots — 4 slides total */}
           <div
             style={{
               display: "flex",
@@ -126,14 +160,14 @@ export default function FeedbackModal({
               marginBottom: 28,
             }}
           >
-            {[0, 1, 2].map((i) => (
+            {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
                 style={{
                   width: i === slide ? 24 : 8,
                   height: 8,
                   borderRadius: 4,
-                  background: i <= slide ? "#8387C3" : "rgba(131,135,195,0.15)",
+                  background: i <= slide ? "#4E7AB1" : "rgba(78,122,177,0.15)",
                   transition: "all 0.3s ease",
                 }}
               />
@@ -149,13 +183,13 @@ export default function FeedbackModal({
               position: "absolute",
               top: 16,
               right: 16,
-              background: "rgba(131,135,195, 0.08)",
-              border: "1px solid rgba(131,135,195, 0.2)",
+              background: "rgba(78,122,177, 0.08)",
+              border: "1px solid rgba(78,122,177, 0.2)",
               borderRadius: "50%",
               width: 32,
               height: 32,
               cursor: "pointer",
-              color: "#8387C3",
+              color: "#4E7AB1",
               fontSize: 16,
               display: "flex",
               alignItems: "center",
@@ -165,28 +199,193 @@ export default function FeedbackModal({
             ✕
           </button>
 
-          {/* SLIDE 0: Star Rating */}
+          {/* SLIDE 0: Name + Gender */}
           {slide === 0 && (
             <div className="fb-slide" key="slide0">
-              <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>⭐</div>
-              <h2
+              <div
                 style={{
-                  color: "#8387C3",
-                  fontSize: "1.4rem",
-                  fontWeight: 800,
-                  marginBottom: 8,
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #4E7AB1, #7DBFC0)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 16px",
+                  boxShadow: "0 0 24px rgba(78,122,177,0.35)",
                 }}
               >
-                How was your experience?
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  role="img"
+                >
+                  <title>User profile</title>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <h2
+                style={{
+                  color: "#102853",
+                  fontSize: "1.4rem",
+                  fontWeight: 800,
+                  marginBottom: 6,
+                }}
+              >
+                Who are you?
               </h2>
               <p
                 style={{
-                  color: "rgba(131,135,195,0.7)",
+                  color: "#506980",
+                  fontSize: "0.9rem",
+                  marginBottom: 24,
+                }}
+              >
+                Tell us a little about yourself before leaving a review
+              </p>
+
+              {/* Name input */}
+              <div style={{ textAlign: "left", marginBottom: 20 }}>
+                <label
+                  htmlFor="fb-name"
+                  style={{
+                    display: "block",
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    color: "#102853",
+                    marginBottom: 8,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  Your Name
+                </label>
+                <input
+                  id="fb-name"
+                  className="fb-name-input"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  style={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: "12px 16px",
+                    borderRadius: 12,
+                    background: "rgba(78,122,177,0.06)",
+                    border: "1.5px solid rgba(78,122,177,0.25)",
+                    color: "#102853",
+                    fontSize: "0.95rem",
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                />
+              </div>
+
+              {/* Gender selection */}
+              <div style={{ textAlign: "left", marginBottom: 28 }}>
+                <p
+                  style={{
+                    display: "block",
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    color: "#102853",
+                    marginBottom: 10,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    margin: "0 0 10px 0",
+                  }}
+                >
+                  Gender
+                </p>
+                <div style={{ display: "flex", gap: 10 }}>
+                  {genderOptions.map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      className="fb-gender-btn"
+                      onClick={() => setSelectedGender(g)}
+                      style={{
+                        flex: 1,
+                        padding: "10px 0",
+                        borderRadius: 10,
+                        border:
+                          selectedGender === g
+                            ? "2px solid #4E7AB1"
+                            : "1.5px solid rgba(78,122,177,0.25)",
+                        background:
+                          selectedGender === g
+                            ? "linear-gradient(135deg, #4E7AB1, #7DBFC0)"
+                            : "rgba(78,122,177,0.05)",
+                        color: selectedGender === g ? "#fff" : "#506980",
+                        fontSize: "0.85rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        boxShadow:
+                          selectedGender === g
+                            ? "0 0 12px rgba(78,122,177,0.3)"
+                            : "none",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {primaryBtn(
+                "Next →",
+                () => setSlide(1),
+                !name.trim() || !selectedGender,
+              )}
+            </div>
+          )}
+
+          {/* SLIDE 1: Star Rating */}
+          {slide === 1 && (
+            <div className="fb-slide" key="slide1">
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #4E7AB1, #7DBFC0)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 16px",
+                  boxShadow: "0 0 24px rgba(78,122,177,0.35)",
+                  fontSize: "1.5rem",
+                }}
+              >
+                ⭐
+              </div>
+              <h2
+                style={{
+                  color: "#102853",
+                  fontSize: "1.4rem",
+                  fontWeight: 800,
+                  marginBottom: 6,
+                }}
+              >
+                Hi {name}! Rate your experience
+              </h2>
+              <p
+                style={{
+                  color: "#506980",
                   fontSize: "0.9rem",
                   marginBottom: 28,
                 }}
               >
-                Rate your MedAI Nexus analysis session
+                How was your MedAI Nexus analysis session?
               </p>
               <div
                 style={{
@@ -208,8 +407,8 @@ export default function FeedbackModal({
                     style={{
                       color:
                         (hoverRating || rating) >= star
-                          ? "#8387C3"
-                          : "rgba(58,62,108,0.25)",
+                          ? "#4E7AB1"
+                          : "rgba(78,122,177,0.2)",
                       background: "none",
                       border: "none",
                       padding: 0,
@@ -220,51 +419,42 @@ export default function FeedbackModal({
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                data-ocid="feedback.primary_button"
-                onClick={() => rating > 0 && setSlide(1)}
-                disabled={rating === 0}
-                style={{
-                  padding: "13px 40px",
-                  borderRadius: 999,
-                  background:
-                    rating > 0
-                      ? "linear-gradient(135deg, #8387C3, #95BBB5)"
-                      : "rgba(131,135,195, 0.1)",
-                  color: rating > 0 ? "#fff" : "rgba(58,62,108,0.4)",
-                  border: "none",
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  cursor: rating > 0 ? "pointer" : "not-allowed",
-                  boxShadow:
-                    rating > 0 ? "0 0 20px rgba(131,135,195, 0.3)" : "none",
-                  transition: "all 0.25s",
-                  fontFamily: "Poppins, sans-serif",
-                }}
-              >
-                Next →
-              </button>
+              {primaryBtn("Next →", () => setSlide(2), rating === 0)}
             </div>
           )}
 
-          {/* SLIDE 1: Description */}
-          {slide === 1 && (
-            <div className="fb-slide" key="slide1">
-              <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>💬</div>
+          {/* SLIDE 2: Description */}
+          {slide === 2 && (
+            <div className="fb-slide" key="slide2">
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #4E7AB1, #7DBFC0)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 16px",
+                  boxShadow: "0 0 24px rgba(78,122,177,0.35)",
+                  fontSize: "1.5rem",
+                }}
+              >
+                💬
+              </div>
               <h2
                 style={{
-                  color: "#8387C3",
+                  color: "#102853",
                   fontSize: "1.4rem",
                   fontWeight: 800,
-                  marginBottom: 8,
+                  marginBottom: 6,
                 }}
               >
                 Tell us more
               </h2>
               <p
                 style={{
-                  color: "rgba(131,135,195,0.7)",
+                  color: "#506980",
                   fontSize: "0.9rem",
                   marginBottom: 24,
                 }}
@@ -283,9 +473,9 @@ export default function FeedbackModal({
                   boxSizing: "border-box",
                   padding: "14px 16px",
                   borderRadius: 14,
-                  background: "rgba(58,62,108,0.4)",
-                  border: "1px solid rgba(131,135,195, 0.25)",
-                  color: "#ffffff",
+                  background: "rgba(78,122,177,0.06)",
+                  border: "1.5px solid rgba(78,122,177,0.25)",
+                  color: "#102853",
                   fontSize: "0.9rem",
                   fontFamily: "Poppins, sans-serif",
                   resize: "vertical",
@@ -293,37 +483,19 @@ export default function FeedbackModal({
                   display: "block",
                 }}
               />
-              <button
-                type="button"
-                data-ocid="feedback.submit_button"
-                onClick={handleSubmit}
-                style={{
-                  padding: "13px 40px",
-                  borderRadius: 999,
-                  background: "linear-gradient(135deg, #8387C3, #95BBB5)",
-                  color: "#fff",
-                  border: "none",
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  boxShadow: "0 0 20px rgba(131,135,195, 0.3)",
-                  fontFamily: "Poppins, sans-serif",
-                }}
-              >
-                Submit →
-              </button>
+              {primaryBtn("Submit →", handleSubmit)}
             </div>
           )}
 
-          {/* SLIDE 2: Final message */}
-          {slide === 2 && (
-            <div className="fb-slide" key="slide2">
+          {/* SLIDE 3: Final message */}
+          {slide === 3 && (
+            <div className="fb-slide" key="slide3">
               <div style={{ fontSize: "3rem", marginBottom: 16 }}>
                 {isPositive ? "🎉" : "💪"}
               </div>
               <h2
                 style={{
-                  color: isPositive ? "#8387C3" : "#95BBB5",
+                  color: isPositive ? "#4E7AB1" : "#506980",
                   fontSize: "1.5rem",
                   fontWeight: 900,
                   marginBottom: 12,
@@ -334,11 +506,11 @@ export default function FeedbackModal({
               {description ? (
                 <div
                   style={{
-                    background: "rgba(58,62,108,0.4)",
-                    border: "1px solid rgba(131,135,195,0.2)",
+                    background: "rgba(78,122,177,0.07)",
+                    border: "1px solid rgba(78,122,177,0.2)",
                     borderRadius: 14,
                     padding: "14px 18px",
-                    color: "rgba(255,255,255,0.8)",
+                    color: "#102853",
                     fontSize: "0.9rem",
                     lineHeight: 1.6,
                     marginBottom: 24,
@@ -351,7 +523,7 @@ export default function FeedbackModal({
               ) : (
                 <p
                   style={{
-                    color: "#8C8CAC",
+                    color: "#506980",
                     marginBottom: 24,
                     fontSize: "0.9rem",
                   }}
@@ -361,25 +533,7 @@ export default function FeedbackModal({
                     : "Your feedback helps us build better diagnostics."}
                 </p>
               )}
-              <button
-                type="button"
-                data-ocid="feedback.confirm_button"
-                onClick={handleClose}
-                style={{
-                  padding: "13px 40px",
-                  borderRadius: 999,
-                  background: "linear-gradient(135deg, #8387C3, #95BBB5)",
-                  color: "#fff",
-                  border: "none",
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  boxShadow: "0 0 20px rgba(131,135,195, 0.3)",
-                  fontFamily: "Poppins, sans-serif",
-                }}
-              >
-                Done ✓
-              </button>
+              {primaryBtn("Done ✓", handleClose)}
             </div>
           )}
         </div>

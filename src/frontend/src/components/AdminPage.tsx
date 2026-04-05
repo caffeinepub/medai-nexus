@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
-import type { FeedbackEntry } from "../backend.d";
 import { useActor } from "../hooks/useActor";
 
 const ADMIN_PASSWORD = "dickyaddu@admin2026";
+
+interface LocalFeedbackEntry {
+  name: string;
+  rating: bigint;
+  description: string;
+  disease: string;
+  age: bigint;
+  gender: string;
+  timestamp: bigint;
+}
 
 interface Props {
   alreadyAuthenticated?: boolean;
@@ -17,7 +26,7 @@ export default function AdminPage({
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(alreadyAuthenticated);
   const [error, setError] = useState("");
-  const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
+  const [feedbacks, setFeedbacks] = useState<LocalFeedbackEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,16 +37,17 @@ export default function AdminPage({
         const stored = JSON.parse(
           localStorage.getItem("medai_feedback") || "[]",
         );
-        const localEntries: FeedbackEntry[] = stored.map(
+        const localEntries: LocalFeedbackEntry[] = stored.map(
           (item: {
+            name?: string;
             rating: number;
             description: string;
             disease: string;
             age: number;
             gender: string;
             timestamp: number;
-            name?: string;
           }) => ({
+            name: item.name || "",
             rating: BigInt(item.rating || 0),
             description: item.description || "",
             disease: item.disease || "",
@@ -61,7 +71,19 @@ export default function AdminPage({
       }
       actor
         .getFeedbacks()
-        .then((data) => setFeedbacks(data))
+        .then((data) =>
+          setFeedbacks(
+            data.map((entry) => ({
+              name: "",
+              rating: entry.rating,
+              description: entry.description,
+              disease: entry.disease,
+              age: entry.age,
+              gender: entry.gender,
+              timestamp: entry.timestamp,
+            })),
+          ),
+        )
         .catch(() => setFeedbacks([]))
         .finally(() => setLoading(false));
     }
@@ -116,7 +138,7 @@ export default function AdminPage({
         .admin-row:hover td { background: rgba(78,122,177,0.04) !important; }
         @media (max-width: 768px) {
           .admin-table-wrap { overflow-x: auto; }
-          .admin-table { min-width: 700px; }
+          .admin-table { min-width: 800px; }
         }
       `}</style>
       <div
@@ -462,6 +484,7 @@ export default function AdminPage({
                       <tr style={{ background: "rgba(215,182,212,0.1)" }}>
                         {[
                           "#",
+                          "Reviewer Name",
                           "Date / Time",
                           "Stars",
                           "Disease",
@@ -506,6 +529,20 @@ export default function AdminPage({
                             }}
                           >
                             {idx + 1}
+                          </td>
+                          <td
+                            style={{
+                              padding: "14px 16px",
+                              color: "#102853",
+                              fontWeight: 700,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {entry.name ? (
+                              entry.name
+                            ) : (
+                              <em style={{ color: "#aaa" }}>Anonymous</em>
+                            )}
                           </td>
                           <td
                             style={{

@@ -32,10 +32,22 @@ export default function App() {
   const [userGender, setUserGender] = useState<string>("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [reviewHover, setReviewHover] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const saved = localStorage.getItem("medai-theme");
+    return (saved === "light" || saved === "dark" ? saved : "dark") as
+      | "dark"
+      | "light";
+  });
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", "light");
-  }, []);
+    document.documentElement.setAttribute("data-theme", theme);
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("medai-theme", theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const handleActivate = (key: string) => {
     setApiKey(key);
@@ -93,12 +105,11 @@ export default function App() {
 
     setAnalysisResults(ranked);
     setIsAnalyzing(false);
-    // No auto-popup — user clicks the floating button to leave a review
   };
 
   if (!activated) {
     return (
-      <div data-theme="light">
+      <div>
         <ActivationScreen onActivate={handleActivate} />
       </div>
     );
@@ -109,13 +120,10 @@ export default function App() {
     : "translateY(-50%) translateX(0)";
 
   return (
-    <div
-      data-theme="light"
-      style={{ position: "relative", minHeight: "100vh" }}
-    >
-      <ParticleBackground isDark={false} />
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      <ParticleBackground />
       <div style={{ position: "relative", zIndex: 1 }}>
-        <Navbar />
+        <Navbar theme={theme} onToggleTheme={handleToggleTheme} />
         <Hero />
         <SymptomPanel onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
         <ResultDashboard
@@ -132,6 +140,7 @@ export default function App() {
       {/* Floating Give Review Button */}
       <button
         type="button"
+        data-ocid="review.open_modal_button"
         onClick={() => setShowFeedback(true)}
         onMouseEnter={() => setReviewHover(true)}
         onMouseLeave={() => setReviewHover(false)}
@@ -143,9 +152,9 @@ export default function App() {
           transform: reviewBtnTransform,
           zIndex: 99990,
           background: reviewHover
-            ? "linear-gradient(135deg, #8387C3, #4E7AB1)"
-            : "linear-gradient(135deg, #4E7AB1, #506980)",
-          color: "#fff",
+            ? "linear-gradient(135deg, #bf5fff, #00e5ff)"
+            : "linear-gradient(135deg, #00e5ff, #7c3aed)",
+          color: theme === "dark" ? "#030c1a" : "#fff",
           border: "none",
           borderRadius: "12px 0 0 12px",
           padding: "14px 10px",
@@ -155,10 +164,10 @@ export default function App() {
           alignItems: "center",
           gap: 6,
           boxShadow: reviewHover
-            ? "-4px 0 24px rgba(131,135,195,0.5), -2px 0 8px rgba(0,0,0,0.2)"
-            : "-2px 0 12px rgba(78,122,177,0.35)",
+            ? "-4px 0 24px rgba(191,95,255,0.6), -2px 0 8px rgba(0,0,0,0.3)"
+            : "-2px 0 16px rgba(0,229,255,0.4)",
           transition: "all 0.25s cubic-bezier(0.23, 1, 0.32, 1)",
-          fontFamily: "Poppins, sans-serif",
+          fontFamily: "Plus Jakarta Sans, Poppins, sans-serif",
           writingMode: "vertical-rl",
           textOrientation: "mixed",
           fontSize: "0.78rem",

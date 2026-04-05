@@ -152,10 +152,10 @@ export default function ActivationScreen({ onActivate }: Props) {
     window.addEventListener("resize", resize);
 
     const COLORS = [
-      "rgba(131,135,195,",
-      "rgba(149,187,181,",
-      "rgba(131,135,195,",
-      "rgba(131,135,195,",
+      "rgba(78,122,177,",
+      "rgba(125,191,192,",
+      "rgba(78,122,177,",
+      "rgba(78,122,177,",
     ];
     const particles = Array.from({ length: 70 }, () => ({
       x: Math.random() * canvas.width,
@@ -304,15 +304,15 @@ export default function ActivationScreen({ onActivate }: Props) {
           50% { transform: translateY(-14px) skewX(2deg); }
         }
         @keyframes statPulse {
-          0%, 100% { box-shadow: 0 0 14px rgba(131,135,195,0.25), 0 0 30px rgba(131,135,195,0.1); }
-          50% { box-shadow: 0 0 28px rgba(131,135,195,0.45), 0 0 55px rgba(149,187,181,0.2); }
+          0%, 100% { box-shadow: 0 0 14px rgba(78,122,177,0.25), 0 0 30px rgba(78,122,177,0.1); }
+          50% { box-shadow: 0 0 28px rgba(78,122,177,0.45), 0 0 55px rgba(125,191,192,0.2); }
         }
         @keyframes countUp {
           from { opacity: 0; transform: scale(0.5); }
           to { opacity: 1; transform: scale(1); }
         }
         @keyframes dotLight {
-          0%, 100% { background: rgba(131,135,195,0.18); box-shadow: none; }
+          0%, 100% { background: rgba(78,122,177,0.18); box-shadow: none; }
           50% { background: #4E7AB1; box-shadow: 0 0 8px rgba(78,122,177,0.5); }
         }
         @keyframes cardSlideLeft {
@@ -328,8 +328,8 @@ export default function ActivationScreen({ onActivate }: Props) {
           to { width: 100%; }
         }
         @keyframes shieldPulse {
-          0%, 100% { filter: drop-shadow(0 0 8px rgba(131,135,195,0.5)); }
-          50% { filter: drop-shadow(0 0 20px rgba(131,135,195,0.8)) drop-shadow(0 0 35px rgba(149,187,181,0.4)); }
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(78,122,177,0.5)); }
+          50% { filter: drop-shadow(0 0 20px rgba(78,122,177,0.8)) drop-shadow(0 0 35px rgba(125,191,192,0.4)); }
         }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-4px); }
@@ -527,7 +527,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                 borderRadius: 4,
                 background:
                   i === slide && !isLastSlide
-                    ? "#8387C3"
+                    ? "#4E7AB1"
                     : "rgba(78,122,177,0.18)",
                 transition: "all 0.3s ease",
                 boxShadow:
@@ -542,10 +542,10 @@ export default function ActivationScreen({ onActivate }: Props) {
               width: isLastSlide ? 22 : 7,
               height: 7,
               borderRadius: 4,
-              background: isLastSlide ? "#95BBB5" : "rgba(149,187,181,0.25)",
+              background: isLastSlide ? "#7DBFC0" : "rgba(125,191,192,0.25)",
               transition: "all 0.3s ease",
               boxShadow: isLastSlide
-                ? "0 0 10px rgba(149,187,181,0.8)"
+                ? "0 0 10px rgba(125,191,192,0.8)"
                 : "none",
             }}
           />
@@ -738,7 +738,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                           fontSize: "1.8rem",
                           fontWeight: 900,
                           color: "#4E7AB1",
-                          textShadow: "0 0 20px rgba(131,135,195,0.5)",
+                          textShadow: "0 0 20px rgba(78,122,177,0.5)",
                           marginRight: 6,
                         }}
                       >
@@ -1104,12 +1104,12 @@ export default function ActivationScreen({ onActivate }: Props) {
                     style={{
                       fontSize: "0.65rem",
                       letterSpacing: "0.3em",
-                      color: "rgba(131,135,195,0.65)",
+                      color: "rgba(78,122,177,0.65)",
                       fontWeight: 700,
                       textTransform: "uppercase",
                       display: "inline-block",
                       overflow: "hidden",
-                      borderRight: "2px solid rgba(131,135,195,0.6)",
+                      borderRight: "2px solid rgba(78,122,177,0.6)",
                       whiteSpace: "nowrap",
                       animation:
                         "typewriter 1.8s steps(22) 0.2s both, glowBlink 0.8s step-end infinite",
@@ -1165,7 +1165,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         gap: 6,
                         padding: "5px 12px",
                         background: "rgba(78,122,177,0.05)",
-                        border: "1px solid rgba(131,135,195,0.18)",
+                        border: "1px solid rgba(78,122,177,0.18)",
                         borderRadius: 999,
                       }}
                     >
@@ -1319,7 +1319,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                     cursor: loading ? "not-allowed" : "pointer",
                     background: loading
                       ? "rgba(78,122,177,0.15)"
-                      : "linear-gradient(135deg, #4E7AB1 0%, #7DBFC0 50%, #3a6090 100%)",
+                      : "linear-gradient(135deg, #102853 0%, #4E7AB1 40%, #7DBFC0 70%, #D7B6D4 100%)",
                     color: loading ? "#7a95aa" : "#fff",
                     border: "none",
                     borderRadius: 14,
@@ -1411,7 +1411,7 @@ export default function ActivationScreen({ onActivate }: Props) {
                         height: "100%",
                         width: `${progress}%`,
                         background:
-                          "linear-gradient(90deg, #4E7AB1, #7DBFC0, #3a6090)",
+                          "linear-gradient(90deg, #102853, #4E7AB1, #7DBFC0, #D7B6D4)",
                         boxShadow:
                           "0 0 10px rgba(78,122,177,0.4), 0 0 5px rgba(125,191,192,0.25)",
                         transition: "width 0.05s linear",
